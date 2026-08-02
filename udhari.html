@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Udhari Bahi Khata</title>
+  <style id="auth-guard-style">html { visibility: hidden; }</style>
+  <script type="module" src="auth-guard.js?v=5"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 12px; background: #f4f7fe; color: #2b3674; font-family: Inter, Arial, sans-serif; }
+    .app { max-width: 1400px; margin: auto; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 15px; margin-bottom: 14px; background: #fff; border: 1px solid #e0e5f2; border-radius: 14px; }
+    .top h1 { margin: 0; color: #1b2559; font-size: 20px; }
+    .top h1 i { color: #2b6cb0; margin-right: 8px; }
+    button { border: 0; border-radius: 9px; padding: 9px 13px; font-weight: 700; cursor: pointer; }
+    .primary { background: #4318ff; color: #fff; }
+    .success { background: #05cd99; color: #fff; }
+    .outline { background: #fff; color: #1b2559; border: 1px solid #d8deef; }
+    .danger { background: #ffe6e6; color: #c62828; }
+    .cards { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .card { padding: 13px; background: #fff; border: 1px solid #e0e5f2; border-radius: 12px; }
+    .card span { display: block; margin-bottom: 6px; color: #a3aed1; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .card strong { color: #1b2559; font-size: 18px; }
+    .tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 12px; background: #fff; border: 1px solid #e0e5f2; border-radius: 12px 12px 0 0; }
+    .search { position: relative; flex: 1 1 260px; }
+    .search input { width: 100%; padding: 10px 36px; border: 1px solid #d8deef; border-radius: 9px; outline: none; }
+    .search > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #a3aed1; }
+    .clear { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; padding: 0; border-radius: 50%; background: #ffe6e6; color: #ee5d50; display: none; }
+    .status { font-size: 12px; color: #008f68; }
+    .table-wrap { overflow: auto; background: #fff; border: 1px solid #e0e5f2; border-top: 0; border-radius: 0 0 12px 12px; }
+    table { width: 100%; min-width: 1900px; border-collapse: collapse; font-size: 12px; }
+    th { position: sticky; top: 0; z-index: 1; padding: 10px 8px; background: #f4f7fe; color: #7b85a8; text-align: left; white-space: nowrap; }
+    td { padding: 9px 8px; border-top: 1px solid #edf0f8; color: #2b3674; white-space: nowrap; }
+    tr:hover td { background: #fafbff; }
+    .badge { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+    .pending { background: #fff5e6; color: #b45309; }
+    .partial { background: #e6f2ff; color: #1565c0; }
+    .paid { background: #e6fcf5; color: #008f68; }
+    .overdue { background: #ffe6e6; color: #c62828; }
+    .actions { display: flex; gap: 5px; }
+    .actions button { padding: 6px 8px; }
+    .customer-grid { display: grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 12px; padding: 12px 0; }
+    .customer-card { padding: 15px; background: #fff; border: 1px solid #e0e5f2; border-radius: 14px; box-shadow: 0 5px 15px rgba(27,37,89,.05); }
+    .customer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .customer-name { margin: 0 0 4px; color: #1b2559; font-size: 16px; }
+    .customer-mobile { color: #7b85a8; font-size: 12px; }
+    .customer-balance { color: #c62828; font-size: 18px; font-weight: 800; white-space: nowrap; }
+    .customer-balance.clear-balance { color: #008f68; }
+    .customer-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid #edf0f8; border-bottom: 1px solid #edf0f8; }
+    .customer-info span { color: #7b85a8; font-size: 10px; text-transform: uppercase; }
+    .customer-info b { display: block; margin-top: 3px; color: #2b3674; font-size: 13px; }
+    .customer-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin-top: 11px; }
+    .whatsapp { background: #25d366; color: #fff; }
+    .ledger-dialog { width: min(1200px, 100%); }
+    .ledger-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ledger-summary .card { min-width: 145px; flex: 1; }
+    .empty-state { grid-column: 1/-1; padding: 35px; text-align: center; background: #fff; border: 1px solid #e0e5f2; border-radius: 12px; color: #7b85a8; }
+    .more { display: none; justify-content: center; padding: 12px; }
+    .modal { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; padding: 14px; background: rgba(27,37,89,.45); }
+    .modal.open { display: flex; }
+    .modal[hidden] { display: none !important; }
+    .dialog { width: min(950px, 100%); max-height: 94vh; overflow: auto; padding: 18px; background: #fff; border-radius: 15px; }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .dialog-head h2 { margin: 0; font-size: 17px; color: #1b2559; }
+    .close { width: 30px; height: 30px; padding: 0; border-radius: 50%; background: #ffe6e6; color: #ee5d50; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.wide { grid-column: span 2; }
+    label { color: #7b85a8; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    input, select, textarea { width: 100%; padding: 9px; border: 1px solid #d8deef; border-radius: 8px; outline: none; font: inherit; }
+    textarea { min-height: 70px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: #4318ff; box-shadow: 0 0 0 2px rgba(67,24,255,.1); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); } }
+    @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) {
+      body { padding: 7px; }
+      .top { align-items: stretch; padding: 12px; }
+      .top > div { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+      .cards, .customer-grid { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      .field.wide { grid-column: span 1; }
+      .customer-actions { grid-template-columns: 1fr 1fr; }
+      .dialog { padding: 12px; max-height: 97vh; }
+      .ledger-dialog .table-wrap { overflow: visible; border: 0; background: transparent; }
+      .ledger-dialog table, .ledger-dialog tbody { display: block; min-width: 0; width: 100%; }
+      .ledger-dialog thead { display: none; }
+      .ledger-dialog tr { display: block; margin-bottom: 10px; padding: 9px 11px; background: #fff; border: 1px solid #e0e5f2; border-radius: 11px; }
+      .ledger-dialog td { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; white-space: normal; text-align: right; border-top: 1px solid #edf0f8; }
+      .ledger-dialog td:first-child { border-top: 0; }
+      .ledger-dialog td::before { content: attr(data-label); color: #7b85a8; font-size: 10px; font-weight: 800; text-align: left; text-transform: uppercase; }
+      .ledger-dialog td .actions { justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <h1><i class="fas fa-book-open"></i>Udhari Bahi Khata</h1>
+    <div>
+      <button class="outline" onclick="loadData(true)"><i class="fas fa-rotate"></i> Refresh</button>
+      <button class="primary" onclick="openForm()"><i class="fas fa-plus"></i> New Entry</button>
+    </div>
+  </div>
+
+  <section class="cards">
+    <div class="card"><span>Customers</span><strong id="customerCount">0</strong></div>
+    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">₹0</strong></div>
+    <div class="card"><span>Payment Mila</span><strong id="totalPayment">₹0</strong></div>
+    <div class="card"><span>Current Balance</span><strong id="totalBalance">₹0</strong></div>
+    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">₹0</strong></div>
+    <div class="card"><span>Total Payable</span><strong id="totalPayable">₹0</strong></div>
+  </section>
+
+  <div class="tools">
+    <div class="search">
+      <i class="fas fa-search"></i>
+      <input id="searchInput" placeholder="Customer name ya mobile number search karein..." oninput="handleSearch(this.value)">
+      <button id="clearSearch" class="clear" onclick="clearSearch()" title="Clear"><i class="fas fa-times"></i></button>
+    </div>
+    <span id="recordCount">0 customers</span>
+    <span id="statusMessage" class="status">Ready</span>
+  </div>
+
+  <div id="customerCards" class="customer-grid"></div>
+  <div id="moreWrap" class="more"><button id="moreButton" class="outline" onclick="toggleMore()">Show 10 More</button></div>
+</main>
+
+<div class="modal" id="ledgerModal" hidden>
+  <div class="dialog ledger-dialog">
+    <div class="dialog-head"><h2 id="ledgerTitle">Customer Ledger</h2><button class="close" onclick="closeLedger()">&times;</button></div>
+    <div id="ledgerSummary" class="ledger-summary"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Type</th><th>Description</th><th>Udhari</th><th>Payment</th><th>Balance</th>
+          <th>Interest</th><th>Total Payable</th><th>Due Date</th><th>Status</th><th>Mode</th>
+          <th>Reference</th><th>Remarks</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="ledgerRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="entryModal">
+  <div class="dialog">
+    <div class="dialog-head"><h2 id="formTitle">Add Udhari Entry</h2><button class="close" onclick="closeForm()">&times;</button></div>
+    <form id="entryForm" onsubmit="saveEntry(event)">
+      <input type="hidden" id="entryId">
+      <div class="grid">
+        <div class="field"><label>Date *</label><input type="date" id="date" onchange="syncInterestDate()" required></div>
+        <div class="field"><label>Customer Name *</label><input id="customerName" required></div>
+        <div class="field"><label>Mobile No. *</label><input id="mobileNo" inputmode="numeric" maxlength="15" oninput="lookupCustomer()" required><small id="customerLookup" class="status"></small></div>
+        <div class="field"><label>Address / State</label><input id="address"></div>
+        <div class="field"><label>Transaction Type</label><select id="transactionType" onchange="applyType()"><option>UDHAR DIYA</option><option>UDHAR LIYA</option><option>PAYMENT MILA</option></select></div>
+        <div class="field"><label>Description</label><input id="description"></div>
+        <div class="field"><label>Udhari Diya Amount</label><input type="number" step="0.01" id="udharAmount"></div>
+        <div class="field"><label>Payment Mila Amount</label><input type="number" step="0.01" id="paymentAmount"></div>
+        <div class="field"><label>Due Date</label><input type="date" id="dueDate"></div>
+        <div class="field"><label>Payment Mode</label><select id="paymentMode"><option value="">Select</option><option>CASH</option><option>UPI</option><option>BANK</option><option>OTHER</option></select></div>
+        <div class="field"><label>UTR / Reference No.</label><input id="referenceNo"></div>
+        <div class="field"><label>Reminder Date</label><input type="date" id="reminderDate"></div>
+        <div class="field"><label>Interest Rate (%)</label><input type="number" step="0.01" id="interestRate" value="0"></div>
+        <div class="field"><label>Interest Type</label><select id="interestType"><option>MONTHLY</option><option>YEARLY</option></select></div>
+        <div class="field"><label>Interest Start Date</label><input type="date" id="interestStartDate"></div>
+        <div class="field wide"><label>Remarks</label><textarea id="remarks"></textarea></div>
+      </div>
+      <div class="form-actions"><button type="button" class="outline" onclick="closeForm()">Cancel</button><button id="saveButton" class="success" type="submit">Save Entry</button></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_URL = new URLSearchParams(location.search).get('api') || '';
+  const CACHE_KEY = 'krp_udhari_cache_v1';
+  const COL = { id:0,date:1,name:2,mobile:3,address:4,type:5,description:6,udhar:7,payment:8,balance:9,due:10,mode:11,ref:12,status:13,reminder:14,remarks:15,createdBy:16,timestamp:17,rate:18,interestType:19,interestStart:20,interestTill:21,interest:22,total:23 };
+  let records = [];
+  let query = '';
+  let visible = 10;
+  let filteredCount = 0;
+  let activeLedgerKey = '';
+  let returnToLedgerKey = '';
+
+  const money = value => '₹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const num = value => Number(String(value || 0).replace(/,/g,'')) || 0;
+  const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const isoToDisplay = value => { const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:value||''; };
+  const displayToIso = value => { const m=String(value||'').match(/^(\d{2})-(\d{2})-(\d{4})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:value||''; };
+  const dateTime = value => { const iso=displayToIso(value); const t=new Date(iso+'T00:00:00').getTime(); return Number.isFinite(t)?t:0; };
+  const localTodayIso = () => { const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+
+  function setStatus(text, error=false) { const el=document.getElementById('statusMessage'); el.textContent=text; el.style.color=error?'#c62828':'#008f68'; }
+  function cache() { localStorage.setItem(CACHE_KEY, JSON.stringify({savedAt:Date.now(),records})); }
+  function restoreCache() { try { const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); if(c?.records){records=c.records;render();return true;} } catch(e){} return false; }
+  function applyServerData(result, message='Updated') {
+    if(Array.isArray(result?.data)) {
+      records=result.data;
+      cache();
+      render();
+      setStatus(message);
+      return true;
+    }
+    return false;
+  }
+
+  async function request(params) {
+    if (!API_URL) throw new Error('Dashboard se Udhari tab open karein');
+    const qs = new URLSearchParams({...params,t:Date.now()});
+    const response = await fetch(API_URL+'?'+qs.toString(),{cache:'no-store'});
+    if (!response.ok) throw new Error('HTTP '+response.status);
+    return response.json();
+  }
+
+  async function loadData(force=false) {
+    let showingCache=false;
+    if(!force) {
+      try {
+        const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
+        if(Array.isArray(cached?.records)) {
+          records=cached.records;
+          render();
+          showingCache=true;
+          setStatus('Ready · Cached JSON');
+        }
+      } catch(e){}
+    }
+    if(!showingCache)setStatus(force?'Syncing...':'Ready');
+    try {
+      const result=await request({action:'getUdhariData'});
+      if(!result.success) throw new Error(result.error||'Load failed');
+      records=result.data||[];
+      cache();
+      render();
+      setStatus(showingCache?'Background sync complete':'Updated');
+    } catch(error) {
+      if(showingCache)setStatus('Cached data · Background sync pending',true);
+      else setStatus(error.message,true);
+    }
+  }
+
+  const normalizeMobile = value => String(value||'').replace(/\D/g,'').replace(/^91(?=\d{10}$)/,'');
+
+  function getCustomers() {
+    const grouped={};
+    records.slice().sort((a,b)=>dateTime(a[COL.date])-dateTime(b[COL.date])).forEach(r=>{
+      const mobile=normalizeMobile(r[COL.mobile]);
+      const key=mobile||String(r[COL.name]||'').trim().toLowerCase();
+      if(!grouped[key]) grouped[key]={key,mobile,name:r[COL.name],address:r[COL.address],entries:[]};
+      grouped[key].entries.push(r);
+      grouped[key].name=r[COL.name]||grouped[key].name;
+      grouped[key].address=r[COL.address]||grouped[key].address;
+      grouped[key].latest=r;
+    });
+    return Object.values(grouped).sort((a,b)=>dateTime(b.latest[COL.date])-dateTime(a.latest[COL.date]));
+  }
+
+  function render() {
+    const q=query.trim().toLowerCase();
+    const customers=getCustomers();
+    const filtered=q?customers.filter(c=>
+      `${c.name} ${c.mobile} ${c.address}`.toLowerCase().includes(q) ||
+      c.entries.some(r=>r.some(v=>String(v||'').toLowerCase().includes(q)))
+    ):customers;
+    filteredCount=filtered.length;
+    const shown=filtered.slice(0,visible);
+    document.getElementById('customerCards').innerHTML=shown.length?shown.map(c=>{
+      const r=c.latest;
+      const balance=num(r[COL.balance]);
+      const totalUdhari=c.entries.reduce((s,x)=>s+num(x[COL.udhar]),0);
+      const totalPayment=c.entries.reduce((s,x)=>s+num(x[COL.payment]),0);
+      return `<article class="customer-card">
+        <div class="customer-head">
+          <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div></div>
+          <div class="customer-balance ${balance<=0?'clear-balance':''}">${money(balance)}</div>
+        </div>
+        <div class="customer-info">
+          <div><span>Total Udhari</span><b>${money(totalUdhari)}</b></div>
+          <div><span>Payment Mila</span><b>${money(totalPayment)}</b></div>
+          <div><span>Remaining Interest</span><b>${money(r[COL.interest])}</b></div>
+          <div><span>Total Payable</span><b>${money(r[COL.total])}</b></div>
+          <div><span>Last Entry</span><b>${escapeHtml(r[COL.date])}</b></div>
+        </div>
+        <div class="customer-actions">
+          <button class="primary" onclick="addCustomerUdhari('${escapeHtml(c.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
+          <button class="success" onclick="addCustomerPayment('${escapeHtml(c.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+          <button class="outline" onclick="openLedger('${escapeHtml(c.key)}')"><i class="fas fa-book"></i> Full Ledger</button>
+          <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(c.key)}')"><i class="fab fa-whatsapp"></i> Due Reminder</button>
+        </div>
+      </article>`;
+    }).join(''):'<div class="empty-state"><i class="fas fa-user-slash"></i><br><br>No customer found</div>';
+    document.getElementById('recordCount').textContent=`${shown.length} / ${filtered.length} customers`;
+    const more=document.getElementById('moreWrap'); more.style.display=filtered.length>10?'flex':'none';
+    document.getElementById('moreButton').textContent=shown.length>=filtered.length?'Show Less':'Show 10 More';
+    renderStats(customers);
+  }
+
+  function renderStats(customers=getCustomers()) {
+    const current=customers.map(c=>c.latest);
+    document.getElementById('customerCount').textContent=customers.length;
+    document.getElementById('totalUdhari').textContent=money(records.reduce((s,r)=>s+num(r[COL.udhar]),0));
+    document.getElementById('totalPayment').textContent=money(records.reduce((s,r)=>s+num(r[COL.payment]),0));
+    document.getElementById('totalBalance').textContent=money(current.reduce((s,r)=>s+num(r[COL.balance]),0));
+    document.getElementById('totalInterest').textContent=money(current.reduce((s,r)=>s+num(r[COL.interest]),0));
+    document.getElementById('totalPayable').textContent=money(current.reduce((s,r)=>s+num(r[COL.total]),0));
+  }
+
+  function handleSearch(value) { query=value;visible=10;document.getElementById('clearSearch').style.display=value?'block':'none';render(); }
+  function clearSearch() { const el=document.getElementById('searchInput');el.value='';query='';visible=10;document.getElementById('clearSearch').style.display='none';render();el.focus(); }
+  function toggleMore() { visible=visible>=filteredCount?10:visible+10;render(); }
+  function applyType(updateDescription=true) {
+    const type=document.getElementById('transactionType').value;
+    const description=document.getElementById('description');
+    const rate=document.getElementById('interestRate');
+    const interestType=document.getElementById('interestType');
+    const interestStart=document.getElementById('interestStartDate');
+    const isPayment=type==='PAYMENT MILA';
+    rate.disabled=isPayment;
+    interestType.disabled=isPayment;
+    interestStart.disabled=isPayment;
+    if(type==='PAYMENT MILA') {
+      document.getElementById('udharAmount').value='';
+      rate.value='0';
+      interestStart.value='';
+      if(updateDescription)description.value='Customer se payment mila';
+    } else if(type==='UDHAR LIYA') {
+      document.getElementById('paymentAmount').value='';
+      if(!interestStart.value)interestStart.value=document.getElementById('date').value;
+      if(updateDescription)description.value='Customer ne udhar liya';
+    } else {
+      document.getElementById('paymentAmount').value='';
+      if(!interestStart.value)interestStart.value=document.getElementById('date').value;
+      if(updateDescription)description.value='Customer ko udhar diya';
+    }
+  }
+  function syncInterestDate() {
+    if(document.getElementById('transactionType').value!=='PAYMENT MILA') {
+      document.getElementById('interestStartDate').value=document.getElementById('date').value;
+    }
+  }
+
+  function findCustomer(keyOrMobile) {
+    const wanted=normalizeMobile(keyOrMobile);
+    return getCustomers().find(c=>c.key===keyOrMobile||(wanted&&c.mobile===wanted));
+  }
+
+  function lookupCustomer() {
+    const mobile=normalizeMobile(document.getElementById('mobileNo').value);
+    const customer=findCustomer(mobile);
+    const note=document.getElementById('customerLookup');
+    if(customer) {
+      document.getElementById('customerName').value=customer.name||'';
+      document.getElementById('address').value=customer.address||'';
+      note.textContent=`Existing customer मिला: ${customer.name} · Balance ${money(customer.latest[COL.balance])}`;
+      note.style.color='#008f68';
+    } else {
+      note.textContent=mobile.length>=10?'New customer mobile number':'';
+      note.style.color='#b45309';
+    }
+  }
+
+  function addCustomerPayment(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
+    openForm();
+    const latest=customer.latest;
+    document.getElementById('customerName').value=customer.name||'';
+    document.getElementById('mobileNo').value=customer.mobile||latest[COL.mobile];
+    document.getElementById('address').value=customer.address||'';
+    document.getElementById('transactionType').value='PAYMENT MILA';
+    applyType();
+    document.getElementById('description').value='Part / full payment received';
+    document.getElementById('formTitle').textContent=`Payment - ${customer.name}`;
+    lookupCustomer();
+    document.getElementById('paymentAmount').focus();
+  }
+
+  function addCustomerUdhari(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
+    openForm();
+    const latest=customer.latest;
+    document.getElementById('customerName').value=customer.name||'';
+    document.getElementById('mobileNo').value=customer.mobile||latest[COL.mobile];
+    document.getElementById('address').value=customer.address||'';
+    document.getElementById('transactionType').value='UDHAR DIYA';
+    document.getElementById('udharAmount').value='';
+    document.getElementById('paymentAmount').value='';
+    document.getElementById('description').value='Additional Udhari';
+    document.getElementById('interestRate').value=latest[COL.rate]||0;
+    document.getElementById('interestType').value=latest[COL.interestType]||'MONTHLY';
+    document.getElementById('interestStartDate').value=document.getElementById('date').value;
+    document.getElementById('formTitle').textContent=`Add Udhari - ${customer.name}`;
+    lookupCustomer();
+    document.getElementById('udharAmount').focus();
+  }
+
+  function shareWhatsApp(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    const latest=customer.latest;
+    const mobile=normalizeMobile(customer.mobile||latest[COL.mobile]);
+    if(mobile.length!==10)return alert('Customer ka sahi 10-digit mobile number nahi mila');
+    const dueEntry=[...customer.entries].reverse().find(r=>r[COL.due]);
+    const dueDate=dueEntry?.[COL.due]||'जल्द से जल्द';
+    const message=[
+      `नमस्ते ${customer.name||'जी'},`,
+      '',
+      'यह आपके बकाया भुगतान का reminder है।',
+      `बकाया राशि: ${money(latest[COL.balance])}`,
+      `ब्याज सहित कुल देय: ${money(latest[COL.total])}`,
+      `Due Date: ${dueDate}`,
+      '',
+      'कृपया भुगतान करके जानकारी साझा करें। धन्यवाद।'
+    ].join('\n');
+    window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
+  }
+
+  function openLedger(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    activeLedgerKey=customer.key;
+    const entries=[...customer.entries].sort((a,b)=>dateTime(b[COL.date])-dateTime(a[COL.date]));
+    const latest=customer.latest;
+    const totalUdhari=entries.reduce((s,r)=>s+num(r[COL.udhar]),0);
+    const totalPayment=entries.reduce((s,r)=>s+num(r[COL.payment]),0);
+    document.getElementById('ledgerTitle').textContent=`${customer.name} · ${customer.mobile||latest[COL.mobile]} Ledger`;
+    document.getElementById('ledgerSummary').innerHTML=`
+      <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
+      <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
+      <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
+      <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
+      <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
+      <button class="primary" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
+      <button class="success" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+      <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> WhatsApp Due Reminder</button>`;
+    document.getElementById('ledgerRows').innerHTML=entries.map(r=>`<tr>
+      <td data-label="Date">${escapeHtml(r[COL.date])}</td><td data-label="Type">${escapeHtml(r[COL.type])}</td><td data-label="Description">${escapeHtml(r[COL.description])}</td>
+      <td data-label="Udhari">${money(r[COL.udhar])}</td><td data-label="Payment">${money(r[COL.payment])}</td><td data-label="Balance"><b>${money(r[COL.balance])}</b></td>
+      <td data-label="Interest">${money(r[COL.interest])}</td><td data-label="Total Payable"><b>${money(r[COL.total])}</b></td><td data-label="Due Date">${escapeHtml(r[COL.due])}</td>
+      <td data-label="Status"><span class="badge ${String(r[COL.status]).toLowerCase()}">${escapeHtml(r[COL.status])}</span></td>
+      <td data-label="Mode">${escapeHtml(r[COL.mode])}</td><td data-label="Reference">${escapeHtml(r[COL.ref])}</td><td data-label="Remarks">${escapeHtml(r[COL.remarks])}</td>
+      <td data-label="Actions"><div class="actions"><button class="outline" onclick="closeLedger();editEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-pen"></i></button><button class="danger" onclick="deleteEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-trash"></i></button></div></td>
+    </tr>`).join('');
+    const ledgerModal=document.getElementById('ledgerModal');
+    ledgerModal.hidden=false;
+    ledgerModal.classList.add('open');
+  }
+  function closeLedger(){
+    const modal=document.getElementById('ledgerModal');
+    modal.classList.remove('open');
+    modal.hidden=true;
+    activeLedgerKey='';
+    returnToLedgerKey='';
+  }
+
+  function openForm(record=null) {
+    document.getElementById('entryForm').reset();
+    document.getElementById('entryId').value='';
+    document.getElementById('date').value=localTodayIso();
+    document.getElementById('interestStartDate').value=document.getElementById('date').value;
+    document.getElementById('interestRate').value='0';
+    document.getElementById('customerLookup').textContent='';
+    applyType();
+    document.getElementById('formTitle').textContent=record?'Edit Udhari Entry':'Add Udhari Entry';
+    if(record) {
+      document.getElementById('entryId').value=record[COL.id]; document.getElementById('date').value=displayToIso(record[COL.date]);
+      document.getElementById('customerName').value=record[COL.name]; document.getElementById('mobileNo').value=record[COL.mobile];
+      document.getElementById('address').value=record[COL.address]; document.getElementById('transactionType').value=record[COL.type];
+      document.getElementById('description').value=record[COL.description]; document.getElementById('udharAmount').value=record[COL.udhar];
+      document.getElementById('paymentAmount').value=record[COL.payment]; document.getElementById('dueDate').value=displayToIso(record[COL.due]);
+      document.getElementById('paymentMode').value=record[COL.mode]; document.getElementById('referenceNo').value=record[COL.ref];
+      document.getElementById('reminderDate').value=displayToIso(record[COL.reminder]); document.getElementById('remarks').value=record[COL.remarks];
+      document.getElementById('interestRate').value=record[COL.rate]; document.getElementById('interestType').value=record[COL.interestType]||'MONTHLY';
+      document.getElementById('interestStartDate').value=displayToIso(record[COL.interestStart]);
+      applyType(false);
+    }
+    document.getElementById('entryModal').classList.add('open');
+  }
+  function closeForm(){document.getElementById('entryModal').classList.remove('open');}
+  function editEntry(id){const r=records.find(x=>String(x[COL.id])===String(id));if(r)openForm(r);}
+
+  async function saveEntry(event) {
+    event.preventDefault();
+    const selectedType=document.getElementById('transactionType').value;
+    if(selectedType!=='PAYMENT MILA'&&!document.getElementById('interestStartDate').value) {
+      document.getElementById('interestStartDate').value=document.getElementById('date').value;
+    }
+    const data={entryId:document.getElementById('entryId').value,date:isoToDisplay(document.getElementById('date').value),customerName:document.getElementById('customerName').value.trim(),mobileNo:normalizeMobile(document.getElementById('mobileNo').value),address:document.getElementById('address').value.trim(),transactionType:document.getElementById('transactionType').value,description:document.getElementById('description').value.trim(),udharAmount:num(document.getElementById('udharAmount').value),paymentAmount:num(document.getElementById('paymentAmount').value),dueDate:isoToDisplay(document.getElementById('dueDate').value),paymentMode:document.getElementById('paymentMode').value,referenceNo:document.getElementById('referenceNo').value.trim(),reminderDate:isoToDisplay(document.getElementById('reminderDate').value),remarks:document.getElementById('remarks').value.trim(),interestRate:num(document.getElementById('interestRate').value),interestType:document.getElementById('interestType').value,interestStartDate:isoToDisplay(document.getElementById('interestStartDate').value),createdBy:window.parent.currentKrpUser?.email||''};
+    if(data.mobileNo.length<10)return alert('Sahi mobile number enter karein');
+    if(data.transactionType!=='PAYMENT MILA'&&data.udharAmount<=0)return alert('Udhari amount enter karein');
+    if(data.transactionType==='PAYMENT MILA'&&data.paymentAmount<=0)return alert('Payment amount enter karein');
+    const button=document.getElementById('saveButton');button.disabled=true;setStatus('Saving...');
+    try {
+      const action=data.entryId?'updateUdhariRecord':'saveUdhariRecord';
+      const ledgerKey=returnToLedgerKey||activeLedgerKey;
+      closeForm();
+      closeLedger();
+      const result=await request({action,data:JSON.stringify(data)});
+      if(!result.success)throw new Error(result.error||'Save failed');
+      if(!applyServerData(result,data.entryId?'Entry updated':'Entry saved')) await loadData(true);
+      if(ledgerKey) openLedger(ledgerKey);
+      returnToLedgerKey='';
+    }
+    catch(error){setStatus(error.message,true);} finally{button.disabled=false;}
+  }
+
+  async function deleteEntry(id) {
+    if(!confirm('Is Udhari entry ko delete karein?'))return;
+    const previousRecords=records;
+    closeLedger();
+    records=records.filter(r=>String(r[COL.id])!==String(id));
+    cache();
+    render();
+    setStatus('Deleting...');
+    try {
+      const result=await request({action:'deleteUdhariRecord',entryId:id});
+      if(!result.success)throw new Error(result.error||'Delete failed');
+      if(!applyServerData(result,'Entry deleted')) await loadData(true);
+    }
+    catch(error){
+      records=previousRecords;
+      cache();
+      render();
+      setStatus(error.message,true);
+    }
+  }
+
+  document.getElementById('entryModal').addEventListener('click',e=>{if(e.target.id==='entryModal')closeForm();});
+  document.getElementById('ledgerModal').addEventListener('click',e=>{if(e.target.id==='ledgerModal')closeLedger();});
+  window.addEventListener('load',()=>{
+    loadData(false);
+    setInterval(()=>loadData(false),120000);
+  });
+</script>
+</body>
+</html>

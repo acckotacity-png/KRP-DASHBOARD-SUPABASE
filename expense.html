@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Daily Expense Tracker</title>
+  <style id="auth-guard-style">html{visibility:hidden}</style>
+  <script type="module" src="auth-guard.js?v=5"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:12px;background:#f4f7fe;color:#2b3674;font-family:Inter,Arial,sans-serif}.app{max-width:1400px;margin:auto}
+    .top,.tools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px;background:#fff;border:1px solid #e0e5f2;border-radius:14px;margin-bottom:12px}
+    h1{margin:0;color:#1b2559;font-size:20px}.top-actions{display:flex;gap:7px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:9px 12px;font-weight:700;cursor:pointer}.primary{background:#4318ff;color:#fff}.success{background:#05a66f;color:#fff}.outline{background:#fff;color:#1b2559;border:1px solid #d8deef}.danger{background:#ffe6e6;color:#c62828}
+    .summary{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;margin-bottom:12px}.card{background:#fff;border:1px solid #e0e5f2;border-radius:12px;padding:13px}.card span{display:block;color:#8f9bba;font-size:10px;font-weight:800;text-transform:uppercase;margin-bottom:5px}.card strong{color:#1b2559;font-size:18px}
+    .compact{padding:7px 10px;font-size:12px}.tools{border-radius:12px;justify-content:flex-start}.filter-row{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;max-width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}.tools input,.tools select{padding:8px;border:1px solid #d8deef;border-radius:8px;min-width:0;font-size:12px;flex:none}.tools .year-filter,.tools .month-filter{height:31px;padding:5px 6px;font-size:11px}.year-filter{width:78px}.month-filter{width:102px}.date-filter{width:132px;min-width:132px!important}.search-wrap{position:relative;flex:0 0 160px;width:160px;max-width:none}.search-wrap input{width:160px;min-width:0!important;padding-left:27px;padding-right:29px}.search-wrap>i{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:9px;color:#a3aed1}.search-clear{display:none;position:absolute;right:5px;top:50%;transform:translateY(-50%);width:22px;height:22px;padding:0;border-radius:50%;background:#ffe6e6;color:#c62828;font-size:17px;line-height:19px}.status{font-size:12px;color:#008f68;margin-left:auto}
+    .category-grid{display:grid;grid-template-columns:repeat(4,minmax(190px,1fr));gap:10px;margin-bottom:12px}.category-card{background:#fff;border:1px solid #e0e5f2;border-radius:12px;padding:12px}.category-card.watch-card{border-color:#ffd58a;background:#fffaf0}.category-card.warning-card{border-color:#ffb547;background:#fff7e6}.category-card.over-card{border-color:#ee5d50;background:#fff0f0}.category-head{display:flex;justify-content:space-between;gap:8px}.bar{height:7px;background:#edf0f8;border-radius:10px;margin:9px 0;overflow:hidden}.bar i{display:block;height:100%;background:#05a66f}.bar i.watch{background:#f6c344}.bar i.warn{background:#ff9f43}.bar i.over{background:#ee5d50}.remark{font-size:11px;color:#7b85a8;line-height:1.4}
+    .table-wrap{overflow:auto;background:#fff;border:1px solid #e0e5f2;border-radius:12px}table{width:100%;min-width:1350px;border-collapse:collapse;font-size:12px}th{padding:10px 8px;background:#f4f7fe;text-align:left;color:#7b85a8;white-space:nowrap}td{padding:9px 8px;border-top:1px solid #edf0f8;white-space:nowrap}.badge{display:inline-flex;padding:4px 7px;border-radius:99px;font-size:10px;font-weight:800}.normal{background:#e6fcf5;color:#008f68}.watch,.warning{background:#fff5e6;color:#b45309}.over-budget{background:#ffe6e6;color:#c62828}.no-budget{background:#edf0f8;color:#667085}.actions{display:flex;gap:5px}.actions button{padding:6px 8px}
+    .modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(27,37,89,.45)}.modal.open{display:flex}.dialog{width:min(920px,100%);max-height:95vh;overflow:auto;background:#fff;border-radius:15px;padding:17px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.head h2{margin:0;font-size:17px}.close{width:30px;height:30px;padding:0;border-radius:50%;background:#ffe6e6;color:#c62828}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px}.wide{grid-column:span 2}label{font-size:10px;color:#7b85a8;font-weight:800;text-transform:uppercase}input,select,textarea{width:100%;padding:9px;border:1px solid #d8deef;border-radius:8px;font:inherit}textarea{min-height:65px}.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}
+    @media(max-width:950px){.summary{grid-template-columns:repeat(2,1fr)}.category-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){body{padding:7px}.top{align-items:stretch}.top-actions{display:grid;grid-template-columns:1fr 1fr}.summary,.category-grid,.grid{grid-template-columns:1fr}.wide{grid-column:span 1}.dialog{padding:12px}.table-wrap{overflow:visible;border:0;background:transparent}table,tbody{display:block;min-width:0}thead{display:none}tr{display:block;background:#fff;border:1px solid #e0e5f2;border-radius:11px;padding:8px 10px;margin-bottom:9px}td{display:flex;justify-content:space-between;gap:12px;white-space:normal;text-align:right;padding:6px 0}td:before{content:attr(data-label);font-size:10px;font-weight:800;color:#7b85a8;text-transform:uppercase;text-align:left}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <h1><i class="fas fa-chart-line"></i> Daily Expense Tracker</h1>
+    <div class="top-actions">
+      <button class="outline" onclick="load(true)"><i class="fas fa-rotate"></i> Refresh</button>
+      <button class="outline compact" onclick="openBudget()"><i class="fas fa-sliders"></i> Set Budget</button>
+      <button class="primary" onclick="openExpense()"><i class="fas fa-plus"></i> Add Expense</button>
+    </div>
+  </header>
+  <section class="summary">
+    <div class="card"><span>Month Expense</span><strong id="monthTotal">₹0</strong></div>
+    <div class="card"><span>Today Expense</span><strong id="todayTotal">₹0</strong></div>
+    <div class="card"><span>Essential</span><strong id="essentialTotal">₹0</strong></div>
+    <div class="card"><span>Optional</span><strong id="optionalTotal">₹0</strong></div>
+    <div class="card"><span>Highest Category</span><strong id="highestCategory">—</strong></div>
+  </section>
+  <section class="tools">
+    <div class="filter-row">
+      <select id="yearFilter" class="year-filter" onchange="render()"></select>
+      <select id="monthFilter" class="month-filter" onchange="render()"></select>
+      <input type="text" id="dateFilter" class="date-filter" placeholder="DD-MM-YYYY" inputmode="numeric" maxlength="10" oninput="formatDateFilter()" title="Exact date: DD-MM-YYYY">
+      <div class="search-wrap"><i class="fas fa-search"></i><input id="search" placeholder="Search..." oninput="handleSearch()"><button id="searchClear" class="search-clear" onclick="clearSearch()" title="Clear search" aria-label="Clear search">&times;</button></div>
+    </div>
+    <span id="recordCount">0 entries</span><span id="status" class="status">Ready</span>
+  </section>
+  <section id="categoryGrid" class="category-grid"></section>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Paid To</th><th>Amount</th><th>Mode</th><th>Type</th><th>Priority</th><th>Budget Used</th><th>Alert</th><th>Smart Remarks</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+
+<div class="modal" id="expenseModal"><div class="dialog"><div class="head"><h2 id="expenseTitle">Add Expense</h2><button class="close" onclick="closeExpense()">&times;</button></div>
+  <form onsubmit="saveExpense(event)"><input type="hidden" id="expenseId"><div class="grid">
+    <div class="field"><label>Date *</label><input type="date" id="date" required></div>
+    <div class="field"><label>Category *</label><select id="category" required><option>FOOD</option><option>TRAVEL</option><option>OFFICE</option><option>UTILITIES</option><option>RENT</option><option>MARKETING</option><option>HEALTH</option><option>PERSONAL</option><option>OTHER</option></select></div>
+    <div class="field"><label>Sub Category</label><input id="subCategory"></div>
+    <div class="field wide"><label>Description *</label><input id="description" required></div>
+    <div class="field"><label>Amount *</label><input type="number" min="0.01" step="0.01" id="amount" required></div>
+    <div class="field"><label>Payment Mode</label><select id="paymentMode"><option>CASH</option><option>UPI</option><option>BANK</option><option>CARD</option><option>OTHER</option></select></div>
+    <div class="field"><label>Paid To</label><input id="paidTo"></div>
+    <div class="field"><label>UTR / Reference</label><input id="referenceNo"></div>
+    <div class="field"><label>Expense Type</label><select id="expenseType"><option>VARIABLE</option><option>FIXED</option></select></div>
+    <div class="field"><label>Priority</label><select id="priority"><option>ESSENTIAL</option><option>IMPORTANT</option><option>OPTIONAL</option></select></div>
+    <div class="field wide"><label>Bill / Receipt Link</label><input type="url" id="billLink"></div>
+  </div><div class="form-actions"><button type="button" class="outline" onclick="closeExpense()">Cancel</button><button class="success" type="submit" id="saveBtn">Save Expense</button></div></form>
+</div></div>
+
+<div class="modal" id="budgetModal"><div class="dialog" style="max-width:600px"><div class="head"><h2>Monthly Category Budget</h2><button class="close" onclick="closeBudget()">&times;</button></div>
+  <form onsubmit="saveBudget(event)"><div class="grid" style="grid-template-columns:repeat(2,1fr)">
+    <div class="field"><label>Month</label><input type="month" id="budgetMonth" required></div>
+    <div class="field"><label>Category</label><select id="budgetCategory"><option>FOOD</option><option>TRAVEL</option><option>OFFICE</option><option>UTILITIES</option><option>RENT</option><option>MARKETING</option><option>HEALTH</option><option>PERSONAL</option><option>OTHER</option></select></div>
+    <div class="field"><label>Monthly Budget</label><input type="number" min="0" id="budgetAmount" required></div>
+    <div class="field"><label>Warning Limit %</label><input type="number" min="1" max="100" id="warningLimit" value="80"></div>
+    <div class="field wide"><label>Notes</label><input id="budgetNotes"></div>
+  </div><div class="form-actions"><button type="button" class="outline" onclick="closeBudget()">Cancel</button><button class="success">Save Budget</button></div></form>
+</div></div>
+
+<script>
+const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense_cache_v2';
+const C={id:0,date:1,month:2,category:3,sub:4,desc:5,mode:6,paidTo:7,amount:8,ref:9,bill:10,type:11,priority:12,budget:13,spent:14,remaining:15,monthTotal:16,used:17,alert:18,remark:19,added:20,time:21};
+let records=[],budgets=[],preferredMonth='',preferredYear='';
+const MONTH_NAMES=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+const money=v=>'₹'+(Number(String(v||0).replace(/,/g,''))||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=v=>Number(String(v||0).replace(/,/g,''))||0;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isoDisplay=v=>{const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:v||''};
+const displayIso=v=>{const m=String(v||'').match(/^(\d{2})-(\d{2})-(\d{4})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:v||''};
+const todayIso=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const monthKeyFromIso=v=>{const d=new Date(v+'T00:00:00');return d.toLocaleString('en-US',{month:'long',year:'numeric'}).replace(' ','-').toUpperCase()};
+const recordMonth=r=>{const iso=displayIso(r?.[C.date]);if(iso)return monthKeyFromIso(iso);return String(r?.[C.month]||'').trim().toUpperCase()};
+const recordIso=r=>displayIso(r?.[C.date]);
+const recordYear=r=>{const iso=recordIso(r);return iso?iso.slice(0,4):(recordMonth(r).match(/\d{4}/)||[''])[0]};
+const recordMonthName=r=>{const key=recordMonth(r);return key.split('-')[0]||''};
+function status(t,e=false){const x=document.getElementById('status');x.textContent=t;x.style.color=e?'#c62828':'#008f68'}
+function cache(){localStorage.setItem(CACHE,JSON.stringify({records,budgets,savedAt:Date.now()}))}
+function restoreExpenseCache(){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(!Array.isArray(c?.records))return false;records=c.records;budgets=Array.isArray(c.budgets)?c.budgets:[];render();const age=Math.max(0,Math.floor((Date.now()-Number(c.savedAt||0))/60000));status(`Ready · ${records.length} cached records${age?' · '+age+'m old':''}`);return true}catch(e){return false}}
+async function request(params){const q=new URLSearchParams({...params,t:Date.now()});const r=await fetch(API+'?'+q,{cache:'no-store'});return r.json()}
+async function load(force=false){let cached=false;if(!force){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(c?.records){records=c.records;budgets=c.budgets||[];cached=true;render();status(`Ready · ${records.length} cached records`)}}catch(e){}}try{const x=await request({action:'getExpenseData'});if(!x.success)throw Error(x.error||'Load failed');records=Array.isArray(x.data)?x.data:[];budgets=Array.isArray(x.budgets)?x.budgets:[];cache();render();status(`Sheet synced · ${records.length} records loaded`)}catch(e){status(cached?`Showing ${records.length} cached records · ${e.message}`:e.message,true)}}
+function years(){const set=new Set(records.map(recordYear).filter(Boolean));set.add(todayIso().slice(0,4));return [...set].sort((a,b)=>Number(b)-Number(a))}
+function render(){
+  const ySel=document.getElementById('yearFilter'),mSel=document.getElementById('monthFilter'),ys=years(),currentIso=todayIso();
+  const oldYear=preferredYear||ySel.value||currentIso.slice(0,4),oldMonth=preferredMonth||mSel.value||MONTH_NAMES[Number(currentIso.slice(5,7))-1];
+  ySel.innerHTML='<option value="ALL">ALL YEARS</option>'+ys.map(y=>`<option ${y===oldYear?'selected':''}>${y}</option>`).join('');
+  mSel.innerHTML='<option value="ALL">ALL MONTHS</option>'+MONTH_NAMES.map(m=>`<option ${m===oldMonth?'selected':''}>${m}</option>`).join('');
+  ySel.value=ys.includes(oldYear)?oldYear:'ALL';mSel.value=MONTH_NAMES.includes(oldMonth)?oldMonth:'ALL';preferredYear='';preferredMonth='';
+  const year=ySel.value,month=mSel.value,dateExact=document.getElementById('dateFilter').value,q=document.getElementById('search').value.toLowerCase();
+  const inPeriod=r=>(year==='ALL'||recordYear(r)===year)&&(month==='ALL'||recordMonthName(r)===month)&&(!dateExact||String(r[C.date]||'')===dateExact);
+  const list=records.filter(r=>inPeriod(r)&&(!q||r.some(v=>String(v||'').toLowerCase().includes(q)))).sort((a,b)=>recordIso(b).localeCompare(recordIso(a)));
+  const all=records.filter(inPeriod),today=isoDisplay(todayIso());document.getElementById('monthTotal').textContent=money(all.reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('todayTotal').textContent=money(all.filter(r=>r[C.date]===today).reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('essentialTotal').textContent=money(all.filter(r=>r[C.priority]==='ESSENTIAL').reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('optionalTotal').textContent=money(all.filter(r=>r[C.priority]==='OPTIONAL').reduce((s,r)=>s+num(r[C.amount]),0));
+  const cats={};all.forEach(r=>cats[r[C.category]]=(cats[r[C.category]]||0)+num(r[C.amount]));const sortedCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]);document.getElementById('highestCategory').textContent=sortedCats[0]?`${sortedCats[0][0]} · ${money(sortedCats[0][1])}`:'—';
+  document.getElementById('categoryGrid').innerHTML=sortedCats.length?sortedCats.map(([cat,total])=>{const latest=[...all].reverse().find(r=>r[C.category]===cat)||[],used=num(latest[C.used]),alert=String(latest[C.alert]||'NO BUDGET'),tone=used>=100?'over-card':used>=80?'warning-card':used>=60?'watch-card':'';return `<div class="category-card ${tone}"><div class="category-head"><b>${esc(cat)}</b><b>${money(total)}</b></div><div class="bar"><i class="${used>=100?'over':used>=80?'warn':used>=60?'watch':''}" style="width:${Math.min(100,used)}%"></i></div><div class="remark">${used?used.toFixed(1)+'% used · ':''}${esc(latest[C.remark]||'Budget set karein')}</div></div>`}).join(''):'<div class="card">Selected filter me koi expense nahi hai.</div>';
+  document.getElementById('rows').innerHTML=list.length?list.map(r=>`<tr><td data-label="Date">${esc(r[C.date])}</td><td data-label="Category"><b>${esc(r[C.category])}</b></td><td data-label="Description">${esc(r[C.desc])}</td><td data-label="Paid To">${esc(r[C.paidTo])}</td><td data-label="Amount"><b>${money(r[C.amount])}</b></td><td data-label="Mode">${esc(r[C.mode])}</td><td data-label="Type">${esc(r[C.type])}</td><td data-label="Priority">${esc(r[C.priority])}</td><td data-label="Budget Used">${num(r[C.used]).toFixed(1)}%</td><td data-label="Alert"><span class="badge ${String(r[C.alert]).toLowerCase().replace(/ /g,'-')}">${esc(r[C.alert])}</span></td><td data-label="Smart Remarks">${esc(r[C.remark])}</td><td data-label="Actions"><div class="actions"><button class="outline" onclick="editExpense('${esc(r[C.id])}')"><i class="fas fa-pen"></i></button><button class="danger" onclick="deleteExpense('${esc(r[C.id])}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join(''):'<tr><td colspan="12">No expense found</td></tr>';
+  document.getElementById('recordCount').textContent=list.length+' entries';
+}
+function handleSearch(){document.getElementById('searchClear').style.display=document.getElementById('search').value?'block':'none';render()}
+function clearSearch(){document.getElementById('search').value='';document.getElementById('searchClear').style.display='none';render();document.getElementById('search').focus()}
+function formatDateFilter(){const el=document.getElementById('dateFilter'),digits=el.value.replace(/\D/g,'').slice(0,8);el.value=digits.length>4?digits.slice(0,2)+'-'+digits.slice(2,4)+'-'+digits.slice(4):digits.length>2?digits.slice(0,2)+'-'+digits.slice(2):digits;render()}
+function openExpense(r=null){document.querySelector('#expenseModal form').reset();document.getElementById('expenseId').value='';document.getElementById('date').value=todayIso();document.getElementById('expenseTitle').textContent=r?'Edit Expense':'Add Expense';if(r){expenseId.value=r[C.id];date.value=displayIso(r[C.date]);category.value=r[C.category];subCategory.value=r[C.sub];description.value=r[C.desc];amount.value=r[C.amount];paymentMode.value=r[C.mode];paidTo.value=r[C.paidTo];referenceNo.value=r[C.ref];expenseType.value=r[C.type];priority.value=r[C.priority];billLink.value=r[C.bill]}expenseModal.classList.add('open')}
+function closeExpense(){expenseModal.classList.remove('open')}function editExpense(id){const r=records.find(x=>String(x[C.id])===String(id));if(r)openExpense(r)}
+async function saveExpense(e){e.preventDefault();const selectedDate=date.value;const data={expenseId:expenseId.value,date:isoDisplay(selectedDate),category:category.value,subCategory:subCategory.value,description:description.value,amount:num(amount.value),paymentMode:paymentMode.value,paidTo:paidTo.value,referenceNo:referenceNo.value,billLink:billLink.value,expenseType:expenseType.value,priority:priority.value,addedBy:window.parent.currentKrpUser?.email||''};closeExpense();status('Saving...');try{const x=await request({action:data.expenseId?'updateExpense':'saveExpense',data:JSON.stringify(data)});if(!x.success)throw Error(x.error||'Save failed');records=x.data||records;budgets=x.budgets||budgets;preferredYear=selectedDate.slice(0,4);preferredMonth=MONTH_NAMES[Number(selectedDate.slice(5,7))-1];document.getElementById('dateFilter').value='';cache();render();status('Expense saved')}catch(e){status(e.message,true)}}
+async function deleteExpense(id){if(!confirm('Expense delete karein?'))return;const old=records;records=records.filter(r=>r[C.id]!==id);render();try{const x=await request({action:'deleteExpense',expenseId:id});if(!x.success)throw Error(x.error||'Delete failed');records=x.data||records;budgets=x.budgets||budgets;cache();render();status('Expense deleted')}catch(e){records=old;render();status(e.message,true)}}
+function openBudget(){budgetMonth.value=todayIso().slice(0,7);budgetModal.classList.add('open')}function closeBudget(){budgetModal.classList.remove('open')}
+async function saveBudget(e){e.preventDefault();const data={month:monthKeyFromIso(budgetMonth.value+'-01'),category:budgetCategory.value,budget:num(budgetAmount.value),warningLimit:num(warningLimit.value),notes:budgetNotes.value,active:true};closeBudget();status('Saving budget...');try{const x=await request({action:'saveExpenseBudget',data:JSON.stringify(data)});if(!x.success)throw Error(x.error||'Budget failed');records=x.data||records;budgets=x.budgets||budgets;cache();render();status('Budget saved')}catch(e){status(e.message,true)}}
+restoreExpenseCache();
+window.addEventListener('load',()=>{load(false);setInterval(()=>load(false),120000)});
+</script>
+</body>
+</html>

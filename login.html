@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05a66f">
+  <title>Login · KRP Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:20px;background:#f4f7fe;color:#1b2559;font-family:"Segoe UI",Arial,sans-serif}.card{width:min(100%,410px);padding:32px;background:#fff;border:1px solid #e0e5f2;border-radius:20px;box-shadow:0 16px 45px rgba(27,37,89,.12);text-align:center}.logo{width:76px;height:76px;margin:0 auto 18px;border-radius:18px}h1{margin:0 0 8px;font-size:25px}p{margin:0 0 24px;color:#7b85a8;font-size:14px;line-height:1.5}button{width:100%;min-height:48px;border:1px solid #d8deef;border-radius:12px;background:#fff;color:#1b2559;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px}button:hover{border-color:#05a66f;background:#f2fff9}button:disabled{opacity:.65;cursor:wait}.google{font-size:18px;font-weight:900;color:#4285f4}#message{min-height:20px;margin-top:16px;color:#d13d31;font-size:13px;line-height:1.45}.security{margin-top:18px;padding-top:16px;border-top:1px solid #edf0f8;color:#7b85a8;font-size:11px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="icon-192.png" alt="KRP logo">
+    <h1>KRP Dashboard</h1>
+    <p>Dashboard access करने के लिए अपने authorized Google account से sign in करें।</p>
+    <button type="button" id="googleLogin"><span class="google">G</span> Continue with Google</button>
+    <div id="message" role="alert"></div>
+    <div class="security">Protected by Supabase Auth and Row Level Security</div>
+  </main>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
+
+    const button = document.getElementById("googleLogin");
+    const message = document.getElementById("message");
+    const query = new URLSearchParams(location.search);
+    const requestedNext = query.get("next") || AUTH_OPTIONS.homePage;
+    const nextPage = /^[a-zA-Z0-9._-]+\.html$/.test(requestedNext) ? requestedNext : AUTH_OPTIONS.homePage;
+    const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
+      && SUPABASE_PUBLISHABLE_KEY && !SUPABASE_PUBLISHABLE_KEY.includes("YOUR_");
+
+    if (!configured) {
+      message.textContent = "पहले supabase-config.js में Project URL और Publishable Key डालें।";
+      button.disabled = true;
+    } else {
+      const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      });
+
+      async function checkAccessAndContinue() {
+        const { data: sessionData } = await client.auth.getSession();
+        const user = sessionData?.session?.user;
+        if (!user) return false;
+        const { data: access, error } = await client.from("app_users").select("active").eq("user_id", user.id).maybeSingle();
+        if (error || !access?.active) {
+          await client.auth.signOut();
+          message.textContent = "इस Google account को dashboard access नहीं दिया गया है।";
+          button.disabled = false;
+          return false;
+        }
+        location.replace(nextPage);
+        return true;
+      }
+
+      if (query.get("error") === "access_denied") message.textContent = "इस account को access नहीं दिया गया है।";
+      await checkAccessAndContinue();
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        message.textContent = "Google login खुल रहा है...";
+        const redirectTo = new URL(`login.html?next=${encodeURIComponent(nextPage)}`, location.href).href;
+        const { error } = await client.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo, queryParams: { prompt: "select_account" } }
+        });
+        if (error) {
+          message.textContent = error.message || "Google login failed.";
+          button.disabled = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
