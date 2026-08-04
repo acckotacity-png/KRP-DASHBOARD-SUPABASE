@@ -41,7 +41,7 @@ create table if not exists public.business_settings (
   id smallint primary key default 1 check (id = 1), business_name text default '', contact_number text default '', email_address text default '',
   gstin text default '', business_address text default '', account_holder_name text default '', account_number text default '', ifsc text default '',
   upi_id text default '', terms_conditions text default '', purpose_options jsonb not null default '[]'::jsonb,
-  financial_year_options jsonb not null default '[]'::jsonb,
+  financial_year_options jsonb not null default '[]'::jsonb, state_options jsonb not null default '[]'::jsonb,
   updated_by uuid default auth.uid() references auth.users(id), updated_at timestamptz not null default now()
 );
 

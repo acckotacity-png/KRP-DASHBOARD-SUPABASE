@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
-    <script type="module" src="auth-guard.js?v=6"></script>
+    <script type="module" src="auth-guard.js?v=7"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>KRP ID Activation - Dashboard</title>
@@ -384,6 +384,16 @@
         .purpose-year-row { border-top: 1px solid #e0e5f2; margin-top: 5px; padding: 10px 15px; }
         .purpose-year-row label { display: block; font-size: 12px; color: #a3aed1; font-weight: 700; margin-bottom: 6px; }
         .purpose-year-select { width: 100%; padding: 8px 10px; border: 1px solid #e0e5f2; border-radius: 8px; color: #2b3674; outline: none; }
+        #state, #edit_state, #purposeYear, #editPurposeYear {
+            color-scheme:light !important;
+            background-color:#fff !important;
+            color:#1b2559 !important;
+            border-color:#d8deef !important;
+        }
+        #state option, #edit_state option, #purposeYear option, #editPurposeYear option {
+            background:#fff !important;
+            color:#1b2559 !important;
+        }
         
         /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 20, 55, 0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 15px; overflow-y: auto; }
@@ -1541,7 +1551,12 @@
             <div class="purpose-manager-add"><input id="newYearSetting" type="text" placeholder="Example: 26-27"><button type="button" onclick="addFinancialYearSetting()"><i class="fas fa-plus"></i> Add</button></div>
             <div id="yearManagerList" class="purpose-manager-list"></div>
         </div>
-        <button type="button" class="btn-submit" style="width:100%;max-width:none;margin-top:0;" onclick="savePurposeManagerSettings()"><i class="fas fa-save"></i> Save Purpose & Year Settings</button>
+        <div class="purpose-manager-section">
+            <strong style="font-size:12px;">State List</strong>
+            <div class="purpose-manager-add"><input id="newStateSetting" type="text" placeholder="New state name"><button type="button" onclick="addStateSetting()"><i class="fas fa-plus"></i> Add</button></div>
+            <div id="stateManagerList" class="purpose-manager-list"></div>
+        </div>
+        <button type="button" class="btn-submit" style="width:100%;max-width:none;margin-top:0;" onclick="savePurposeManagerSettings()"><i class="fas fa-save"></i> Save Purpose, Year & State</button>
     </div>
 </div>
 
@@ -1909,7 +1924,8 @@
     };
     const PURPOSE_SETTINGS_CACHE_KEY = 'krp_purpose_year_settings_v1';
     const DEFAULT_PURPOSE_NAMES = ['LOAN APPLICATION ID','IS / PRI ID','ROLLOVER ID','INTREST SUBVENTION','UPARJAN (LOAN ENTRY)','ERP','DISCRIPENCY','OPTOUT','PMFBY KHARIF','PMFBY RABI','P-Pacs','KRP APPROVAL TOOL'];
-    let purposeSettingsState = { purposes: [], years: [] };
+    const DEFAULT_STATE_NAMES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Other'];
+    let purposeSettingsState = { purposes: [], years: [], states: [] };
 
     function makePurposeSettingId(prefix) {
         return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -1918,7 +1934,8 @@
         const fyStart = getFinancialYearStart();
         return {
             purposes: DEFAULT_PURPOSE_NAMES.map((name,index) => ({ id:`purpose_${index + 1}`, name, active:true })),
-            years: [fyStart - 1, fyStart, fyStart + 1, fyStart + 2].map(year => ({ id:`fy_${year}`, name:formatFinancialYear(year), active:true }))
+            years: [fyStart - 1, fyStart, fyStart + 1, fyStart + 2].map(year => ({ id:`fy_${year}`, name:formatFinancialYear(year), active:true })),
+            states: DEFAULT_STATE_NAMES.map((name,index) => ({ id:`state_${index + 1}`, name, active:true }))
         };
     }
     function normalizePurposeSettingItems(items, type) {
@@ -1936,13 +1953,16 @@
         const defaults = buildDefaultPurposeSettings();
         purposeSettingsState = {
             purposes: normalizePurposeSettingItems(settings?.purposes, 'purpose'),
-            years: normalizePurposeSettingItems(settings?.years, 'year')
+            years: normalizePurposeSettingItems(settings?.years, 'year'),
+            states: normalizePurposeSettingItems(settings?.states, 'state')
         };
         if (!purposeSettingsState.purposes.length) purposeSettingsState.purposes = defaults.purposes;
         if (!purposeSettingsState.years.length) purposeSettingsState.years = defaults.years;
+        if (!purposeSettingsState.states.length) purposeSettingsState.states = defaults.states;
         if (persist) localStorage.setItem(PURPOSE_SETTINGS_CACHE_KEY, JSON.stringify(purposeSettingsState));
         renderPurposeDropdownOptions();
         populatePurposeYears();
+        renderStateDropdownOptions();
         renderPurposeManagerLists();
     }
     function renderPurposeDropdownOptions() {
@@ -1957,6 +1977,23 @@
             yearRow.insertAdjacentHTML('beforebegin', html || '<div style="padding:8px;font-size:10px;color:#a3aed1;">No active purpose</div>');
         });
     }
+    function renderStateDropdownOptions() {
+        ['state','edit_state'].forEach(id => {
+            const select = document.getElementById(id);
+            if (!select) return;
+            const selected = select.value;
+            select.innerHTML = '<option value="">Select State</option>' + purposeSettingsState.states.filter(item => item.active).map(item => `<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join('');
+            if (selected && !Array.from(select.options).some(option => option.value === selected)) select.add(new Option(`${selected} (Hidden)`, selected));
+            select.value = selected;
+        });
+    }
+    function setManagedStateValue(selectId, value) {
+        const select = document.getElementById(selectId);
+        const stateValue = showSheetText(value).trim();
+        if (!select) return;
+        if (stateValue && !Array.from(select.options).some(option => option.value === stateValue)) select.add(new Option(`${stateValue} (Hidden)`, stateValue));
+        select.value = stateValue;
+    }
     async function loadPurposeManagerSettings() {
         try {
             const cached = JSON.parse(localStorage.getItem(PURPOSE_SETTINGS_CACHE_KEY) || 'null');
@@ -1966,7 +2003,7 @@
         try {
             const response = await fetch(`${APPS_SCRIPT_URL}?action=getPurposeSettings&t=${Date.now()}`, { cache:'no-store' });
             const result = await response.json();
-            if (result?.success && (result.purposes?.length || result.years?.length)) applyPurposeSettings(result);
+            if (result?.success && (result.purposes?.length || result.years?.length || result.states?.length)) applyPurposeSettings(result);
         } catch (error) {
             console.warn('Purpose settings load failed; cached defaults used.', error);
         }
@@ -1984,10 +2021,12 @@
     function renderPurposeManagerLists() {
         const purposeList = document.getElementById('purposeManagerList');
         const yearList = document.getElementById('yearManagerList');
+        const stateList = document.getElementById('stateManagerList');
         if (purposeList) purposeList.innerHTML = renderPurposeManagerRows(purposeSettingsState.purposes, 'purpose');
         if (yearList) yearList.innerHTML = renderPurposeManagerRows(purposeSettingsState.years, 'year');
+        if (stateList) stateList.innerHTML = renderPurposeManagerRows(purposeSettingsState.states, 'state');
     }
-    function getPurposeManagerCollection(type) { return type === 'year' ? purposeSettingsState.years : purposeSettingsState.purposes; }
+    function getPurposeManagerCollection(type) { return type === 'year' ? purposeSettingsState.years : type === 'state' ? purposeSettingsState.states : purposeSettingsState.purposes; }
     function addPurposeSetting() {
         const input = document.getElementById('newPurposeSetting');
         const name = showSheetText(input?.value).trim().replace(/\s+/g,' ');
@@ -2004,10 +2043,18 @@
         purposeSettingsState.years.push({ id:makePurposeSettingId('year'), name, active:true });
         input.value = ''; applyPurposeSettings(purposeSettingsState, false);
     }
+    function addStateSetting() {
+        const input = document.getElementById('newStateSetting');
+        const name = showSheetText(input?.value).trim().replace(/\s+/g,' ');
+        if (!name) return showMessage('State name enter karein', 'error');
+        if (purposeSettingsState.states.some(item => item.name.toUpperCase() === name.toUpperCase())) return showMessage('State already exists', 'error');
+        purposeSettingsState.states.push({ id:makePurposeSettingId('state'), name, active:true });
+        input.value = ''; applyPurposeSettings(purposeSettingsState, false);
+    }
     function editPurposeManagerItem(type, id) {
         const item = getPurposeManagerCollection(type).find(row => row.id === id);
         if (!item) return;
-        const entered = window.prompt(type === 'year' ? 'Financial Year edit karein (26-27)' : 'Purpose name edit karein', item.name);
+        const entered = window.prompt(type === 'year' ? 'Financial Year edit karein (26-27)' : type === 'state' ? 'State name edit karein' : 'Purpose name edit karein', item.name);
         if (entered === null) return;
         const name = type === 'year' ? normalizePurposeYearValue(entered) : showSheetText(entered).trim().replace(/\s+/g,' ');
         if (!name) return showMessage('Valid value enter karein', 'error');
@@ -2024,19 +2071,19 @@
         const item = collection.find(row => row.id === id);
         if (!item || !confirm(`${item.name} delete karein? Old records delete nahi honge.`)) return;
         const filtered = collection.filter(row => row.id !== id);
-        if (type === 'year') purposeSettingsState.years = filtered; else purposeSettingsState.purposes = filtered;
-        renderPurposeDropdownOptions(); populatePurposeYears(); renderPurposeManagerLists();
+        if (type === 'year') purposeSettingsState.years = filtered; else if (type === 'state') purposeSettingsState.states = filtered; else purposeSettingsState.purposes = filtered;
+        renderPurposeDropdownOptions(); populatePurposeYears(); renderStateDropdownOptions(); renderPurposeManagerLists();
     }
     async function savePurposeManagerSettings() {
         try {
             showMessage('Purpose settings saving...', 'pending');
-            const payload = new URLSearchParams({ action:'savePurposeSettings', purposes:JSON.stringify(purposeSettingsState.purposes), years:JSON.stringify(purposeSettingsState.years) });
+            const payload = new URLSearchParams({ action:'savePurposeSettings', purposes:JSON.stringify(purposeSettingsState.purposes), years:JSON.stringify(purposeSettingsState.years), states:JSON.stringify(purposeSettingsState.states) });
             const response = await fetch(APPS_SCRIPT_URL, { method:'POST', body:payload });
             const result = await response.json();
             if (!result?.success) throw new Error(result?.error || 'Save failed');
             applyPurposeSettings(result);
             closePurposeManager();
-            showMessage('Purpose & Financial Year settings saved', 'success');
+            showMessage('Purpose, Financial Year & State settings saved', 'success');
         } catch (error) { showMessage(error.message || 'Purpose settings save failed', 'error'); }
     }
 
@@ -4923,7 +4970,7 @@
         document.getElementById('edit_contactName').value       = showSheetText(record[getColIndex('CONTACT NO. OR NAME')]) || '';
         document.getElementById('edit_customerName').value      = showSheetText(record[getColIndex('CUSTOMER NAME')]) || '';
         document.getElementById('edit_bankOwner').value         = record[getColIndex('BANK OWNER NAME')] || '';
-        document.getElementById('edit_state').value             = record[getColIndex('STATE')] || '';
+        setManagedStateValue('edit_state', record[getColIndex('STATE')] || '');
         setMultiSelectState('edit_purpose',        record[getColIndex('PURPOSE')] || '');
         setMultiSelectState('edit_serviceRemarks', record[getColIndex('SERVICE CHARGE REMARKS')] || '');
         document.getElementById('edit_loginId').value           = record[getColIndex('LOGIN ID')] || '';

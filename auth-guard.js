@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
-import { installSupabaseApiAdapter } from "./supabase-api.js?v=6";
+import { installSupabaseApiAdapter } from "./supabase-api.js?v=7";
 
 const guardStyle = document.getElementById("auth-guard-style");
 const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
