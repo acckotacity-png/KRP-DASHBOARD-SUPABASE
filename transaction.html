@@ -129,6 +129,26 @@
     @media (min-width: 900px) { .dash-card.success { grid-column: auto; } }
     .dash-card.success .dash-value { color: #1e7e34; }
 
+    /* Compact transaction view on phones: avoid oversized dashboard boxes. */
+    @media (max-width: 599px) {
+      body { padding: 4px; }
+      .app-container { padding: 0.55rem; border-radius: 10px; }
+      .crm-header { gap: 7px; margin-bottom: 0.55rem; padding-bottom: 0.5rem; }
+      .crm-header h1 { font-size: 1rem; gap: 6px; }
+      .crm-header h1 i { font-size: 1rem; }
+      .header-actions { gap: 4px; }
+      .header-actions button { padding: 0.42rem 0.55rem; border-radius: 7px; font-size: 0.68rem; gap: 4px; }
+      .dashboard { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 0.4rem; margin-bottom: 0.55rem; border-radius: 8px; }
+      .dash-card { padding: 0.4rem 0.25rem; border-radius: 7px; min-width: 0; }
+      .dash-card.success { grid-column: span 3; }
+      .dash-card .dash-label { font-size: 0.49rem; margin-bottom: 2px; line-height: 1.15; }
+      .dash-card .dash-value { font-size: 0.78rem; word-break: normal; overflow-wrap: anywhere; }
+      .table-wrapper { border-radius: 8px; margin-top: 0.3rem; }
+      table { font-size: 0.7rem; }
+      th { padding: 0.55rem 0.4rem; }
+      td { padding: 0.5rem 0.4rem; }
+    }
+
     /* Entry/Update Panel Form Overlay */
     .data-entry-panel {
       position: fixed;

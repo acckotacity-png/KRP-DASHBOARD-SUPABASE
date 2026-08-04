@@ -240,14 +240,16 @@
         .mobile-card-view table { min-width: 0 !important; width: 100% !important; }
         .mobile-card-view thead tr { position: absolute; top: -9999px; left: -9999px; }
         .mobile-card-view tr { border: 1px solid #e0e5f2; border-radius: 10px; margin-bottom: 15px; background: #fff; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .mobile-card-view tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
         .mobile-card-view td {
             border: none;
-            border-bottom: 1px solid #f4f7fe;
-            display: grid;
-            grid-template-columns: minmax(88px, 36%) minmax(0, 1fr);
-            gap: 8px;
+            border: 1px solid #edf0f6;
+            border-radius: 7px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             align-items: start;
-            padding: 8px 2px;
+            padding: 7px 8px;
             text-align: left;
             word-break: break-word;
             white-space: normal;
@@ -267,6 +269,7 @@
         }
         .mobile-card-view td[data-label="Actions"] {
             display: block;
+            grid-column: 1 / -1;
             border-bottom: 0;
             border-top: 1px solid #e0e5f2;
             margin-top: 4px;
@@ -294,6 +297,8 @@
         .id-count-cell { min-width: 115px; }
         .id-count-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 14px; background: #e6fcf5; color: #008f68; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .id-purpose-preview { display: block; max-width: 150px; margin-top: 4px; color: #6b7280; font-size: 9px; line-height: 1.25; white-space: normal; }
+        .tracker-invoice-stack { display:flex; flex-direction:column; align-items:flex-start; gap:4px; min-width:0; }
+        .activation-serial-label { display:inline-flex; align-items:center; gap:4px; padding:3px 7px; border-radius:10px; background:#eef7ee; color:#257a2d; font-size:9px; line-height:1.2; font-weight:900; white-space:normal; }
         .tracker-contact-stack { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
         .tracker-login-subline { color:#6b7280; font-size:10px; font-weight:700; overflow-wrap:anywhere; }
         
@@ -510,14 +515,14 @@
             .mobile-card-view { border: 0; overflow: visible; }
             .mobile-card-view tr {
                 border-radius: 12px;
-                padding: 8px 10px;
-                margin-bottom: 12px;
+                padding: 7px;
+                margin-bottom: 9px;
             }
+            .mobile-card-view tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:5px; }
             .mobile-card-view td {
-                grid-template-columns: minmax(78px, 34%) minmax(0, 1fr);
-                gap: 6px;
-                padding: 7px 2px;
-                font-size: 12px;
+                gap: 3px;
+                padding: 6px 7px;
+                font-size: 11px;
             }
             .mobile-card-view td:before { font-size: 10px; }
             .mobile-card-view td[data-label="Actions"] { padding-top: 8px; margin-top: 2px; }
@@ -3644,6 +3649,9 @@
             const idActivationSerialNo = getIdActivationSerialNo(originalIdx);
             const idActivationButtonHtml = idActivationSerialNo ?
                 `<button type="button" class="action-btn btn-wa-direct" onclick="sendIdActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Send ID Activation WhatsApp"><i class="fas fa-comment-dots"></i></button>` : '';
+            const invoiceSerialHtml = idActivationSerialNo
+                ? `<small class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(idActivationSerialNo)} ID ACTIVATION</small>`
+                : '';
             const rawPurpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim() : '';
             const hasIdEntry = statusVal !== 'REFUND' && idxLogin !== -1 && showSheetText(row[idxLogin]).trim() !== '';
             const rowIdCount = hasIdEntry ? getIdActivationPurposeCount(rawPurpose) : 0;
@@ -3653,7 +3661,7 @@
                 : '<span style="color:#a3aed1;">-</span>';
 
             html += `<tr>
-                <td data-label="Invoice"><strong>${row[idxInv] || '-'}</strong></td>
+                <td data-label="Invoice"><div class="tracker-invoice-stack"><strong>${escapeHtml(row[idxInv] || '-')}</strong>${invoiceSerialHtml}</div></td>
                 <td data-label="ID Count" class="id-count-cell">${idDetailsHtml}</td>
                 <td data-label="Date">${dateDisplay}</td>
                 <td data-label="Contact">${contactHtml}</td>
