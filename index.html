@@ -1188,7 +1188,7 @@
                     <thead>
                         <tr>
                             <th>Invoice</th><th>ID No. / Count</th><th>Date</th><th>Contact</th><th>Name</th><th>Bank</th>
-                            <th>Status</th><th>Dealing Amt</th><th>Amt Deno</th><th>UTR</th><th>Actions</th>
+                            <th>Dealing Amt</th><th>Amt Deno</th><th>UTR</th><th>Status</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -3762,10 +3762,10 @@
                 <td data-label="Contact">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
                 <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
                 <td data-label="UTR">${row[idxUtr] || '-'}</td>
+                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Actions">
                     <div class="action-icons">
                         ${callButtonHtml}
