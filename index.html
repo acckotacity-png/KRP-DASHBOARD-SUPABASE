@@ -217,20 +217,22 @@
         .date-filter-input { display: none; padding: 10px; border: 1px solid #e0e5f2; border-radius: 8px; outline: none; min-width: 155px; background: white; }
         .btn-outline { border: 1px solid #e0e5f2; background: white; color: #1b2559; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e0e5f2; width: 100%; -webkit-overflow-scrolling: touch; }
-        #dataTable { width: 100%; min-width: 1420px; table-layout: fixed; }
+        #tableContainer:not(.mobile-card-view) { overflow-x: hidden; }
+        #dataTable { width: 100%; min-width: 0; table-layout: fixed; }
         #dataTable th, #dataTable td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1) { width: 150px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2) { width: 155px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(3), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(3) { width: 95px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(4), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { width: 190px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(5), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(5) { width: 125px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(6), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(6) { width: 100px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(7), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(7) { width: 110px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(8), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(8) { width: 105px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(9), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { width: 130px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(10), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(10) { width: 260px; }
-        .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2) { white-space: normal; vertical-align: middle; }
-        .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(10) { overflow: visible; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1) { width: 12%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2) { width: 12%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(3), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(3) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(4), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { width: 11%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(5), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(5) { width: 9%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(6), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(6) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(7), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(7) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(8), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(8) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(9), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(10), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(10) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(11), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { width: 14%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { white-space: normal; vertical-align: middle; }
+        .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { overflow: visible; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #f4f7fe; color: #a3aed1; font-weight: 600; text-align: left; padding: 12px 10px; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #e0e5f2; color: #2b3674; font-weight: 500; }
@@ -514,18 +516,24 @@
 
             .mobile-card-view { border: 0; overflow: visible; }
             .mobile-card-view tr {
-                border-radius: 12px;
-                padding: 7px;
-                margin-bottom: 9px;
+                border-radius: 0;
+                border-width: 0 0 1px;
+                padding: 3px 0;
+                margin-bottom: 0;
+                box-shadow: none;
             }
-            .mobile-card-view tbody tr { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:5px; }
+            .mobile-card-view tbody tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap:0; }
             .mobile-card-view td {
-                gap: 3px;
-                padding: 6px 7px;
-                font-size: 11px;
+                gap: 2px;
+                padding: 4px 5px;
+                border: 0;
+                border-right: 1px solid #edf0f6;
+                border-radius: 0;
+                font-size: 10px;
             }
-            .mobile-card-view td:before { font-size: 10px; }
-            .mobile-card-view td[data-label="Actions"] { padding-top: 8px; margin-top: 2px; }
+            .mobile-card-view td:before { font-size: 8px; }
+            .mobile-card-view td[data-label="Actions"] { padding:4px; margin-top:0; border-top:1px solid #edf0f6; }
+            .mobile-card-view td[data-label="Actions"]:before { display:none; }
             .mobile-card-view .action-icons { gap: 5px; }
             .mobile-card-view .action-btn {
                 width: 26px;
@@ -638,8 +646,8 @@
             .stat-card { padding: 10px; }
             .toolbar { gap: 8px; }
             .search-box, .filter-select { padding: 8px; font-size: 12px; }
-            .mobile-card-view tr { padding: 4px; margin-bottom: 6px; border-radius: 7px; box-shadow: none; }
-            .mobile-card-view tbody tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
+            .mobile-card-view tr { padding: 2px 0; margin-bottom: 0; border-radius: 0; box-shadow: none; }
+            .mobile-card-view tbody tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
             .mobile-card-view td {
                 padding: 4px;
                 gap: 2px;
