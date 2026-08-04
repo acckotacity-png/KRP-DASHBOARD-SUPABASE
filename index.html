@@ -384,6 +384,70 @@
         .ledger-table .ledger-purpose, .ledger-table .ledger-remarks { min-width: 180px; white-space: normal; }
         .ledger-table .ledger-actions { min-width: 135px; }
         .ledger-due.positive { color: #ee5d50; font-weight: 800; }
+        .ledger-table-wrapper.main-ledger-fit { overflow-x:hidden; overflow-y:auto; }
+        .main-ledger-fit .ledger-table { width:100%; min-width:0; table-layout:fixed; font-size:9px; }
+        .main-ledger-fit .ledger-table th, .main-ledger-fit .ledger-table td { min-width:0; padding:6px 3px; white-space:normal; overflow-wrap:anywhere; }
+        .main-ledger-fit .ledger-table .ledger-purpose, .main-ledger-fit .ledger-table .ledger-remarks, .main-ledger-fit .ledger-table .ledger-actions { min-width:0; }
+        .main-ledger-fit .ledger-table th:nth-child(1) { width:5%; }
+        .main-ledger-fit .ledger-table th:nth-child(2) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(3) { width:8%; }
+        .main-ledger-fit .ledger-table th:nth-child(4) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(5) { width:7%; }
+        .main-ledger-fit .ledger-table th:nth-child(6) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(7) { width:7%; }
+        .main-ledger-fit .ledger-table th:nth-child(8) { width:5%; }
+        .main-ledger-fit .ledger-table th:nth-child(9) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(10) { width:5%; }
+        .main-ledger-fit .ledger-table th:nth-child(11) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(12) { width:7%; }
+        .main-ledger-fit .ledger-table th:nth-child(13) { width:6%; }
+        .main-ledger-fit .ledger-table th:nth-child(14) { width:7%; }
+        .main-ledger-fit .ledger-table th:nth-child(15) { width:13%; }
+        .main-ledger-fit .ledger-actions .action-icons { display:flex; flex-wrap:wrap; gap:3px; }
+        .main-ledger-fit .ledger-payment-btn { padding:5px 6px; font-size:8px; }
+        @media (max-width: 768px) {
+            .ledger-table-wrapper.main-ledger-fit { overflow-x: hidden; overflow-y: auto; }
+            .main-ledger-fit .ledger-table,
+            .main-ledger-fit .ledger-table tbody { display:block; width:100%; min-width:0; }
+            .main-ledger-fit .ledger-table thead { display:none; }
+            .main-ledger-fit .ledger-table tbody tr {
+                display:grid;
+                grid-template-columns:repeat(3,minmax(0,1fr));
+                width:100%;
+                gap:0;
+                padding:3px 0;
+                border-bottom:1px solid #dfe5ec;
+                background:#fff;
+            }
+            .main-ledger-fit .ledger-table td {
+                display:flex;
+                flex-direction:column;
+                align-items:flex-start;
+                min-width:0;
+                padding:5px;
+                border:0;
+                border-right:1px solid #edf0f6;
+                white-space:normal;
+                overflow-wrap:anywhere;
+                font-size:9px;
+                line-height:1.25;
+            }
+            .main-ledger-fit .ledger-table td::before {
+                content:attr(data-label);
+                display:block;
+                margin-bottom:2px;
+                color:#8a93ad;
+                font-size:7px;
+                font-weight:900;
+                line-height:1.1;
+                text-transform:uppercase;
+            }
+            .main-ledger-fit .ledger-table td[data-label="Actions"] { grid-column:1 / -1; border-top:1px solid #edf0f6; }
+            .main-ledger-fit .ledger-table td[data-label="Actions"]::before { display:none; }
+            .main-ledger-fit .ledger-actions { min-width:0; width:100%; }
+            .main-ledger-fit .ledger-actions .action-icons { display:flex; flex-wrap:wrap; gap:4px; }
+            .main-ledger-fit .ledger-payment-btn { padding:5px 7px; font-size:8px; }
+        }
         .ledger-history-panel { margin-top: 15px; border: 1px solid #e0e5f2; border-radius: 12px; background: #fff; overflow: hidden; }
         .ledger-history-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 15px; background: #f4f7fe; border-bottom: 1px solid #e0e5f2; font-weight: 700; color: #1b2559; }
         .ledger-history-header span { font-size: 11px; color: #a3aed1; font-weight: 700; text-transform: uppercase; }
@@ -2780,6 +2844,7 @@
     }
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
+        document.querySelector('#contactLedgerModal .ledger-table-wrapper')?.classList.add('main-ledger-fit');
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
@@ -2834,21 +2899,21 @@
             }
 
             return `<tr>
-                <td>${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
-                <td>${escapeHtml(formatDisplayDate(row[idxDate]) || '-')}</td>
-                <td><strong>${escapeHtml(row[idxInv] || '-')}</strong></td>
-                <td><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
-                <td class="ledger-purpose">${escapeHtml(row[idxPurpose] || '-')}</td>
-                <td class="ledger-remarks">${escapeHtml(row[idxServiceRemarks] || '-')}</td>
-                <td class="ledger-remarks">${escapeHtml(row[idxLogin] || '-')}</td>
-                <td>${formatLedgerMoney(deal)}</td>
-                <td style="${statusVal === 'REFUND' ? 'color:#ee5d50;font-weight:700;' : ''}">${statusVal === 'REFUND' ? '- ' : ''}${formatLedgerMoney(received)}</td>
-                <td class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
-                <td style="color:${setupChange < 0 ? '#ee5d50' : '#05a660'};font-weight:700;">${setupChange > 0 ? '+' : ''}${formatLedgerMoney(setupChange)}</td>
-                <td style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
-                <td>${escapeHtml(row[idxUtr] || '-')}</td>
-                <td class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
-                <td class="ledger-actions">
+                <td data-label="ID Serial">${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
+                <td data-label="Date">${escapeHtml(formatDisplayDate(row[idxDate]) || '-')}</td>
+                <td data-label="Invoice"><strong>${escapeHtml(row[idxInv] || '-')}</strong></td>
+                <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
+                <td data-label="Purpose" class="ledger-purpose">${escapeHtml(row[idxPurpose] || '-')}</td>
+                <td data-label="Service" class="ledger-remarks">${escapeHtml(row[idxServiceRemarks] || '-')}</td>
+                <td data-label="Login ID" class="ledger-remarks">${escapeHtml(row[idxLogin] || '-')}</td>
+                <td data-label="Deal">${formatLedgerMoney(deal)}</td>
+                <td data-label="Received" style="${statusVal === 'REFUND' ? 'color:#ee5d50;font-weight:700;' : ''}">${statusVal === 'REFUND' ? '- ' : ''}${formatLedgerMoney(received)}</td>
+                <td data-label="Due" class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
+                <td data-label="Setup +/-" style="color:${setupChange < 0 ? '#ee5d50' : '#05a660'};font-weight:700;">${setupChange > 0 ? '+' : ''}${formatLedgerMoney(setupChange)}</td>
+                <td data-label="Setup Balance" style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
+                <td data-label="UTR">${escapeHtml(row[idxUtr] || '-')}</td>
+                <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
+                <td data-label="Actions" class="ledger-actions">
                     <div class="action-icons">
                         <button type="button" class="ledger-payment-btn" onclick="openLedgerPaymentModal(${item.index})" title="Add Payment or Refund Entry"><i class="fas fa-money-bill-wave"></i> Payment</button>
                         <button type="button" class="action-btn btn-edit" onclick="editLedgerRecord(${item.index})" title="Full Edit"><i class="fas fa-edit"></i></button>
@@ -6375,6 +6440,7 @@
     }
 
     function renderNotepadContactLedger(contactKey, contactText) {
+        document.querySelector('#contactLedgerModal .ledger-table-wrapper')?.classList.remove('main-ledger-fit');
         const ledgerRows = notepadRows.map((row, index) => ({ row, index })).filter(item => normalizeContactLedgerKey(item.row[1]) === contactKey);
         let totalDeal = 0, totalReceived = 0, totalBalance = 0;
         const rowsHtml = ledgerRows.map(item => {
