@@ -2821,6 +2821,48 @@
         showMessage('Activation Done WhatsApp message ready', 'success');
     }
 
+    function sendBothActivationWhatsApp(rowIndex, serialNo = '') {
+        const record = currentData[rowIndex];
+        if (!record) return;
+
+        const serial = serialNo || getIdActivationSerialNo(rowIndex);
+        if (!serial) {
+            showMessage('ID serial not ready for this record', 'error');
+            return;
+        }
+
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const contactText = idxContact !== -1 ? showSheetText(record[idxContact]).trim() : '';
+        const customerPhone = normalizeWhatsAppPhone(contactText);
+        if (!customerPhone) {
+            showMessage('Customer ka valid WhatsApp number nahi mila', 'error');
+            return;
+        }
+
+        const activationMessage = buildIdActivationWhatsAppMessage(record, serial);
+        const customerMessage = buildActivationDoneWhatsAppMessage(record);
+        const activationUrl = `https://api.whatsapp.com/send?phone=919039779483&text=${encodeURIComponent(activationMessage)}`;
+        const customerUrl = `https://api.whatsapp.com/send?phone=${customerPhone}&text=${encodeURIComponent(customerMessage)}`;
+
+        // Open both tabs from the same user click so browsers can allow both popups.
+        const activationTab = window.open('about:blank', '_blank');
+        const customerTab = window.open('about:blank', '_blank');
+        if (activationTab) {
+            activationTab.opener = null;
+            activationTab.location.href = activationUrl;
+        }
+        if (customerTab) {
+            customerTab.opener = null;
+            customerTab.location.href = customerUrl;
+        }
+
+        if (!activationTab || !customerTab) {
+            showMessage('Chrome me pop-ups allow karein; dono WhatsApp chats open honge', 'error');
+            return;
+        }
+        showMessage('Dono WhatsApp messages ready hain — dono chats me Send dabayein', 'success');
+    }
+
     function openContactLedger(rowIndex) {
         const record = currentData[rowIndex];
         const idxContact = getColIndex('CONTACT NO. OR NAME');
@@ -3742,8 +3784,8 @@
             let smsReminderButtonHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL') ?
                 `<button type="button" class="action-btn btn-sms" onclick="sendSmsReminder(${originalIdx})" title="Send SMS Payment Reminder"><i class="fas fa-sms"></i></button>` : '';
             const idActivationSerialNo = getIdActivationSerialNo(originalIdx);
-            const idActivationButtonHtml = idActivationSerialNo ?
-                `<button type="button" class="action-btn btn-wa-direct" onclick="sendIdActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Send ID Activation WhatsApp"><i class="fas fa-comment-dots"></i></button>` : '';
+            const combinedActivationButtonHtml = idActivationSerialNo ?
+                `<button type="button" class="action-btn btn-wa-direct" onclick="sendBothActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Open both ID Activation and Activation Done WhatsApp messages"><i class="fas fa-paper-plane"></i></button>` : '';
             const invoiceSerialHtml = idActivationSerialNo
                 ? `<small class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(idActivationSerialNo)}. ID ACTIVATION</small>`
                 : '';
@@ -3770,8 +3812,7 @@
                     <div class="action-icons">
                         ${callButtonHtml}
                         <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
-                        <button type="button" class="action-btn btn-activation-done" onclick="sendActivationDoneWhatsApp(${originalIdx})" title="Send Activation Done Message"><i class="fas fa-check-circle"></i></button>
-                        ${idActivationButtonHtml}
+                        ${combinedActivationButtonHtml}
                         ${reminderButtonHtml}
                         ${smsReminderButtonHtml}
                         <button type="button" class="action-btn btn-print"    onclick="openPrintChoice(${originalIdx})" title="Print Invoice"><i class="fas fa-print"></i></button>
