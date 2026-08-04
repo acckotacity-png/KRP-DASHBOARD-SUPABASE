@@ -81,6 +81,18 @@ async function route(client,user,p){
   }
   if(action==="getSettings"){const {data,error}=await client.from("business_settings").select("*").eq("id",1).maybeSingle();if(error)throw error;const x=data?{businessName:data.business_name,contactNumber:data.contact_number,emailAddress:data.email_address,gstin:data.gstin,businessAddress:data.business_address,accountHolderName:data.account_holder_name,accountNumber:data.account_number,ifsc:data.ifsc,upiId:data.upi_id,termsConditions:data.terms_conditions}:{};return {success:true,hasSettings:!!data,settings:x};}
   if(action==="saveSettings"){const x={id:1,business_name:s(p.businessName),contact_number:s(p.contactNumber),email_address:s(p.emailAddress),gstin:s(p.gstin),business_address:s(p.businessAddress),account_holder_name:s(p.accountHolderName),account_number:s(p.accountNumber),ifsc:s(p.ifsc),upi_id:s(p.upiId),terms_conditions:s(p.termsConditions),updated_by:user.uid};const {error}=await client.from("business_settings").upsert(x);if(error)throw error;return {success:true,settings:p};}
+  if(action==="getPurposeSettings"){
+    const {data,error}=await client.from("business_settings").select("purpose_options,financial_year_options").eq("id",1).maybeSingle();
+    if(error)throw error;
+    return {success:true,purposes:Array.isArray(data?.purpose_options)?data.purpose_options:[],years:Array.isArray(data?.financial_year_options)?data.financial_year_options:[]};
+  }
+  if(action==="savePurposeSettings"){
+    const purposes=parseJson(p.purposes),years=parseJson(p.years);
+    if(!Array.isArray(purposes)||!Array.isArray(years))throw Error("Invalid purpose settings");
+    const {error}=await client.from("business_settings").upsert({id:1,purpose_options:purposes,financial_year_options:years,updated_by:user.uid},{onConflict:"id"});
+    if(error)throw error;
+    return {success:true,purposes,years};
+  }
   if(action==="getRecordsData"){const rows=await all(client,"monthly_records");return {success:true,headers:MONTH_HEADERS,data:rows.map(monthRow)};}
   if(["addRecord","updateRecordField","updateRecord","deleteRecord"].includes(action)&&!(p.rowIndex!==undefined&&p.data)){const table="monthly_records";if(action==="addRecord"){const {error}=await client.from(table).insert({entry_date:s(p.date),month:s(p.month),total_id:n(p.totalId),working_amount:n(p.working),transfer_amount:n(p.transfer),monthly_amount:n(p.monthly),setup_amount:n(p.setup),remarks:s(p.remarks)});if(error)throw error;}else{const id=await idAt(client,table,n(p.row)-2);if(action==="deleteRecord"){const {error}=await client.from(table).delete().eq("id",id);if(error)throw error;}else{const map={date:"entry_date",month:"month",totalId:"total_id",working:"working_amount",transfer:"transfer_amount",monthly:"monthly_amount",setup:"setup_amount",remarks:"remarks"};const update=action==="updateRecordField"?{[map[p.field]||p.field]:p.value}:{entry_date:s(p.date),month:s(p.month),total_id:n(p.totalId),working_amount:n(p.working),transfer_amount:n(p.transfer),monthly_amount:n(p.monthly),setup_amount:n(p.setup),remarks:s(p.remarks)};const {error}=await client.from(table).update(update).eq("id",id);if(error)throw error;}}return {success:true};}
   if(action==="getNotepadData"){const rows=await all(client,"notepad_tasks");return {success:true,headers:NOTE_HEADERS,data:rows.map(noteRow)};}
