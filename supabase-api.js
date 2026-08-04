@@ -27,6 +27,7 @@ function isoDate(value) {
 }
 function dateText(date) { return `${String(date.getDate()).padStart(2,"0")}-${String(date.getMonth()+1).padStart(2,"0")}-${date.getFullYear()}`; }
 function mobile(value) { let x=s(value).replace(/\D/g,""); return x.length===12 && x.startsWith("91") ? x.slice(2) : x; }
+function mainContactKey(value) { const phone=mobile(value); return phone||s(value).trim().replace(/\s+/g," ").toLowerCase(); }
 async function all(client, table) { const {data,error}=await client.from(table).select("*").order("sequence_no"); if(error) throw error; return data||[]; }
 async function idAt(client, table, index) { const rows=await all(client,table); const row=rows[n(index)]; if(!row) throw Error("Record not found"); return row.id; }
 
@@ -61,7 +62,23 @@ async function route(client,user,p){
   if(action==="getData"){const rows=await all(client,"main_records");return {success:true,headers:MAIN_HEADERS,data:rows.map(mainRow)};}
   if(action==="add"||action==="update"){const payload=mainPayload(p);if(action==="add"){const {error}=await client.from("main_records").insert(payload);if(error)throw error;}else{const id=await idAt(client,"main_records",p.row);const {error}=await client.from("main_records").update(payload).eq("id",id);if(error)throw error;}return {success:true};}
   if(action==="delete"){const id=await idAt(client,"main_records",p.row);const {error}=await client.from("main_records").delete().eq("id",id);if(error)throw error;return {success:true};}
-  if(action==="updateStatusUtr"){const id=await idAt(client,"main_records",p.row);const {error}=await client.from("main_records").update({payment_status:s(p.status),utr_no:s(p.utr)}).eq("id",id);if(error)throw error;return {success:true};}
+  if(action==="updateStatusUtr"){
+    const rows=await all(client,"main_records"), rowIndex=n(p.row), current=rows[rowIndex];
+    if(!current)throw Error("Record not found");
+    const key=mainContactKey(current.contact_name);
+    const openingBalance=round(rows.filter(row=>mainContactKey(row.contact_name)===key).reduce((sum,row)=>sum+n(row.uploading_amount),0));
+    const originalId=n(current.id_activation_amount), availableBeforeId=Math.max(0,openingBalance+originalId);
+    let nextId=p.idActivationAmount===undefined?originalId:Math.max(0,n(p.idActivationAmount));
+    if(openingBalance<=0)nextId=originalId;
+    if(nextId>availableBeforeId)throw Error("ID Activation Amount recharge balance se zyada nahi ho sakta");
+    const projectedBalance=Math.max(0,availableBeforeId-nextId);
+    let nextStatus=s(p.status||"PENDING").toUpperCase();
+    if(openingBalance<=0||projectedBalance<=0)nextStatus="PENDING";
+    const nextSetup=nextStatus==="REFUND"?0:round(n(current.received_amount)-nextId);
+    const {data,error}=await client.from("main_records").update({payment_status:nextStatus,utr_no:s(p.utr),id_activation_amount:nextId,uploading_amount:nextSetup}).eq("id",current.id).select("*").single();
+    if(error)throw error;
+    return {success:true,headers:MAIN_HEADERS,rowIndex,savedRow:mainRow(data),rechargeBalance:projectedBalance};
+  }
   if(action==="getSettings"){const {data,error}=await client.from("business_settings").select("*").eq("id",1).maybeSingle();if(error)throw error;const x=data?{businessName:data.business_name,contactNumber:data.contact_number,emailAddress:data.email_address,gstin:data.gstin,businessAddress:data.business_address,accountHolderName:data.account_holder_name,accountNumber:data.account_number,ifsc:data.ifsc,upiId:data.upi_id,termsConditions:data.terms_conditions}:{};return {success:true,hasSettings:!!data,settings:x};}
   if(action==="saveSettings"){const x={id:1,business_name:s(p.businessName),contact_number:s(p.contactNumber),email_address:s(p.emailAddress),gstin:s(p.gstin),business_address:s(p.businessAddress),account_holder_name:s(p.accountHolderName),account_number:s(p.accountNumber),ifsc:s(p.ifsc),upi_id:s(p.upiId),terms_conditions:s(p.termsConditions),updated_by:user.uid};const {error}=await client.from("business_settings").upsert(x);if(error)throw error;return {success:true,settings:p};}
   if(action==="getRecordsData"){const rows=await all(client,"monthly_records");return {success:true,headers:MONTH_HEADERS,data:rows.map(monthRow)};}

@@ -1405,6 +1405,8 @@
         </div>
         <input type="hidden" id="modalRowIndex">
         <div class="form-group" style="margin-bottom: 15px;"><label>Invoice No.</label><input type="text" id="modalInvoiceDisplay" readonly></div>
+        <div class="form-group" style="margin-bottom: 15px;"><label>Customer Recharge Balance</label><input type="text" id="modalRechargeBalance" readonly></div>
+        <div class="form-group" style="margin-bottom: 15px;"><label>ID Activation Amount</label><input type="number" id="modalIdActivationAmount" min="0" step="0.01" oninput="updateQuickRechargeState()"></div>
         <div class="form-group" style="margin-bottom: 15px;"><label>UTR / TRN NO.</label><input type="text" id="modalUtr"></div>
         <div class="form-group" style="margin-bottom: 20px;">
             <label>Status</label>
@@ -4843,31 +4845,56 @@
     }
 
     // ─── QUICK UPDATE MODAL ───────────────────────────────────────
+    function getCustomerRechargeBalance(rowIndex) {
+        const record = currentData[Number(rowIndex)];
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxSetup = getColIndex('UPLOADING OR SETUP AMOUNT');
+        if (!record || idxContact === -1 || idxSetup === -1) return 0;
+        const contactKey = normalizeContactLedgerKey(record[idxContact]);
+        if (!contactKey) return 0;
+        return currentData.reduce((total, row) => {
+            if (normalizeContactLedgerKey(row[idxContact]) !== contactKey) return total;
+            return total + (parseFloat(row[idxSetup]) || 0);
+        }, 0);
+    }
+
+    function updateQuickRechargeState() {
+        const statusEl = document.getElementById('modalStatus');
+        const idAmountEl = document.getElementById('modalIdActivationAmount');
+        const balanceEl = document.getElementById('modalRechargeBalance');
+        if (!statusEl || !idAmountEl || !balanceEl) return;
+
+        const openingBalance = parseFloat(idAmountEl.dataset.openingBalance || '0') || 0;
+        const originalIdAmount = parseFloat(idAmountEl.dataset.originalIdAmount || '0') || 0;
+        const newIdAmount = Math.max(parseFloat(idAmountEl.value || '0') || 0, 0);
+        const availableBeforeThisId = Math.max(openingBalance + originalIdAmount, 0);
+        const projectedBalance = Math.max(availableBeforeThisId - newIdAmount, 0);
+        const canUpdateFromRecharge = openingBalance > 0 && newIdAmount <= availableBeforeThisId && projectedBalance > 0;
+
+        balanceEl.value = `₹${projectedBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        idAmountEl.style.borderColor = newIdAmount > availableBeforeThisId ? '#ee5d50' : '';
+        statusEl.disabled = !canUpdateFromRecharge;
+        if (!canUpdateFromRecharge) statusEl.value = 'PENDING';
+    }
+
     function openPaymentModal(rowIndex) {
         const record = currentData[rowIndex];
-        const idxRecv = getColIndex('RECEIVED AMOUNT');
-        const receivedAmount = idxRecv !== -1 ? (parseFloat(record[idxRecv]) || 0) : 0;
+        if (!record) return;
+        const rechargeBalance = Math.max(getCustomerRechargeBalance(rowIndex), 0);
+        const originalIdAmount = parseFloat(record[getColIndex('ID ACTIVATION AMOUNT')]) || 0;
         document.getElementById('modalRowIndex').value      = rowIndex;
         document.getElementById('modalInvoiceDisplay').value = record[getColIndex('INVOICE NO.')] || '';
         document.getElementById('modalUtr').value           = record[getColIndex('UTR / TRN NO.')] || '';
+        const idAmountEl = document.getElementById('modalIdActivationAmount');
+        idAmountEl.value = originalIdAmount;
+        idAmountEl.dataset.openingBalance = String(rechargeBalance);
+        idAmountEl.dataset.originalIdAmount = String(originalIdAmount);
+        idAmountEl.max = String(Math.max(rechargeBalance + originalIdAmount, 0));
+        idAmountEl.disabled = rechargeBalance <= 0;
         const statusEl = document.getElementById('modalStatus');
         statusEl.value = record[getColIndex('PAYMENT STATUS')] || 'PENDING';
-        const optionMap = {
-            SUCCESS: statusEl.querySelector('option[value="SUCCESS"]'),
-            PARTIAL: statusEl.querySelector('option[value="PARTIAL"]'),
-            ADVANCE: statusEl.querySelector('option[value="ADVANCE"]'),
-            FAILED: statusEl.querySelector('option[value="FAILED"]'),
-            REFUND: statusEl.querySelector('option[value="REFUND"]')
-        };
-        const lockStatusOptions = receivedAmount <= 0;
-        Object.values(optionMap).forEach(option => {
-            if (!option) return;
-            option.disabled = lockStatusOptions;
-            option.hidden = lockStatusOptions;
-        });
-        if (receivedAmount <= 0) {
-            statusEl.value = 'PENDING';
-        }
+        statusEl.disabled = false;
+        updateQuickRechargeState();
         document.getElementById('paymentModal').classList.add('active');
     }
     function closePaymentModal() { document.getElementById('paymentModal').classList.remove('active'); }
@@ -4876,19 +4903,28 @@
         const rowIndex = document.getElementById('modalRowIndex').value;
         let newStatus = document.getElementById('modalStatus').value;
         const newUtr    = document.getElementById('modalUtr').value.trim();
+        const idAmountEl = document.getElementById('modalIdActivationAmount');
+        const newIdActivationAmount = Math.max(parseFloat(idAmountEl.value || '0') || 0, 0);
+        const openingBalance = parseFloat(idAmountEl.dataset.openingBalance || '0') || 0;
+        const originalIdAmount = parseFloat(idAmountEl.dataset.originalIdAmount || '0') || 0;
+        const availableBeforeThisId = Math.max(openingBalance + originalIdAmount, 0);
         const paymentHistoryBefore = captureLedgerSnapshotFromRow(currentData[Number(rowIndex)] || []);
-        const paymentHistoryAfter = { ...paymentHistoryBefore, paymentStatus: newStatus, utrNo: newUtr };
-        const receivedAmount = parseFloat(paymentHistoryBefore.receivedAmount || '0') || 0;
-        if (receivedAmount <= 0) {
+        const projectedBalance = Math.max(availableBeforeThisId - newIdActivationAmount, 0);
+        if (newIdActivationAmount > availableBeforeThisId) {
+            showMessage('ID Activation Amount recharge balance se zyada nahi ho sakta', 'error');
+            return;
+        }
+        if (openingBalance <= 0 || projectedBalance <= 0) {
             if (newStatus !== 'PENDING') {
-                showMessage('Received amount ke bina status PENDING hi rahega', 'error');
+                showMessage('Recharge balance 0 hone par status PENDING hi rahega', 'error');
             }
             newStatus = 'PENDING';
         }
+        const paymentHistoryAfter = { ...paymentHistoryBefore, paymentStatus: newStatus, utrNo: newUtr, idActivationAmount: newIdActivationAmount };
         paymentHistoryAfter.paymentStatus = newStatus;
         try {
             showMessage('Updating...', 'pending');
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=updateStatusUtr&row=${rowIndex}&status=${encodeURIComponent(newStatus)}&utr=${encodeURIComponent(newUtr)}&t=${Date.now()}`);
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=updateStatusUtr&row=${rowIndex}&status=${encodeURIComponent(newStatus)}&utr=${encodeURIComponent(newUtr)}&idActivationAmount=${encodeURIComponent(newIdActivationAmount)}&t=${Date.now()}`);
             const result   = await response.json();
             if (result.success) {
                 appendLedgerHistoryEntry(paymentHistoryAfter.contactName || paymentHistoryBefore.contactName, paymentHistoryAfter.invoiceNo || paymentHistoryBefore.invoiceNo, 'Quick Update', paymentHistoryBefore, paymentHistoryAfter);
