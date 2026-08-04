@@ -50,6 +50,22 @@
         /* Stats Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        #statsArea.stats-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-bottom:10px; }
+        .stat-pair-card { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; padding:7px; background:#fff; border:1px solid #e0e5f2; border-radius:9px; box-shadow:0 2px 7px rgba(27,37,89,.035); min-width:0; }
+        .stat-pair-item { min-width:0; padding:2px 7px; text-align:center; }
+        .stat-pair-item + .stat-pair-item { border-left:1px solid #e0e5f2; }
+        .stat-pair-item h4 { margin:0 0 2px; color:#6f7897; font-size:9px; font-weight:800; line-height:1.15; white-space:normal; }
+        .stat-pair-item .stat-count { margin:0; font-size:14px; line-height:1.1; }
+        .stat-pair-item .stat-amount { margin-top:2px; font-size:9px; line-height:1.1; overflow-wrap:anywhere; }
+        @media (max-width:600px) {
+            #statsArea.stats-grid { gap:4px; margin-bottom:7px; }
+            .stat-pair-card { grid-template-columns:1fr; padding:4px; border-radius:7px; }
+            .stat-pair-item { padding:3px 2px; }
+            .stat-pair-item + .stat-pair-item { border-left:0; border-top:1px solid #edf0f6; }
+            .stat-pair-item h4 { font-size:7px; }
+            .stat-pair-item .stat-count { font-size:11px; }
+            .stat-pair-item .stat-amount { font-size:7.5px; }
+        }
         .stat-info h4 { font-size: 12px; color: #a3aed1; font-weight: 500; margin-bottom: 5px; }
         .stat-count { font-size: 20px; font-weight: 700; color: #1b2559; margin-bottom: 5px; }
         .stat-amount { font-size: 13px; font-weight: 600; color: #4318ff; }
@@ -4662,12 +4678,18 @@
         pAmt = calculatePendingDueFromEntries(data);
 
         document.getElementById('statsArea').innerHTML = `
-            <div class="stat-card"><div class="stat-info"><h4 style="color:#ee5d50;">Pending / Partial</h4><div class="stat-count" style="color:#ee5d50;">${pCount + partialCount}</div><div class="stat-amount" style="color:#ee5d50;">₹${pAmt.toLocaleString('en-IN')}</div></div></div>
-            <div class="stat-card"><div class="stat-info"><h4>Success</h4><div class="stat-count">${sCount}</div><div class="stat-amount">₹${sAmt.toLocaleString('en-IN')}</div></div></div>
-            <div class="stat-card"><div class="stat-info"><h4>Refund</h4><div class="stat-count">${refCount}</div><div class="stat-amount">₹${refAmt.toLocaleString('en-IN')}</div></div></div>
-            <div class="stat-card"><div class="stat-info"><h4>Total IDs</h4><div class="stat-count">${idCount}</div><div class="stat-amount" style="color:#05cd99;">₹${idActAmt.toLocaleString('en-IN')}</div></div></div>
-            <div class="stat-card"><div class="stat-info"><h4>Total Records</h4><div class="stat-count">${totCount}</div><div class="stat-amount">₹${totAmt.toLocaleString('en-IN')}</div></div></div>
-            <div class="stat-card"><div class="stat-info"><h4>Setup Amt</h4><div class="stat-count">${setupCount}</div><div class="stat-amount">₹${setupAmt.toLocaleString('en-IN')}</div></div></div>
+            <div class="stat-pair-card">
+                <div class="stat-pair-item"><h4 style="color:#ee5d50;">Pending / Partial</h4><div class="stat-count" style="color:#ee5d50;">${pCount + partialCount}</div><div class="stat-amount" style="color:#ee5d50;">₹${pAmt.toLocaleString('en-IN')}</div></div>
+                <div class="stat-pair-item"><h4 style="color:#4318ff;">Refund</h4><div class="stat-count" style="color:#4318ff;">${refCount}</div><div class="stat-amount" style="color:#4318ff;">₹${refAmt.toLocaleString('en-IN')}</div></div>
+            </div>
+            <div class="stat-pair-card">
+                <div class="stat-pair-item"><h4 style="color:#05a77d;">Success</h4><div class="stat-count" style="color:#05a77d;">${sCount}</div><div class="stat-amount" style="color:#05a77d;">₹${sAmt.toLocaleString('en-IN')}</div></div>
+                <div class="stat-pair-item"><h4>Total Records</h4><div class="stat-count">${totCount}</div><div class="stat-amount">₹${totAmt.toLocaleString('en-IN')}</div></div>
+            </div>
+            <div class="stat-pair-card">
+                <div class="stat-pair-item"><h4>Total IDs</h4><div class="stat-count">${idCount}</div><div class="stat-amount" style="color:#05cd99;">₹${idActAmt.toLocaleString('en-IN')}</div></div>
+                <div class="stat-pair-item"><h4>Setup Amt</h4><div class="stat-count">${setupCount}</div><div class="stat-amount">₹${setupAmt.toLocaleString('en-IN')}</div></div>
+            </div>
         `;
     }
 
