@@ -923,6 +923,23 @@
         }
         input::placeholder, textarea::placeholder { color: #9da39e !important; opacity: 1; }
         option { background: #202522; color: #fff; }
+
+        /* Keep managed State/Financial Year native menus in the form's light theme.
+           This must stay after the global dark select/option normalization above. */
+        #state, #edit_state, #purposeYear, #editPurposeYear {
+            color-scheme: light !important;
+            appearance: auto;
+            -webkit-appearance: menulist;
+            background-color: #fff !important;
+            color: #1b2559 !important;
+            border: 1px solid #d8deef !important;
+        }
+        #state option, #edit_state option,
+        #purposeYear option, #editPurposeYear option {
+            color-scheme: light !important;
+            background-color: #fff !important;
+            color: #1b2559 !important;
+        }
         table, thead, tbody, tr { background: transparent !important; color: #f7f7f4 !important; }
         th { background: #232825 !important; color: #d6dad6 !important; border-color: #454c47 !important; opacity: 1 !important; }
         td, #notepadTable td, #dataTable td { background: #292e2b !important; color: #f7f7f4 !important; border-color: #454c47 !important; opacity: 1 !important; }
