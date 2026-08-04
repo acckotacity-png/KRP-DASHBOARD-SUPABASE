@@ -638,11 +638,25 @@
             .stat-card { padding: 10px; }
             .toolbar { gap: 8px; }
             .search-box, .filter-select { padding: 8px; font-size: 12px; }
-            .mobile-card-view tr { padding: 6px 8px; margin-bottom: 10px; }
+            .mobile-card-view tr { padding: 4px; margin-bottom: 6px; border-radius: 7px; box-shadow: none; }
+            .mobile-card-view tbody tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
             .mobile-card-view td {
-                grid-template-columns: minmax(72px, 32%) minmax(0, 1fr);
-                padding: 6px 0;
+                padding: 4px;
+                gap: 2px;
+                border: 0;
+                border-bottom: 1px solid #edf0f6;
+                border-radius: 0;
+                font-size: 9.5px;
             }
+            .mobile-card-view td:before { font-size: 7.5px; line-height: 1.1; }
+            .mobile-card-view td[data-label="Invoice"],
+            .mobile-card-view td[data-label="ID No. / Count"],
+            .mobile-card-view td[data-label="Contact"] { grid-column: span 1; }
+            .mobile-card-view td[data-label="Actions"] { grid-column: 1 / -1; padding: 4px 2px 1px; margin-top: 0; }
+            .mobile-card-view td[data-label="Actions"]:before { display:none; }
+            .mobile-card-view .activation-serial-label { padding: 2px 4px; font-size: 7.5px; }
+            .mobile-card-view .id-count-badge { padding: 2px 4px; font-size: 8px; }
+            .mobile-card-view .id-purpose-preview, .mobile-card-view .tracker-login-subline { font-size: 7.5px; margin-top: 1px; }
             .mobile-card-view .action-btn {
                 width: 24px;
                 height: 24px;
@@ -2184,12 +2198,16 @@
         const btn = document.getElementById('viewModeBtn');
         if (isMobileView) {
             container.classList.add('mobile-card-view');
-            btn.innerHTML = '<i class="fas fa-desktop"></i> Desktop View';
-            btn.style.background = '#05cd99';
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-desktop"></i> Desktop View';
+                btn.style.background = '#05cd99';
+            }
         } else {
             container.classList.remove('mobile-card-view');
-            btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Mobile View';
-            btn.style.background = '#4318ff';
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Mobile View';
+                btn.style.background = '#4318ff';
+            }
         }
     }
 
