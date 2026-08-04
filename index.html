@@ -2848,7 +2848,7 @@
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
-        if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
+        if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Status</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         if (idxContact === -1 || !contactKey) return;
 
@@ -2902,7 +2902,6 @@
                 <td data-label="ID Serial">${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
                 <td data-label="Date">${escapeHtml(formatDisplayDate(row[idxDate]) || '-')}</td>
                 <td data-label="Invoice"><strong>${escapeHtml(row[idxInv] || '-')}</strong></td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Purpose" class="ledger-purpose">${escapeHtml(row[idxPurpose] || '-')}</td>
                 <td data-label="Service" class="ledger-remarks">${escapeHtml(row[idxServiceRemarks] || '-')}</td>
                 <td data-label="Login ID" class="ledger-remarks">${escapeHtml(row[idxLogin] || '-')}</td>
@@ -2913,6 +2912,7 @@
                 <td data-label="Setup Balance" style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
                 <td data-label="UTR">${escapeHtml(row[idxUtr] || '-')}</td>
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
+                <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Actions" class="ledger-actions">
                     <div class="action-icons">
                         <button type="button" class="ledger-payment-btn" onclick="openLedgerPaymentModal(${item.index})" title="Add Payment or Refund Entry"><i class="fas fa-money-bill-wave"></i> Payment</button>
