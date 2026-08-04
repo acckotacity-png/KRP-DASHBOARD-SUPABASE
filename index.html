@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
-    <script type="module" src="auth-guard.js?v=7"></script>
+<script type="module" src="auth-guard.js?v=8"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>KRP ID Activation - Dashboard</title>
@@ -384,13 +384,13 @@
         .purpose-year-row { border-top: 1px solid #e0e5f2; margin-top: 5px; padding: 10px 15px; }
         .purpose-year-row label { display: block; font-size: 12px; color: #a3aed1; font-weight: 700; margin-bottom: 6px; }
         .purpose-year-select { width: 100%; padding: 8px 10px; border: 1px solid #e0e5f2; border-radius: 8px; color: #2b3674; outline: none; }
-        #state, #edit_state, #purposeYear, #editPurposeYear {
+        #state, #edit_state, #bankOwner, #edit_bankOwner, #purposeYear, #editPurposeYear {
             color-scheme:light !important;
             background-color:#fff !important;
             color:#1b2559 !important;
             border-color:#d8deef !important;
         }
-        #state option, #edit_state option, #purposeYear option, #editPurposeYear option {
+        #state option, #edit_state option, #bankOwner option, #edit_bankOwner option, #purposeYear option, #editPurposeYear option {
             background:#fff !important;
             color:#1b2559 !important;
         }
@@ -926,7 +926,7 @@
 
         /* Keep managed State/Financial Year native menus in the form's light theme.
            This must stay after the global dark select/option normalization above. */
-        #state, #edit_state, #purposeYear, #editPurposeYear {
+        #state, #edit_state, #bankOwner, #edit_bankOwner, #purposeYear, #editPurposeYear {
             color-scheme: light !important;
             appearance: auto;
             -webkit-appearance: menulist;
@@ -934,7 +934,7 @@
             color: #1b2559 !important;
             border: 1px solid #d8deef !important;
         }
-        #state option, #edit_state option,
+        #state option, #edit_state option, #bankOwner option, #edit_bankOwner option,
         #purposeYear option, #editPurposeYear option {
             color-scheme: light !important;
             background-color: #fff !important;
@@ -1276,7 +1276,7 @@
                     <div class="form-group"><label class="required">Date</label><input type="date" id="date" required onchange="generateInvoiceNo()"></div>
                     <div class="form-group"><label class="required">Contact No.</label><input type="text" id="contactName" required autocomplete="off"></div>
                     <div class="form-group"><label>Customer Name</label><input type="text" id="customerName" autocomplete="name"></div>
-                    <div class="form-group"><label>Bank Name</label><input type="text" id="bankOwner"></div>
+                    <div class="form-group"><label>Bank Name</label><select id="bankOwner"><option value="">Select Bank</option></select></div>
                     <div class="form-group">
                         <label>State</label>
                         <select id="state">
@@ -1370,7 +1370,7 @@
                 <div class="form-group"><label class="required">Date</label><input type="date" id="edit_date" required></div>
                 <div class="form-group"><label class="required">Contact No.</label><input type="text" id="edit_contactName" required></div>
                 <div class="form-group"><label>Customer Name</label><input type="text" id="edit_customerName"></div>
-                <div class="form-group"><label>Bank Name</label><input type="text" id="edit_bankOwner"></div>
+                <div class="form-group"><label>Bank Name</label><select id="edit_bankOwner"><option value="">Select Bank</option></select></div>
                 <div class="form-group">
                     <label>State</label>
                     <select id="edit_state">
@@ -1480,7 +1480,7 @@
 <div class="modal-overlay" id="contactLedgerModal">
     <div class="modal-content large-modal ledger-modal">
         <div class="modal-header">
-            <span><i class="fas fa-book"></i> Ledger: <span id="ledgerContactTitle">-</span></span>
+            <span><i class="fas fa-book"></i> Ledger: <span id="ledgerContactTitle">-</span><small id="ledgerCustomerName" style="display:block;margin:4px 0 0 25px;font-size:11px;font-weight:600;opacity:.82;"></small></span>
             <i class="fas fa-times close-modal" onclick="closeContactLedger()"></i>
         </div>
         <div id="ledgerSummary" class="ledger-summary-grid"></div>
@@ -1564,7 +1564,7 @@
         <div class="settings-hub-options">
             <button type="button" class="settings-hub-option" onclick="openPaymentFromHub()"><i class="fas fa-wallet"></i><span>Payment Settings</span></button>
             <button type="button" class="settings-hub-option" onclick="openBusinessFromHub()"><i class="fas fa-building"></i><span>Business Settings</span></button>
-            <button type="button" class="settings-hub-option" style="grid-column:1 / -1; min-height:76px;" onclick="openPurposeManagerFromHub()"><i class="fas fa-list-check"></i><span>Purpose & Financial Years</span></button>
+            <button type="button" class="settings-hub-option" style="grid-column:1 / -1; min-height:76px;" onclick="openPurposeManagerFromHub()"><i class="fas fa-list-check"></i><span>Dropdown Settings</span></button>
         </div>
     </div>
 </div>
@@ -1572,7 +1572,7 @@
 <div id="purposeManagerModal" class="modal-overlay">
     <div class="modal-content" style="max-width:620px;">
         <div class="modal-header">
-            <span><i class="fas fa-list-check"></i> Purpose & Financial Year Manager</span>
+            <span><i class="fas fa-list-check"></i> Dropdown Settings Manager</span>
             <i class="fas fa-times close-modal" onclick="closePurposeManager()"></i>
         </div>
         <div class="purpose-manager-section">
@@ -1590,7 +1590,12 @@
             <div class="purpose-manager-add"><input id="newStateSetting" type="text" placeholder="New state name"><button type="button" onclick="addStateSetting()"><i class="fas fa-plus"></i> Add</button></div>
             <div id="stateManagerList" class="purpose-manager-list"></div>
         </div>
-        <button type="button" class="btn-submit" style="width:100%;max-width:none;margin-top:0;" onclick="savePurposeManagerSettings()"><i class="fas fa-save"></i> Save Purpose, Year & State</button>
+        <div class="purpose-manager-section">
+            <strong style="font-size:12px;">Bank List</strong>
+            <div class="purpose-manager-add"><input id="newBankSetting" type="text" placeholder="New bank name"><button type="button" onclick="addBankSetting()"><i class="fas fa-plus"></i> Add</button></div>
+            <div id="bankManagerList" class="purpose-manager-list"></div>
+        </div>
+        <button type="button" class="btn-submit" style="width:100%;max-width:none;margin-top:0;" onclick="savePurposeManagerSettings()"><i class="fas fa-save"></i> Save All Dropdown Settings</button>
     </div>
 </div>
 
@@ -1956,10 +1961,11 @@
         upiId: ['globalUpiId', 'merchant_upi_id'],
         termsAndConditions: ['bizTerms', 'biz_terms']
     };
-    const PURPOSE_SETTINGS_CACHE_KEY = 'krp_purpose_year_settings_v1';
+    const PURPOSE_SETTINGS_CACHE_KEY = 'krp_purpose_year_settings_v2';
     const DEFAULT_PURPOSE_NAMES = ['LOAN APPLICATION ID','IS / PRI ID','ROLLOVER ID','INTREST SUBVENTION','UPARJAN (LOAN ENTRY)','ERP','DISCRIPENCY','OPTOUT','PMFBY KHARIF','PMFBY RABI','P-Pacs','KRP APPROVAL TOOL'];
     const DEFAULT_STATE_NAMES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Other'];
-    let purposeSettingsState = { purposes: [], years: [], states: [] };
+    const DEFAULT_BANK_NAMES = ['SBI','Bank of Baroda','Punjab National Bank','HDFC Bank','ICICI Bank','Axis Bank','Other'];
+    let purposeSettingsState = { purposes: [], years: [], states: [], banks: [] };
 
     function makePurposeSettingId(prefix) {
         return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -1969,7 +1975,8 @@
         return {
             purposes: DEFAULT_PURPOSE_NAMES.map((name,index) => ({ id:`purpose_${index + 1}`, name, active:true })),
             years: [fyStart - 1, fyStart, fyStart + 1, fyStart + 2].map(year => ({ id:`fy_${year}`, name:formatFinancialYear(year), active:true })),
-            states: DEFAULT_STATE_NAMES.map((name,index) => ({ id:`state_${index + 1}`, name, active:true }))
+            states: DEFAULT_STATE_NAMES.map((name,index) => ({ id:`state_${index + 1}`, name, active:true })),
+            banks: DEFAULT_BANK_NAMES.map((name,index) => ({ id:`bank_${index + 1}`, name, active:true }))
         };
     }
     function normalizePurposeSettingItems(items, type) {
@@ -1988,15 +1995,18 @@
         purposeSettingsState = {
             purposes: normalizePurposeSettingItems(settings?.purposes, 'purpose'),
             years: normalizePurposeSettingItems(settings?.years, 'year'),
-            states: normalizePurposeSettingItems(settings?.states, 'state')
+            states: normalizePurposeSettingItems(settings?.states, 'state'),
+            banks: normalizePurposeSettingItems(settings?.banks, 'bank')
         };
         if (!purposeSettingsState.purposes.length) purposeSettingsState.purposes = defaults.purposes;
         if (!purposeSettingsState.years.length) purposeSettingsState.years = defaults.years;
         if (!purposeSettingsState.states.length) purposeSettingsState.states = defaults.states;
+        if (!purposeSettingsState.banks.length) purposeSettingsState.banks = defaults.banks;
         if (persist) localStorage.setItem(PURPOSE_SETTINGS_CACHE_KEY, JSON.stringify(purposeSettingsState));
         renderPurposeDropdownOptions();
         populatePurposeYears();
         renderStateDropdownOptions();
+        renderBankDropdownOptions();
         renderPurposeManagerLists();
     }
     function renderPurposeDropdownOptions() {
@@ -2028,6 +2038,23 @@
         if (stateValue && !Array.from(select.options).some(option => option.value === stateValue)) select.add(new Option(`${stateValue} (Hidden)`, stateValue));
         select.value = stateValue;
     }
+    function renderBankDropdownOptions() {
+        ['bankOwner','edit_bankOwner'].forEach(id => {
+            const select = document.getElementById(id);
+            if (!select) return;
+            const selected = select.value;
+            select.innerHTML = '<option value="">Select Bank</option>' + purposeSettingsState.banks.filter(item => item.active).map(item => `<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}</option>`).join('');
+            if (selected && !Array.from(select.options).some(option => option.value === selected)) select.add(new Option(`${selected} (Hidden)`, selected));
+            select.value = selected;
+        });
+    }
+    function setManagedBankValue(selectId, value) {
+        const select = document.getElementById(selectId);
+        const bankValue = showSheetText(value).trim();
+        if (!select) return;
+        if (bankValue && !Array.from(select.options).some(option => option.value === bankValue)) select.add(new Option(`${bankValue} (Hidden)`, bankValue));
+        select.value = bankValue;
+    }
     async function loadPurposeManagerSettings() {
         try {
             const cached = JSON.parse(localStorage.getItem(PURPOSE_SETTINGS_CACHE_KEY) || 'null');
@@ -2037,7 +2064,7 @@
         try {
             const response = await fetch(`${APPS_SCRIPT_URL}?action=getPurposeSettings&t=${Date.now()}`, { cache:'no-store' });
             const result = await response.json();
-            if (result?.success && (result.purposes?.length || result.years?.length || result.states?.length)) applyPurposeSettings(result);
+            if (result?.success && (result.purposes?.length || result.years?.length || result.states?.length || result.banks?.length)) applyPurposeSettings(result);
         } catch (error) {
             console.warn('Purpose settings load failed; cached defaults used.', error);
         }
@@ -2056,11 +2083,13 @@
         const purposeList = document.getElementById('purposeManagerList');
         const yearList = document.getElementById('yearManagerList');
         const stateList = document.getElementById('stateManagerList');
+        const bankList = document.getElementById('bankManagerList');
         if (purposeList) purposeList.innerHTML = renderPurposeManagerRows(purposeSettingsState.purposes, 'purpose');
         if (yearList) yearList.innerHTML = renderPurposeManagerRows(purposeSettingsState.years, 'year');
         if (stateList) stateList.innerHTML = renderPurposeManagerRows(purposeSettingsState.states, 'state');
+        if (bankList) bankList.innerHTML = renderPurposeManagerRows(purposeSettingsState.banks, 'bank');
     }
-    function getPurposeManagerCollection(type) { return type === 'year' ? purposeSettingsState.years : type === 'state' ? purposeSettingsState.states : purposeSettingsState.purposes; }
+    function getPurposeManagerCollection(type) { return type === 'year' ? purposeSettingsState.years : type === 'state' ? purposeSettingsState.states : type === 'bank' ? purposeSettingsState.banks : purposeSettingsState.purposes; }
     function addPurposeSetting() {
         const input = document.getElementById('newPurposeSetting');
         const name = showSheetText(input?.value).trim().replace(/\s+/g,' ');
@@ -2085,10 +2114,18 @@
         purposeSettingsState.states.push({ id:makePurposeSettingId('state'), name, active:true });
         input.value = ''; applyPurposeSettings(purposeSettingsState, false);
     }
+    function addBankSetting() {
+        const input = document.getElementById('newBankSetting');
+        const name = showSheetText(input?.value).trim().replace(/\s+/g,' ');
+        if (!name) return showMessage('Bank name enter karein', 'error');
+        if (purposeSettingsState.banks.some(item => item.name.toUpperCase() === name.toUpperCase())) return showMessage('Bank already exists', 'error');
+        purposeSettingsState.banks.push({ id:makePurposeSettingId('bank'), name, active:true });
+        input.value = ''; applyPurposeSettings(purposeSettingsState, false);
+    }
     function editPurposeManagerItem(type, id) {
         const item = getPurposeManagerCollection(type).find(row => row.id === id);
         if (!item) return;
-        const entered = window.prompt(type === 'year' ? 'Financial Year edit karein (26-27)' : type === 'state' ? 'State name edit karein' : 'Purpose name edit karein', item.name);
+        const entered = window.prompt(type === 'year' ? 'Financial Year edit karein (26-27)' : type === 'state' ? 'State name edit karein' : type === 'bank' ? 'Bank name edit karein' : 'Purpose name edit karein', item.name);
         if (entered === null) return;
         const name = type === 'year' ? normalizePurposeYearValue(entered) : showSheetText(entered).trim().replace(/\s+/g,' ');
         if (!name) return showMessage('Valid value enter karein', 'error');
@@ -2105,19 +2142,19 @@
         const item = collection.find(row => row.id === id);
         if (!item || !confirm(`${item.name} delete karein? Old records delete nahi honge.`)) return;
         const filtered = collection.filter(row => row.id !== id);
-        if (type === 'year') purposeSettingsState.years = filtered; else if (type === 'state') purposeSettingsState.states = filtered; else purposeSettingsState.purposes = filtered;
-        renderPurposeDropdownOptions(); populatePurposeYears(); renderStateDropdownOptions(); renderPurposeManagerLists();
+        if (type === 'year') purposeSettingsState.years = filtered; else if (type === 'state') purposeSettingsState.states = filtered; else if (type === 'bank') purposeSettingsState.banks = filtered; else purposeSettingsState.purposes = filtered;
+        renderPurposeDropdownOptions(); populatePurposeYears(); renderStateDropdownOptions(); renderBankDropdownOptions(); renderPurposeManagerLists();
     }
     async function savePurposeManagerSettings() {
         try {
             showMessage('Purpose settings saving...', 'pending');
-            const payload = new URLSearchParams({ action:'savePurposeSettings', purposes:JSON.stringify(purposeSettingsState.purposes), years:JSON.stringify(purposeSettingsState.years), states:JSON.stringify(purposeSettingsState.states) });
+            const payload = new URLSearchParams({ action:'savePurposeSettings', purposes:JSON.stringify(purposeSettingsState.purposes), years:JSON.stringify(purposeSettingsState.years), states:JSON.stringify(purposeSettingsState.states), banks:JSON.stringify(purposeSettingsState.banks) });
             const response = await fetch(APPS_SCRIPT_URL, { method:'POST', body:payload });
             const result = await response.json();
             if (!result?.success) throw new Error(result?.error || 'Save failed');
             applyPurposeSettings(result);
             closePurposeManager();
-            showMessage('Purpose, Financial Year & State settings saved', 'success');
+            showMessage('Purpose, Financial Year, State & Bank settings saved', 'success');
         } catch (error) { showMessage(error.message || 'Purpose settings save failed', 'error'); }
     }
 
@@ -3157,6 +3194,7 @@
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
         if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Status</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxCustomerName = getColIndex('CUSTOMER NAME');
         if (idxContact === -1 || !contactKey) return;
 
         const idxInv     = getColIndex('INVOICE NO.');
@@ -3174,6 +3212,11 @@
         const ledgerRows = currentData
             .map((row, index) => ({ row, index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contactKey);
+
+        const ledgerCustomerName = idxCustomerName === -1 ? '' : ledgerRows
+            .map(item => showSheetText(item.row[idxCustomerName]).trim())
+            .filter(Boolean)
+            .pop() || '';
 
         let totalDeal = 0, totalReceived = 0, totalRefund = 0, pendingDeal = 0, paymentApplied = 0, setupBalance = 0;
         const rowsHtml = ledgerRows.map(item => {
@@ -3234,6 +3277,8 @@
 
         const totalBalance = Math.max(pendingDeal - paymentApplied + totalRefund, 0);
         document.getElementById('ledgerContactTitle').textContent = contactText;
+        const ledgerCustomerNameEl = document.getElementById('ledgerCustomerName');
+        if (ledgerCustomerNameEl) ledgerCustomerNameEl.textContent = ledgerCustomerName ? `Name: ${ledgerCustomerName}` : 'Name: -';
         document.getElementById('ledgerSummary').innerHTML = `
             <div class="ledger-summary-item"><span>Total Entries</span><strong>${ledgerRows.length}</strong></div>
             <div class="ledger-summary-item"><span>Total Deal</span><strong>${formatLedgerMoney(totalDeal)}</strong></div>
@@ -3251,6 +3296,8 @@
         activeLedgerKey = '';
         activeLedgerTitle = '';
         activeLedgerSource = 'main';
+        const ledgerCustomerNameEl = document.getElementById('ledgerCustomerName');
+        if (ledgerCustomerNameEl) ledgerCustomerNameEl.textContent = '';
     }
     function editLedgerRecord(rowIndex) {
         openFullEditModal(rowIndex);
@@ -3736,7 +3783,7 @@
         }
 
         if (stateEl) stateEl.value = record[getColIndex('STATE')] || '';
-        if (bankEl) bankEl.value = record[getColIndex('BANK OWNER NAME')] || '';
+        if (bankEl) setManagedBankValue('bankOwner', record[getColIndex('BANK OWNER NAME')] || '');
         if (loginEl) loginEl.value = record[getColIndex('LOGIN ID')] || '';
         setMultiSelectState('serviceRemarks', record[getColIndex(remarksKey)] || '');
     }
@@ -5003,7 +5050,7 @@
         document.getElementById('edit_date').value              = getLocalISODate(record[getColIndex('DATE')]);
         document.getElementById('edit_contactName').value       = showSheetText(record[getColIndex('CONTACT NO. OR NAME')]) || '';
         document.getElementById('edit_customerName').value      = showSheetText(record[getColIndex('CUSTOMER NAME')]) || '';
-        document.getElementById('edit_bankOwner').value         = record[getColIndex('BANK OWNER NAME')] || '';
+        setManagedBankValue('edit_bankOwner', record[getColIndex('BANK OWNER NAME')] || '');
         setManagedStateValue('edit_state', record[getColIndex('STATE')] || '');
         setMultiSelectState('edit_purpose',        record[getColIndex('PURPOSE')] || '');
         setMultiSelectState('edit_serviceRemarks', record[getColIndex('SERVICE CHARGE REMARKS')] || '');
@@ -6818,6 +6865,9 @@
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
         if (header) header.innerHTML = '<th>Task Date</th><th>Name</th><th>State</th><th>ID</th><th>Task</th><th>Task Status</th><th>Payment Date</th><th>Deal</th><th>Received</th><th>Balance</th><th>Payment Status</th><th>Reminder</th><th>Action</th>';
         document.getElementById('ledgerContactTitle').textContent = contactText;
+        const ledgerCustomerNameEl = document.getElementById('ledgerCustomerName');
+        const notepadCustomerName = ledgerRows.map(item => showSheetText(item.row[3]).trim()).filter(Boolean).pop() || '';
+        if (ledgerCustomerNameEl) ledgerCustomerNameEl.textContent = notepadCustomerName ? `Name: ${notepadCustomerName}` : 'Name: -';
         document.getElementById('ledgerSummary').innerHTML = `
             <div class="ledger-summary-item"><span>Notepad Entries</span><strong>${ledgerRows.length}</strong></div>
             <div class="ledger-summary-item"><span>Total Deal</span><strong>${formatLedgerMoney(totalDeal)}</strong></div>
