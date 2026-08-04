@@ -27,13 +27,15 @@ grant execute on function public.is_krp_admin() to authenticated;
 
 create table if not exists public.main_records (
   id uuid primary key default gen_random_uuid(), sequence_no bigint generated always as identity,
-  invoice_no text not null default '', entry_date text not null default '', contact_name text not null default '',
+  invoice_no text not null default '', entry_date text not null default '', contact_name text not null default '', customer_name text not null default '',
   bank_owner text default '', state text default '', purpose text default '', service_remarks text default '', login_id text default '',
   dealing_amount numeric(14,2) not null default 0, amount_deno numeric(14,2) not null default 0,
   received_amount numeric(14,2) not null default 0, id_activation_amount numeric(14,2) not null default 0,
   uploading_amount numeric(14,2) not null default 0, utr_no text default '', payment_status text not null default 'PENDING', remarks text default '',
   created_by uuid not null default auth.uid() references auth.users(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+
+alter table public.main_records add column if not exists customer_name text not null default '';
 
 create table if not exists public.business_settings (
   id smallint primary key default 1 check (id = 1), business_name text default '', contact_number text default '', email_address text default '',
@@ -97,6 +99,7 @@ create table if not exists public.audit_log (
 create index if not exists main_records_sequence_idx on public.main_records(sequence_no);
 create index if not exists main_records_invoice_idx on public.main_records(invoice_no);
 create index if not exists main_records_contact_idx on public.main_records(contact_name);
+create index if not exists main_records_customer_name_idx on public.main_records(customer_name);
 create index if not exists monthly_records_sequence_idx on public.monthly_records(sequence_no);
 create index if not exists transactions_sequence_idx on public.transactions(sequence_no);
 create index if not exists notepad_tasks_sequence_idx on public.notepad_tasks(sequence_no);

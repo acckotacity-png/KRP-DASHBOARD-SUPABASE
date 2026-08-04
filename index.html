@@ -294,6 +294,8 @@
         .id-count-cell { min-width: 115px; }
         .id-count-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 14px; background: #e6fcf5; color: #008f68; font-size: 10px; font-weight: 800; white-space: nowrap; }
         .id-purpose-preview { display: block; max-width: 150px; margin-top: 4px; color: #6b7280; font-size: 9px; line-height: 1.25; white-space: normal; }
+        .tracker-contact-stack { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+        .tracker-login-subline { color:#6b7280; font-size:10px; font-weight:700; overflow-wrap:anywhere; }
         
         .action-icons { display: flex; gap: 4px; justify-content: flex-end; flex-wrap: wrap; }
         .action-btn { width: 24px; height: 24px; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; flex: 0 0 auto; }
@@ -1093,7 +1095,7 @@
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>Invoice</th><th>ID Details</th><th>Date</th><th>Contact</th><th>Bank</th>
+                            <th>Invoice</th><th>ID Count</th><th>Date</th><th>Contact</th><th>Name</th><th>Bank</th>
                             <th>Status</th><th>Dealing Amt</th><th>Amt Deno</th><th>UTR</th><th>Actions</th>
                         </tr>
                     </thead>
@@ -1110,7 +1112,8 @@
                 <div class="form-grid">
                     <div class="form-group"><label class="required">Invoice (Auto)</label><input type="text" id="invoiceNo" required readonly placeholder="Generating..."></div>
                     <div class="form-group"><label class="required">Date</label><input type="date" id="date" required onchange="generateInvoiceNo()"></div>
-                    <div class="form-group"><label class="required">Contact No / Name</label><input type="text" id="contactName" required autocomplete="off"></div>
+                    <div class="form-group"><label class="required">Contact No.</label><input type="text" id="contactName" required autocomplete="off"></div>
+                    <div class="form-group"><label>Customer Name</label><input type="text" id="customerName" autocomplete="name"></div>
                     <div class="form-group"><label>Bank Name</label><input type="text" id="bankOwner"></div>
                     <div class="form-group">
                         <label>State</label>
@@ -1203,7 +1206,8 @@
             <div class="form-grid">
                 <div class="form-group"><label>Invoice No (Locked)</label><input type="text" id="edit_invoiceNo" readonly></div>
                 <div class="form-group"><label class="required">Date</label><input type="date" id="edit_date" required></div>
-                <div class="form-group"><label class="required">Contact No / Name</label><input type="text" id="edit_contactName" required></div>
+                <div class="form-group"><label class="required">Contact No.</label><input type="text" id="edit_contactName" required></div>
+                <div class="form-group"><label>Customer Name</label><input type="text" id="edit_customerName"></div>
                 <div class="form-group"><label>Bank Name</label><input type="text" id="edit_bankOwner"></div>
                 <div class="form-group">
                     <label>State</label>
@@ -2485,10 +2489,15 @@
 
     function getDefaulterLookupKeys(row) {
         const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxCustomerName = getColIndex('CUSTOMER NAME');
         const idxLogin = getColIndex('LOGIN ID');
         const keys = new Set();
         if (idxContact !== -1) {
             const key = normalizeDefaulterLookupValue(row[idxContact]);
+            if (key) keys.add(key);
+        }
+        if (idxCustomerName !== -1) {
+            const key = normalizeDefaulterLookupValue(row[idxCustomerName]);
             if (key) keys.add(key);
         }
         if (idxLogin !== -1) {
@@ -2500,8 +2509,9 @@
 
     function findPendingDefaulterMatch() {
         const contactInput = document.getElementById('contactName')?.value || '';
+        const customerNameInput = document.getElementById('customerName')?.value || '';
         const loginInput = document.getElementById('loginId')?.value || '';
-        const lookupKeys = [contactInput, loginInput].map(normalizeDefaulterLookupValue).filter(Boolean);
+        const lookupKeys = [contactInput, customerNameInput, loginInput].map(normalizeDefaulterLookupValue).filter(Boolean);
         if (!lookupKeys.length || !currentHeaders.length || !currentData.length) return null;
 
         const idxInv = getColIndex('INVOICE NO.');
@@ -2877,6 +2887,7 @@
         formData.append('date', entryDate);
         const sourceContact = showSheetText(sourceRecord[getColIndex('CONTACT NO. OR NAME')]).trim();
         formData.append('contactName', sourceContact);
+        formData.append('customerName', showSheetText(sourceRecord[getColIndex('CUSTOMER NAME')]).trim());
         formData.append('bankOwner', showSheetText(sourceRecord[getColIndex('BANK OWNER NAME')]).trim());
         formData.append('state', showSheetText(sourceRecord[getColIndex('STATE')]).trim());
         formData.append('purpose', `${isPendingEntry ? 'PENDING DUE' : entryType} AGAINST ${invoiceNo || sourcePurpose || 'LEDGER'}`);
@@ -3453,7 +3464,7 @@
         const filters = getTrackerFilters();
         if (forceRefresh || currentData.length === 0) {
             try {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading Data...</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading Data...</td></tr>';
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&t=${Date.now()}`);
                 const result   = await response.json();
                 if (result.success && result.data) {
@@ -3462,7 +3473,7 @@
                     generateInvoiceNo();
                 }
             } catch (error) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;">❌ Connection error</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center;">❌ Connection error</td></tr>';
                 return;
             }
         }
@@ -3569,6 +3580,7 @@
         const idxInv     = getColIndex('INVOICE NO.');
         const idxDate    = getColIndex('DATE');
         const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxCustomerName = getColIndex('CUSTOMER NAME');
         const idxBank    = getColIndex('BANK OWNER NAME');
         const idxStatus  = getColIndex('PAYMENT STATUS');
         const idxDealing = getColIndex('DEALING AMOUNT');
@@ -3596,7 +3608,7 @@
         updateStats(filtered);
 
         if (!filtered.length) {
-            document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">📭 No records found</td></tr>';
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">📭 No records found</td></tr>';
             return;
         }
 
@@ -3607,8 +3619,11 @@
             const callPhone = normalizeWhatsAppPhone(contactText);
             const callButtonHtml = callPhone ?
                 `<a class="action-btn btn-call" href="tel:+${callPhone}" title="Call ${escapeHtml(formatWhatsAppPhone(callPhone))}"><i class="fas fa-phone-alt"></i></a>` : '';
-            const contactHtml = contactText !== '-' ?
+            const contactLinkHtml = contactText !== '-' ?
                 `<button type="button" class="contact-ledger-link" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
+            const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
+            const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
+            const customerNameText = idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '';
             let statusVal  = row[idxStatus]?.toString().toUpperCase() || 'PENDING';
             let badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
                              statusVal === 'FAILED'  ? 'badge-failed'  :
@@ -3635,9 +3650,10 @@
 
             html += `<tr>
                 <td data-label="Invoice"><strong>${row[idxInv] || '-'}</strong></td>
-                <td data-label="ID Details" class="id-count-cell">${idDetailsHtml}</td>
+                <td data-label="ID Count" class="id-count-cell">${idDetailsHtml}</td>
                 <td data-label="Date">${dateDisplay}</td>
                 <td data-label="Contact">${contactHtml}</td>
+                <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
@@ -4297,6 +4313,7 @@
             invoiceNo: getLedgerRowValue(row, 'INVOICE NO.'),
             date: getLedgerRowValue(row, 'DATE'),
             contactName: getLedgerRowValue(row, 'CONTACT NO. OR NAME'),
+            customerName: getLedgerRowValue(row, 'CUSTOMER NAME'),
             bankOwner: getLedgerRowValue(row, 'BANK OWNER NAME'),
             state: getLedgerRowValue(row, 'STATE'),
             purpose: getLedgerRowValue(row, 'PURPOSE'),
@@ -4328,6 +4345,7 @@
         const fields = [
             ['date', 'Date'],
             ['contactName', 'Contact'],
+            ['customerName', 'Customer Name'],
             ['bankOwner', 'Bank Name'],
             ['state', 'State'],
             ['purpose', 'Purpose'],
@@ -4524,6 +4542,7 @@
         formData.append('invoiceNo',         document.getElementById('invoiceNo').value);
         formData.append('date',              document.getElementById('date').value);
         formData.append('contactName',       makeSheetText(document.getElementById('contactName').value));
+        formData.append('customerName',      document.getElementById('customerName').value.trim());
         formData.append('bankOwner',         document.getElementById('bankOwner').value);
         formData.append('state',             document.getElementById('state').value);
         formData.append('purpose',           document.getElementById('purpose').value);
@@ -4564,6 +4583,7 @@
         document.getElementById('edit_invoiceNo').value         = record[getColIndex('INVOICE NO.')] || '';
         document.getElementById('edit_date').value              = getLocalISODate(record[getColIndex('DATE')]);
         document.getElementById('edit_contactName').value       = showSheetText(record[getColIndex('CONTACT NO. OR NAME')]) || '';
+        document.getElementById('edit_customerName').value      = showSheetText(record[getColIndex('CUSTOMER NAME')]) || '';
         document.getElementById('edit_bankOwner').value         = record[getColIndex('BANK OWNER NAME')] || '';
         document.getElementById('edit_state').value             = record[getColIndex('STATE')] || '';
         setMultiSelectState('edit_purpose',        record[getColIndex('PURPOSE')] || '');
@@ -4596,6 +4616,7 @@
             invoiceNo: document.getElementById('edit_invoiceNo').value.trim(),
             date: document.getElementById('edit_date').value,
             contactName: document.getElementById('edit_contactName').value.trim(),
+            customerName: document.getElementById('edit_customerName').value.trim(),
             bankOwner: document.getElementById('edit_bankOwner').value.trim(),
             state: document.getElementById('edit_state').value.trim(),
             purpose: document.getElementById('edit_purpose').value.trim(),
@@ -4621,6 +4642,7 @@
         formData.append('invoiceNo',         document.getElementById('edit_invoiceNo').value);
         formData.append('date',              document.getElementById('edit_date').value);
         formData.append('contactName',       makeSheetText(document.getElementById('edit_contactName').value));
+        formData.append('customerName',      document.getElementById('edit_customerName').value.trim());
         formData.append('bankOwner',         document.getElementById('edit_bankOwner').value);
         formData.append('state',             document.getElementById('edit_state').value);
         formData.append('purpose',           document.getElementById('edit_purpose').value);
