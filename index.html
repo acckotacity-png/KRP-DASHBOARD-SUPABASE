@@ -1100,7 +1100,7 @@
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>Invoice</th><th>ID Count</th><th>Date</th><th>Contact</th><th>Name</th><th>Bank</th>
+                            <th>Invoice</th><th>ID No. / Count</th><th>Date</th><th>Contact</th><th>Name</th><th>Bank</th>
                             <th>Status</th><th>Dealing Amt</th><th>Amt Deno</th><th>UTR</th><th>Actions</th>
                         </tr>
                     </thead>
@@ -2752,10 +2752,11 @@
         }
     }
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
+        currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
-        if (header) header.innerHTML = '<th>Date</th><th>Invoice</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
+        if (header) header.innerHTML = '<th>Date</th><th>Invoice</th><th>ID Serial</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         if (idxContact === -1 || !contactKey) return;
 
@@ -2778,6 +2779,7 @@
         let totalDeal = 0, totalReceived = 0, totalRefund = 0, pendingDeal = 0, paymentApplied = 0, setupBalance = 0;
         const rowsHtml = ledgerRows.map(item => {
             const row = item.row;
+            const ledgerIdSerial = getIdActivationSerialNo(item.index);
             const statusVal = (row[idxStatus]?.toString().toUpperCase() || 'PENDING');
             const canSendReminder = statusVal === 'PENDING' || statusVal === 'PARTIAL';
             const badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
@@ -2807,6 +2809,7 @@
             return `<tr>
                 <td>${escapeHtml(formatDisplayDate(row[idxDate]) || '-')}</td>
                 <td><strong>${escapeHtml(row[idxInv] || '-')}</strong></td>
+                <td>${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
                 <td><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td class="ledger-purpose">${escapeHtml(row[idxPurpose] || '-')}</td>
                 <td class="ledger-remarks">${escapeHtml(row[idxServiceRemarks] || '-')}</td>
@@ -2840,7 +2843,7 @@
             <div class="ledger-summary-item"><span>Setup Balance</span><strong style="color:#05a660;">${formatLedgerMoney(Math.max(setupBalance, 0))}</strong></div>
             <div class="ledger-summary-item balance"><span>Balance</span><strong>${formatLedgerMoney(totalBalance)}</strong></div>
         `;
-        document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="14" style="text-align:center; padding:20px;">No records found</td></tr>';
+        document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="15" style="text-align:center; padding:20px;">No records found</td></tr>';
         renderLedgerHistory(contactKey, ledgerRows);
         document.getElementById('contactLedgerModal').classList.add('active');
     }
@@ -3650,19 +3653,19 @@
             const idActivationButtonHtml = idActivationSerialNo ?
                 `<button type="button" class="action-btn btn-wa-direct" onclick="sendIdActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Send ID Activation WhatsApp"><i class="fas fa-comment-dots"></i></button>` : '';
             const invoiceSerialHtml = idActivationSerialNo
-                ? `<small class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(idActivationSerialNo)} ID ACTIVATION</small>`
+                ? `<small class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(idActivationSerialNo)}. ID ACTIVATION</small>`
                 : '';
             const rawPurpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim() : '';
             const hasIdEntry = statusVal !== 'REFUND' && idxLogin !== -1 && showSheetText(row[idxLogin]).trim() !== '';
             const rowIdCount = hasIdEntry ? getIdActivationPurposeCount(rawPurpose) : 0;
             const purposeNames = getPurposeValidationParts(rawPurpose).purposes.join(', ');
             const idDetailsHtml = rowIdCount
-                ? `<span class="id-count-badge"><i class="fas fa-id-card"></i>${rowIdCount} ${rowIdCount === 1 ? 'ID' : 'IDs'}</span>${purposeNames ? `<small class="id-purpose-preview">${escapeHtml(purposeNames)}</small>` : ''}`
+                ? `<span class="id-count-badge"><i class="fas fa-id-card"></i>ID No. ${escapeHtml(idActivationSerialNo || '-')}</span><small class="id-purpose-preview">${rowIdCount} ${rowIdCount === 1 ? 'ID' : 'IDs'}${purposeNames ? ` · ${escapeHtml(purposeNames)}` : ''}</small>`
                 : '<span style="color:#a3aed1;">-</span>';
 
             html += `<tr>
                 <td data-label="Invoice"><div class="tracker-invoice-stack"><strong>${escapeHtml(row[idxInv] || '-')}</strong>${invoiceSerialHtml}</div></td>
-                <td data-label="ID Count" class="id-count-cell">${idDetailsHtml}</td>
+                <td data-label="ID No. / Count" class="id-count-cell">${idDetailsHtml}</td>
                 <td data-label="Date">${dateDisplay}</td>
                 <td data-label="Contact">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
