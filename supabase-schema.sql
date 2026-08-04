@@ -29,7 +29,7 @@ create table if not exists public.main_records (
   id uuid primary key default gen_random_uuid(), sequence_no bigint generated always as identity,
   invoice_no text not null default '', entry_date text not null default '', contact_name text not null default '', customer_name text not null default '',
   bank_owner text default '', state text default '', purpose text default '', service_remarks text default '', login_id text default '',
-  dealing_amount numeric(14,2) not null default 0, amount_deno numeric(14,2) not null default 0,
+  dealing_amount numeric(14,2) not null default 0, amount_deno text not null default '',
   received_amount numeric(14,2) not null default 0, id_activation_amount numeric(14,2) not null default 0,
   uploading_amount numeric(14,2) not null default 0, utr_no text default '', payment_status text not null default 'PENDING', remarks text default '',
   created_by uuid not null default auth.uid() references auth.users(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now()

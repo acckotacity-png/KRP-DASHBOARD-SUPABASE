@@ -228,10 +228,11 @@
         .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(6), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(6) { width: 7%; }
         .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(7), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(7) { width: 7%; }
         .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(8), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(8) { width: 7%; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(9), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { width: 7%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(9), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { width: 10%; }
         .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(10), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(10) { width: 7%; }
-        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(11), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { width: 14%; }
+        .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(11), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { width: 11%; }
         .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { white-space: normal; vertical-align: middle; }
+        .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { white-space: normal; overflow: visible; overflow-wrap:anywhere; }
         .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { overflow: visible; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #f4f7fe; color: #a3aed1; font-weight: 600; text-align: left; padding: 12px 10px; white-space: nowrap; }
@@ -1199,7 +1200,7 @@
                     </div>
                     <div class="form-group"><label>Login ID</label><input type="text" id="loginId"></div>
                     <div class="form-group"><label>Dealing Amount (₹)</label><input type="number" id="dealingAmount" step="0.01" oninput="calcNewAmt()"></div>
-                    <div class="form-group"><label>Amount Deno (₹)</label><input type="text" id="amountDeno"></div>
+                    <div class="form-group"><label>Amount Denominations</label><input type="text" id="amountDeno" placeholder="Example: 2000, 500, 150"></div>
                     <div class="form-group"><label>Received Amount (₹)</label><input type="number" id="receivedAmount" step="0.01" oninput="calcNewAmt()"></div>
                     <div class="form-group"><label>ID Activation Amount (₹)</label><input type="number" id="idActivationAmount" step="0.01" oninput="calcNewAmt()"></div>
                     <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (₹)</label><input type="number" id="uploadingAmount" step="0.01" readonly></div>
@@ -1293,7 +1294,7 @@
                 </div>
                 <div class="form-group"><label>Login ID</label><input type="text" id="edit_loginId"></div>
                 <div class="form-group"><label>Dealing Amount (₹)</label><input type="number" id="edit_dealingAmount" step="0.01" oninput="calcEditAmt()"></div>
-                <div class="form-group"><label>Amount Deno (₹)</label><input type="text" id="edit_amountDeno"></div>
+                <div class="form-group"><label>Amount Denominations</label><input type="text" id="edit_amountDeno" placeholder="Example: 2000, 500, 150"></div>
                 <div class="form-group"><label>Received Amount (₹)</label><input type="number" id="edit_receivedAmount" step="0.01" oninput="calcEditAmt()"></div>
                 <div class="form-group"><label>ID Activation Amount (₹)</label><input type="number" id="edit_idActivationAmount" step="0.01" oninput="calcEditAmt()"></div>
                 <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (₹)</label><input type="number" id="edit_uploadingAmount" step="0.01" readonly></div>
@@ -2782,7 +2783,7 @@
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
-        if (header) header.innerHTML = '<th>Date</th><th>Invoice</th><th>ID Serial</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
+        if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         if (idxContact === -1 || !contactKey) return;
 
@@ -2833,9 +2834,9 @@
             }
 
             return `<tr>
+                <td>${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
                 <td>${escapeHtml(formatDisplayDate(row[idxDate]) || '-')}</td>
                 <td><strong>${escapeHtml(row[idxInv] || '-')}</strong></td>
-                <td>${ledgerIdSerial ? `<span class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(ledgerIdSerial)} ID</span>` : '-'}</td>
                 <td><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td class="ledger-purpose">${escapeHtml(row[idxPurpose] || '-')}</td>
                 <td class="ledger-remarks">${escapeHtml(row[idxServiceRemarks] || '-')}</td>
@@ -3698,7 +3699,7 @@
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
-                <td data-label="Amt Deno">₹${parseFloat(row[idxAmtDeno]||0).toLocaleString('en-IN')}</td>
+                <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
                 <td data-label="UTR">${row[idxUtr] || '-'}</td>
                 <td data-label="Actions">
                     <div class="action-icons">
@@ -4375,7 +4376,7 @@
         const text = (value === null || value === undefined ? '' : value).toString().trim();
         if (!text) return '-';
         if (field === 'date') return formatDisplayDate(text) || text;
-        if (['dealingAmount', 'amountDeno', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
+        if (['dealingAmount', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
             const num = parseFloat(text);
             return isNaN(num) ? text : 'Rs. ' + num.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
@@ -5263,7 +5264,7 @@
         const text = (value === null || value === undefined ? '' : value).toString().trim();
         if (!text) return '-';
         if (field === 'date') return formatDisplayDate(text) || text;
-        if (['dealingAmount', 'amountDeno', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
+        if (['dealingAmount', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
             const num = parseFloat(text);
             return isNaN(num) ? text : 'Rs. ' + num.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
@@ -5909,7 +5910,7 @@
         const text = (value === null || value === undefined ? '' : value).toString().trim();
         if (!text) return '-';
         if (field === 'date') return formatDisplayDate(text) || text;
-        if (['dealingAmount', 'amountDeno', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
+        if (['dealingAmount', 'receivedAmount', 'idActivationAmount', 'uploadingAmount'].includes(field)) {
             const num = parseFloat(text);
             return isNaN(num) ? text : 'Rs. ' + num.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
