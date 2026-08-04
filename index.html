@@ -940,6 +940,23 @@
             background-color: #fff !important;
             color: #1b2559 !important;
         }
+
+        /* KRP Ledger: give every dashboard entry a clearly identifiable outline. */
+        #tableContainer:not(.mobile-card-view) #tableBody tr:not(.empty-row) td {
+            border-top: 1px solid #6657c7 !important;
+            border-bottom: 1px solid #6657c7 !important;
+        }
+        #tableContainer:not(.mobile-card-view) #tableBody tr:not(.empty-row) td:first-child {
+            border-left: 1px solid #6657c7 !important;
+        }
+        #tableContainer:not(.mobile-card-view) #tableBody tr:not(.empty-row) td:last-child {
+            border-right: 1px solid #6657c7 !important;
+        }
+        #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) {
+            border: 1px solid #6657c7 !important;
+            border-radius: 7px !important;
+            margin-bottom: 6px !important;
+        }
         table, thead, tbody, tr { background: transparent !important; color: #f7f7f4 !important; }
         th { background: #232825 !important; color: #d6dad6 !important; border-color: #454c47 !important; opacity: 1 !important; }
         td, #notepadTable td, #dataTable td { background: #292e2b !important; color: #f7f7f4 !important; border-color: #454c47 !important; opacity: 1 !important; }
@@ -1213,7 +1230,7 @@
 
     <div id="trackerTab" class="tab-content">
         <div class="tracker-container">
-            <div class="section-title"><i class="fas fa-chart-bar"></i> All Transactions</div>
+            <div class="section-title"><i class="fas fa-book-open"></i> KRP Ledger</div>
             <div class="toolbar">
                 <div class="notepad-search-wrap"><input type="text" id="searchInput" class="search-box" placeholder="Search Invoice / Contact / UTR" autocomplete="off" oninput="loadTrackerData(false)"><button type="button" class="notepad-search-clear" onclick="clearTrackerSearch()" title="Clear search" aria-label="Clear search"><i class="fas fa-times"></i></button></div>
                 <select id="statusFilter" class="filter-select" onchange="loadTrackerData(false)">
