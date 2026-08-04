@@ -2750,7 +2750,7 @@
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
-        if (header) header.innerHTML = '<th>Date</th><th>Invoice</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
+        if (header) header.innerHTML = '<th>Date</th><th>Invoice</th><th>Status</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         if (idxContact === -1 || !contactKey) return;
 
@@ -2762,6 +2762,7 @@
         const idxLogin   = getColIndex('LOGIN ID');
         const idxDeal    = getColIndex('DEALING AMOUNT');
         const idxRecv    = getColIndex('RECEIVED AMOUNT');
+        const idxSetup   = getColIndex('UPLOADING OR SETUP AMOUNT');
         const idxUtr     = getColIndex('UTR / TRN NO.');
         const idxRemarks = getColIndex('REMARKS');
 
@@ -2769,7 +2770,7 @@
             .map((row, index) => ({ row, index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contactKey);
 
-        let totalDeal = 0, totalReceived = 0, totalRefund = 0, pendingDeal = 0, paymentApplied = 0;
+        let totalDeal = 0, totalReceived = 0, totalRefund = 0, pendingDeal = 0, paymentApplied = 0, setupBalance = 0;
         const rowsHtml = ledgerRows.map(item => {
             const row = item.row;
             const statusVal = (row[idxStatus]?.toString().toUpperCase() || 'PENDING');
@@ -2781,6 +2782,8 @@
                                statusVal === 'PARTIAL' ? 'badge-partial' : 'badge-pending';
             const deal = parseFloat(row[idxDeal] || 0) || 0;
             const received = parseFloat(row[idxRecv] || 0) || 0;
+            const setupChange = idxSetup !== -1 ? (parseFloat(row[idxSetup] || 0) || 0) : 0;
+            setupBalance += setupChange;
             const purposeText = showSheetText(row[idxPurpose]).trim().toUpperCase();
             const balance = statusVal === 'REFUND' ? 0 : Math.max(deal - received, 0);
             totalDeal += deal;
@@ -2806,6 +2809,8 @@
                 <td>${formatLedgerMoney(deal)}</td>
                 <td style="${statusVal === 'REFUND' ? 'color:#ee5d50;font-weight:700;' : ''}">${statusVal === 'REFUND' ? '- ' : ''}${formatLedgerMoney(received)}</td>
                 <td class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
+                <td style="color:${setupChange < 0 ? '#ee5d50' : '#05a660'};font-weight:700;">${setupChange > 0 ? '+' : ''}${formatLedgerMoney(setupChange)}</td>
+                <td style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
                 <td>${escapeHtml(row[idxUtr] || '-')}</td>
                 <td class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td class="ledger-actions">
@@ -2827,9 +2832,10 @@
             <div class="ledger-summary-item"><span>Total Deal</span><strong>${formatLedgerMoney(totalDeal)}</strong></div>
             <div class="ledger-summary-item"><span>Total Received</span><strong>${formatLedgerMoney(totalReceived)}</strong></div>
             <div class="ledger-summary-item"><span>Total Refund</span><strong style="color:#ee5d50;">${formatLedgerMoney(totalRefund)}</strong></div>
+            <div class="ledger-summary-item"><span>Setup Balance</span><strong style="color:#05a660;">${formatLedgerMoney(Math.max(setupBalance, 0))}</strong></div>
             <div class="ledger-summary-item balance"><span>Balance</span><strong>${formatLedgerMoney(totalBalance)}</strong></div>
         `;
-        document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="12" style="text-align:center; padding:20px;">No records found</td></tr>';
+        document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="14" style="text-align:center; padding:20px;">No records found</td></tr>';
         renderLedgerHistory(contactKey, ledgerRows);
         document.getElementById('contactLedgerModal').classList.add('active');
     }
@@ -2968,10 +2974,9 @@
 
     // Auto calculate Due Amount balance on Data Entry
     function calcNewAmt() {
-        const d = parseFloat(document.getElementById('dealingAmount').value) || 0;
         const r = parseFloat(document.getElementById('receivedAmount').value) || 0;
         const i = parseFloat(document.getElementById('idActivationAmount').value) || 0;
-        document.getElementById('uploadingAmount').value = (d - i).toFixed(2);
+        document.getElementById('uploadingAmount').value = (r - i).toFixed(2);
         
         const statusEl = document.getElementById('paymentStatus');
         if (r > 0) {
@@ -2983,10 +2988,9 @@
     }
     // Auto calculate Due Amount balance on Edit Modal
     function calcEditAmt() {
-        const d = parseFloat(document.getElementById('edit_dealingAmount').value) || 0;
         const r = parseFloat(document.getElementById('edit_receivedAmount').value) || 0;
         const i = parseFloat(document.getElementById('edit_idActivationAmount').value) || 0;
-        document.getElementById('edit_uploadingAmount').value = (d - i).toFixed(2);
+        document.getElementById('edit_uploadingAmount').value = (r - i).toFixed(2);
         
         const statusEl = document.getElementById('edit_paymentStatus');
         if (r > 0) {
