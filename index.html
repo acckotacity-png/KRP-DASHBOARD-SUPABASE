@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
-<script type="module" src="auth-guard.js?v=8"></script>
+<script type="module" src="auth-guard.js?v=9"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>KRP ID Activation - Dashboard</title>
-    <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#05a66f">
@@ -964,6 +964,19 @@
             border: 1px solid #6657c7 !important;
             border-radius: 7px !important;
             margin-bottom: 6px !important;
+        }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Name"] {
+            white-space: normal !important;
+            overflow: visible !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            line-height: 1.3;
+        }
+        @media (max-width: 768px) {
+            #notepadTable td[data-label="Name"] { white-space: normal !important; overflow-wrap: anywhere !important; word-break: break-word !important; line-height: 1.3; }
+        }
+        @media (max-width: 768px) {
+            #ledgerCustomerName { max-width: 75vw; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
         }
         table, thead, tbody, tr { background: transparent !important; color: #f7f7f4 !important; }
         th { background: #232825 !important; color: #d6dad6 !important; border-color: #454c47 !important; opacity: 1 !important; }
@@ -3937,10 +3950,11 @@
     function applySavedTrackerRow(result, fallbackRowIndex = null) {
         if (!result || !Array.isArray(result.savedRow)) return false;
         if (Array.isArray(result.headers) && result.headers.length) currentHeaders = result.headers;
-        const resultIndex = Number(result.rowIndex);
+        const resultIndex = result.rowIndex == null ? NaN : Number(result.rowIndex);
+        const fallbackIndex = fallbackRowIndex == null ? NaN : Number(fallbackRowIndex);
         const rowIndex = Number.isInteger(resultIndex) && resultIndex >= 0
             ? resultIndex
-            : Number(fallbackRowIndex);
+            : fallbackIndex;
         if (Number.isInteger(rowIndex) && rowIndex >= 0 && rowIndex <= currentData.length) {
             currentData[rowIndex] = result.savedRow;
         } else {
@@ -5545,18 +5559,23 @@
     // ─── DELETE ───────────────────────────────────────────────────
     async function deleteRecord(rowIndex) {
         if (!confirm('Delete this record?')) return;
+        const previousData = currentData.map(row => Array.isArray(row) ? row.slice() : row);
+        const appliedImmediately = applyDeletedTrackerRow(rowIndex);
         try {
-            showMessage('Deleting...', 'pending');
+            showMessage('Deleted · syncing...', 'pending');
             const response = await fetch(`${APPS_SCRIPT_URL}?action=delete&row=${rowIndex}&t=${Date.now()}`);
             const result   = await response.json();
             if (result.success) {
                 showMessage('Deleted successfully', 'success');
-                const applied = applyDeletedTrackerRow(rowIndex);
-                if (!applied) loadTrackerData(true);
+                if (!appliedImmediately) loadTrackerData(true);
                 else scheduleTrackerBackgroundSync();
             }
-            else showMessage(result.message || 'Delete failed', 'error');
-        } catch (e) { showMessage('Network error', 'error'); }
+            else throw new Error(result.message || result.error || 'Delete failed');
+        } catch (e) {
+            currentData = previousData;
+            renderTrackerStateFromMemory();
+            showMessage(`${e.message || 'Network error'} · entry restored`, 'error');
+        }
     }
 
     // ─── EXPORT ───────────────────────────────────────────────────
@@ -7288,30 +7307,49 @@
         payload.append('action', rowIndex === '' ? 'addNotepad' : 'updateNotepad');
         if (rowIndex !== '') payload.append('row', rowIndex);
         ids.forEach((id, i) => payload.append(keys[i], document.getElementById(id)?.value || ''));
+        const previousRows = notepadRows.map(row => row.slice());
+        if (rowIndex === '') notepadRows.push(afterRow);
+        else notepadRows[Number(rowIndex)] = afterRow;
+        writeNotepadCache(notepadRows);
+        renderNotepadTable();
+        closeNotepadModal();
         try {
-            showMessage(rowIndex === '' ? 'Saving task...' : 'Updating task...', 'pending');
+            showMessage(rowIndex === '' ? 'Task added · syncing...' : 'Task updated · syncing...', 'pending');
             const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: payload });
             const result = await response.json();
             if (!result.success) throw new Error(result.message || result.error || 'Save failed');
             appendNotepadHistory(beforeRow, afterRow, rowIndex === '' ? 'Task Created' : 'Task Updated');
-            closeNotepadModal();
-            await loadNotepadData(true);
             if (activeLedgerSource === 'notepad' && document.getElementById('contactLedgerModal')?.classList.contains('active')) {
                 renderNotepadContactLedger(activeLedgerKey, activeLedgerTitle);
             }
             showMessage(result.message || 'Task saved', 'success');
-        } catch (error) { showMessage(error.message || 'Network error', 'error'); }
+            setTimeout(() => loadNotepadData(true), 250);
+        } catch (error) {
+            notepadRows = previousRows;
+            writeNotepadCache(notepadRows);
+            renderNotepadTable();
+            showMessage(`${error.message || 'Network error'} · change restored`, 'error');
+        }
     }
 
     async function deleteNotepadEntry(index) {
         if (!confirm('Delete this Notepad task permanently?')) return;
+        const previousRows = notepadRows.map(row => row.slice());
+        notepadRows.splice(index, 1);
+        writeNotepadCache(notepadRows);
+        renderNotepadTable();
         try {
             const response = await fetch(`${APPS_SCRIPT_URL}?action=deleteNotepad&row=${index}&t=${Date.now()}`);
             const result = await response.json();
             if (!result.success) throw new Error(result.message || result.error || 'Delete failed');
-            await loadNotepadData(true);
             showMessage(result.message || 'Task deleted', 'success');
-        } catch (error) { showMessage(error.message || 'Network error', 'error'); }
+            setTimeout(() => loadNotepadData(true), 250);
+        } catch (error) {
+            notepadRows = previousRows;
+            writeNotepadCache(notepadRows);
+            renderNotepadTable();
+            showMessage(`${error.message || 'Network error'} · entry restored`, 'error');
+        }
     }
 
     function showMessage(msg, type) {

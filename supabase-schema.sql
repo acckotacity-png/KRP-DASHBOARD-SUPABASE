@@ -12,6 +12,14 @@ create table if not exists public.app_users (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.active_sessions (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  session_token uuid not null,
+  device_label text not null default '',
+  signed_in_at timestamptz not null default now(),
+  last_seen timestamptz not null default now()
+);
+
 create or replace function public.is_krp_user()
 returns boolean language sql stable security definer set search_path = public
 as $$ select exists(select 1 from public.app_users where user_id = (select auth.uid()) and active = true) $$;
@@ -136,6 +144,7 @@ begin
 end $$;
 
 alter table public.app_users enable row level security;
+alter table public.active_sessions enable row level security;
 alter table public.main_records enable row level security;
 alter table public.business_settings enable row level security;
 alter table public.monthly_records enable row level security;
@@ -148,6 +157,15 @@ alter table public.audit_log enable row level security;
 
 drop policy if exists "user reads own access" on public.app_users;
 create policy "user reads own access" on public.app_users for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists "user reads own active session" on public.active_sessions;
+drop policy if exists "user creates own active session" on public.active_sessions;
+drop policy if exists "user updates own active session" on public.active_sessions;
+drop policy if exists "user deletes own active session" on public.active_sessions;
+create policy "user reads own active session" on public.active_sessions for select to authenticated using (user_id = (select auth.uid()));
+create policy "user creates own active session" on public.active_sessions for insert to authenticated with check (user_id = (select auth.uid()));
+create policy "user updates own active session" on public.active_sessions for update to authenticated using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+create policy "user deletes own active session" on public.active_sessions for delete to authenticated using (user_id = (select auth.uid()));
 
 do $$
 declare table_name text;
@@ -177,10 +195,17 @@ drop policy if exists "admins read audit" on public.audit_log;
 create policy "admins read audit" on public.audit_log for select to authenticated using ((select public.is_krp_admin()));
 
 grant select on public.app_users to authenticated;
+grant select, insert, update, delete on public.active_sessions to authenticated;
 grant select, insert, update, delete on public.main_records, public.business_settings, public.monthly_records,
   public.transactions, public.notepad_tasks, public.udhari_records, public.expenses, public.expense_budgets to authenticated;
 grant select on public.audit_log to authenticated;
 grant usage, select on all sequences in schema public to authenticated;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.active_sessions;
+exception when duplicate_object then null;
+end $$;
 
 -- FIRST USER ADD KARNE KA EXAMPLE (Google login ek baar karne ke baad SQL Editor me chalayein):
 -- insert into public.app_users(user_id,email,full_name,role,active)

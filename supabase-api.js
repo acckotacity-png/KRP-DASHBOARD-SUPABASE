@@ -60,7 +60,7 @@ function expenseData(expenses,budgets){const names=["JANUARY","FEBRUARY","MARCH"
 async function route(client,user,p){
   const action=s(p.action);
   if(action==="getData"){const rows=await all(client,"main_records");return {success:true,headers:MAIN_HEADERS,data:rows.map(mainRow)};}
-  if(action==="add"||action==="update"){const payload=mainPayload(p);if(action==="add"){const {error}=await client.from("main_records").insert(payload);if(error)throw error;}else{const id=await idAt(client,"main_records",p.row);const {error}=await client.from("main_records").update(payload).eq("id",id);if(error)throw error;}return {success:true};}
+  if(action==="add"||action==="update"){const payload=mainPayload(p);let saved;if(action==="add"){const {data,error}=await client.from("main_records").insert(payload).select("*").single();if(error)throw error;saved=data;}else{const id=await idAt(client,"main_records",p.row);const {data,error}=await client.from("main_records").update(payload).eq("id",id).select("*").single();if(error)throw error;saved=data;}return {success:true,headers:MAIN_HEADERS,...(action==="update"?{rowIndex:n(p.row)}:{}),savedRow:mainRow(saved)};}
   if(action==="delete"){const id=await idAt(client,"main_records",p.row);const {error}=await client.from("main_records").delete().eq("id",id);if(error)throw error;return {success:true};}
   if(action==="updateStatusUtr"){
     const rows=await all(client,"main_records"), rowIndex=n(p.row), current=rows[rowIndex];
