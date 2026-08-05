@@ -1171,7 +1171,7 @@
             grid-column:1 / -1 !important; min-height:67px !important; padding:6px !important;
         }
         #tableContainer.mobile-card-view .tracker-card-head {
-            grid-template-columns:minmax(1.55fr,2fr) repeat(3,minmax(0,1fr)) !important;
+            grid-template-columns:minmax(1.55fr,2fr) repeat(5,minmax(0,1fr)) !important;
             gap:3px !important; background:#f8fffa !important;
         }
         #tableContainer.mobile-card-view .tracker-head-item {
@@ -1183,9 +1183,10 @@
         #tableContainer.mobile-card-view .tracker-head-invoice::before { left:5px; width:30px; height:30px; border-radius:7px; font-size:12px; }
         #tableContainer.mobile-card-view .tracker-head-label { font-size:8px !important; }
         #tableContainer.mobile-card-view .tracker-head-value,
-        #tableContainer.mobile-card-view .tracker-head-invoice .tracker-head-value { font-size:12px !important; line-height:1.15; }
+        #tableContainer.mobile-card-view .tracker-head-invoice .tracker-head-value { font-size:12px !important; line-height:1.15; font-weight:700; }
+        #tableContainer.mobile-card-view .tracker-head-value.emphasis { font-weight:900; }
         #tableContainer.mobile-card-view .tracker-head-status { align-items:flex-start !important; text-align:left !important; }
-        #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:8px !important; padding:3px 5px !important; }
+        #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:12px !important; padding:3px 5px !important; }
         #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1 !important; min-height:45px !important; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Actions"] { grid-column:1 / -1 !important; padding:7px 0 0 !important; }
         #tableContainer.mobile-card-view .action-icons { gap:5px !important; }
@@ -1200,7 +1201,7 @@
             #tableContainer.mobile-card-view #dataTable td { min-height:46px !important; padding:5px !important; font-size:9px !important; }
             #tableContainer.mobile-card-view #dataTable td::before { font-size:6.5px !important; }
             #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { min-height:60px !important; padding:4px !important; }
-            #tableContainer.mobile-card-view .tracker-card-head { grid-template-columns:minmax(1.5fr,1.8fr) repeat(3,minmax(0,1fr)) !important; gap:1px !important; }
+            #tableContainer.mobile-card-view .tracker-card-head { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:1px !important; }
             #tableContainer.mobile-card-view .tracker-head-item { min-height:49px !important; padding:3px !important; }
             #tableContainer.mobile-card-view .tracker-head-invoice { padding-left:31px !important; }
             #tableContainer.mobile-card-view .tracker-head-invoice::before { left:2px; width:25px; height:25px; font-size:10px; }
@@ -1208,7 +1209,7 @@
             #tableContainer.mobile-card-view .tracker-head-value,
             #tableContainer.mobile-card-view .tracker-head-invoice .tracker-head-value { font-size:8px !important; overflow-wrap:anywhere; }
             #tableContainer.mobile-card-view .activation-serial-label { font-size:5.5px !important; padding:1px 3px !important; }
-            #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:6px !important; padding:2px 3px !important; }
+            #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:8px !important; padding:2px 3px !important; }
             #tableContainer.mobile-card-view .action-btn { flex:0 0 29px !important; width:29px !important; height:28px !important; padding:0 !important; }
         }
     </style>
@@ -4444,16 +4445,16 @@
 
             html += `<tr>
                 <td data-label="Invoice"><div class="tracker-card-head">
-                    <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
-                    <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value">${escapeHtml(idActivationSerialNo || '-')}</span></div>
+                    <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value emphasis">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
+                    <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item tracker-head-status"><span class="tracker-head-label">Status</span><span class="badge ${badgeClass}">${statusVal}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Count</span><span class="tracker-head-value">${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</span></div>
+                    <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis">${dateDisplay}</span></div>
+                    <div class="tracker-head-item"><span class="tracker-head-label">Amount</span><span class="tracker-head-value emphasis">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</span></div>
                 </div></td>
-                <td data-label="Date">${dateDisplay}</td>
                 <td data-label="Contact">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
-                <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
                 <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
