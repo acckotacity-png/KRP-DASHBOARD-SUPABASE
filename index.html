@@ -1970,10 +1970,12 @@
         loadPurposeManagerSettings();
         loadSavedBusinessSettings();
         wireContactAutofill();
+        wireUtrNormalization();
         wireDefaulterWarningLookup();
         bindRecordValidation('');
         bindRecordValidation('edit_');
         if (window.innerWidth < 768) toggleViewMode();
+        setupTrackerAutoResponsiveView();
         const restoredTab = getSavedDashboardTab();
         if (restoredTab !== 'form' && !history.state?.krpTab) {
             history.replaceState({ krpTab: 'form' }, '', location.href);
@@ -2632,21 +2634,42 @@
 
     function toggleViewMode() {
         isMobileView = !isMobileView;
+        applyTrackerResponsiveView();
+    }
+
+    function applyTrackerResponsiveView() {
         const container = document.getElementById('tableContainer');
         const btn = document.getElementById('viewModeBtn');
-        if (isMobileView) {
-            container.classList.add('mobile-card-view');
+        if (!container) return;
+        const width = container.getBoundingClientRect().width;
+        const autoCompact = width > 0 && width < 1180;
+        const compact = isMobileView || autoCompact;
+        container.classList.toggle('mobile-card-view', compact);
+        if (compact) {
             if (btn) {
-                btn.innerHTML = '<i class="fas fa-desktop"></i> Desktop View';
+                btn.innerHTML = autoCompact && !isMobileView ? '<i class="fas fa-compress-arrows-alt"></i> Auto Compact' : '<i class="fas fa-desktop"></i> Desktop View';
                 btn.style.background = '#05cd99';
             }
         } else {
-            container.classList.remove('mobile-card-view');
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Mobile View';
                 btn.style.background = '#4318ff';
             }
         }
+    }
+
+    function setupTrackerAutoResponsiveView() {
+        const container = document.getElementById('tableContainer');
+        if (!container || container.dataset.resizeObserverReady === '1') return;
+        container.dataset.resizeObserverReady = '1';
+        if ('ResizeObserver' in window) {
+            const observer = new ResizeObserver(() => applyTrackerResponsiveView());
+            observer.observe(container);
+            window.trackerResizeObserver = observer;
+        } else {
+            window.addEventListener('resize', applyTrackerResponsiveView, { passive:true });
+        }
+        applyTrackerResponsiveView();
     }
 
     // ─── TABS ─────────────────────────────────────────────────────
@@ -2907,10 +2930,25 @@
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         }[ch]));
     }
-    function formatUtrDisplay(value) {
+    function normalizeUtrValue(value) {
         const raw = showSheetText(value).trim();
+        if (!raw) return '';
+        return raw.split(/[\s,;&/|]+/).map(part => part.trim()).filter(Boolean).join(', ');
+    }
+    function wireUtrNormalization() {
+        ['utrNo','edit_utrNo','modalUtr','ledgerPaymentUtr'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input || input.dataset.utrNormalizeReady === '1') return;
+            const normalize = () => { input.value = normalizeUtrValue(input.value); };
+            input.addEventListener('blur', normalize);
+            input.addEventListener('change', normalize);
+            input.dataset.utrNormalizeReady = '1';
+        });
+    }
+    function formatUtrDisplay(value) {
+        const raw = normalizeUtrValue(value);
         if (!raw) return '<span class="utr-value">-</span>';
-        const parts = raw.split(/\r?\n|[,;]+|\s*&\s*/).map(part => part.trim()).filter(Boolean);
+        const parts = raw.split(',').map(part => part.trim()).filter(Boolean);
         const values = parts.length ? parts : [raw];
         return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="utr-value">${escapeHtml(part)}</span>`).join('')}</span>`;
     }
@@ -3403,7 +3441,7 @@
         const entryLabel = entryType === 'REFUND' ? 'Refund' : isPendingEntry ? 'Pending' : 'Payment';
         const entryDate = document.getElementById('ledgerPaymentDate').value;
         const amount = parseFloat(document.getElementById('ledgerPaymentAmount').value) || 0;
-        const utr = document.getElementById('ledgerPaymentUtr').value.trim();
+        const utr = normalizeUtrValue(document.getElementById('ledgerPaymentUtr').value);
         const remarks = document.getElementById('ledgerPaymentRemarks').value.trim();
         if (!sourceRecord) return showMessage('Original ledger record not found', 'error');
         if (!entryDate) return showMessage('Date select karein', 'error');
@@ -5130,7 +5168,7 @@
         formData.append('receivedAmount',    document.getElementById('receivedAmount').value);
         formData.append('idActivationAmount',document.getElementById('idActivationAmount').value);
         formData.append('uploadingAmount',   document.getElementById('uploadingAmount').value);
-        formData.append('utrNo',             document.getElementById('utrNo').value);
+        formData.append('utrNo',             normalizeUtrValue(document.getElementById('utrNo').value));
         formData.append('paymentStatus',     document.getElementById('paymentStatus').value);
         formData.append('remarks',           document.getElementById('remarks').value);
 
@@ -5204,7 +5242,7 @@
             receivedAmount: document.getElementById('edit_receivedAmount').value.trim(),
             idActivationAmount: document.getElementById('edit_idActivationAmount').value.trim(),
             uploadingAmount: document.getElementById('edit_uploadingAmount').value.trim(),
-            utrNo: document.getElementById('edit_utrNo').value.trim(),
+            utrNo: normalizeUtrValue(document.getElementById('edit_utrNo').value),
             paymentStatus: document.getElementById('edit_paymentStatus').value.trim(),
             remarks: document.getElementById('edit_remarks').value.trim()
         };
@@ -5230,7 +5268,7 @@
         formData.append('receivedAmount',    document.getElementById('edit_receivedAmount').value);
         formData.append('idActivationAmount',document.getElementById('edit_idActivationAmount').value);
         formData.append('uploadingAmount',   document.getElementById('edit_uploadingAmount').value);
-        formData.append('utrNo',             document.getElementById('edit_utrNo').value);
+        formData.append('utrNo',             normalizeUtrValue(document.getElementById('edit_utrNo').value));
         formData.append('paymentStatus',     document.getElementById('edit_paymentStatus').value);
         formData.append('remarks',           document.getElementById('edit_remarks').value);
 
@@ -5307,7 +5345,7 @@
     async function savePaymentUpdate() {
         const rowIndex = document.getElementById('modalRowIndex').value;
         let newStatus = document.getElementById('modalStatus').value;
-        const newUtr    = document.getElementById('modalUtr').value.trim();
+        const newUtr    = normalizeUtrValue(document.getElementById('modalUtr').value);
         const idAmountEl = document.getElementById('modalIdActivationAmount');
         const newIdActivationAmount = Math.max(parseFloat(idAmountEl.value || '0') || 0, 0);
         const openingBalance = parseFloat(idAmountEl.dataset.openingBalance || '0') || 0;
