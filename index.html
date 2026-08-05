@@ -1063,11 +1063,31 @@
             #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1; }
         }
         @media (max-width:520px) {
-            #tableContainer.mobile-card-view #tableBody { gap:12px; }
-            #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) { grid-template-columns:1fr; padding:11px !important; gap:7px; border-radius:13px !important; }
-            #tableContainer.mobile-card-view #dataTable td { grid-column:1 / -1 !important; min-height:63px; padding:10px 11px !important; font-size:12px !important; }
-            #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"], #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { min-height:82px; }
-            #tableContainer.mobile-card-view .action-btn { min-width:0; flex:1 1 calc(50% - 5px); justify-content:center; }
+            #tableContainer.mobile-card-view #tableBody { gap:10px; }
+            #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) {
+                grid-template-columns:repeat(2,minmax(0,1fr)); padding:8px !important; gap:5px; border-radius:11px !important;
+                box-shadow:0 4px 13px rgba(17,43,73,.08) !important;
+            }
+            #tableContainer.mobile-card-view #tableBody tr:not(.empty-row)::before { height:4px; }
+            #tableContainer.mobile-card-view #dataTable td {
+                min-height:52px; padding:7px 8px !important; border-radius:8px !important; gap:3px;
+                font-size:11.5px !important; line-height:1.25;
+            }
+            #tableContainer.mobile-card-view #dataTable td::before { font-size:8.5px; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { grid-column:1 / -1 !important; min-height:70px; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] strong { font-size:17px; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { min-height:52px; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1 !important; min-height:52px; font-size:11.5px !important; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Actions"] { grid-column:1 / -1 !important; padding-top:8px !important; }
+            #tableContainer.mobile-card-view .action-icons { gap:5px !important; }
+            #tableContainer.mobile-card-view .action-btn {
+                flex:0 0 33px !important; width:33px !important; min-width:33px !important; height:32px !important;
+                padding:0 !important; justify-content:center; border-radius:7px !important; font-size:11px !important;
+            }
+            #tableContainer.mobile-card-view .action-text { display:none !important; }
+            #tableContainer.mobile-card-view .activation-serial-label { padding:2px 5px; font-size:7.5px; }
+            #tableContainer.mobile-card-view .id-count-badge { padding:2px 5px; font-size:8px; }
+            #tableContainer.mobile-card-view .id-purpose-preview, #tableContainer.mobile-card-view .tracker-login-subline { font-size:7.5px; }
         }
         .profile-header .btn-logout-corner {
             background: transparent !important;
