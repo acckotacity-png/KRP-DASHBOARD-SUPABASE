@@ -19,7 +19,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { background-color: #f4f7fe; color: #2b3674; padding: 15px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1700px; margin: 0 auto; }
         
         /* Profile Header */
         .profile-header {
@@ -264,9 +264,13 @@
             .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1) { width: 10%; }
             .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2) { width: 10%; }
             .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(4), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { width: 9%; }
-            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(5), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(5) { width: 8%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(5), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(5) { width: 7%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(6), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(6) { width: 6%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(9), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { width: 12%; }
             .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(11), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { width: 18%; padding-left: 6px; padding-right: 6px; overflow: visible; }
             .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) .action-icons { justify-content: flex-start; align-content: flex-start; width: 100%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable { font-size: 13px; }
+            .table-wrapper:not(.mobile-card-view) #dataTable td { padding: 11px 7px; }
         }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #f4f7fe; color: #a3aed1; font-weight: 600; text-align: left; padding: 12px 10px; white-space: nowrap; }
@@ -972,6 +976,22 @@
             word-break: break-word !important;
             line-height: 1.3;
         }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact"],
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact"] .contact-ledger-link {
+            white-space: nowrap !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+        }
+        #dataTable td[data-label="UTR"] {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            font-size: 12.5px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+        .utr-stack { display:flex; flex-direction:column; gap:3px; min-width:0; }
+        .utr-value { display:block; width:100%; white-space:normal; overflow-wrap:anywhere; word-break:break-word; color:inherit; }
         @media (max-width: 768px) {
             #notepadTable td[data-label="Name"] { white-space: normal !important; overflow-wrap: anywhere !important; word-break: break-word !important; line-height: 1.3; }
         }
@@ -2887,6 +2907,13 @@
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         }[ch]));
     }
+    function formatUtrDisplay(value) {
+        const raw = showSheetText(value).trim();
+        if (!raw) return '<span class="utr-value">-</span>';
+        const parts = raw.split(/\r?\n|[,;]+|\s*&\s*/).map(part => part.trim()).filter(Boolean);
+        const values = parts.length ? parts : [raw];
+        return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="utr-value">${escapeHtml(part)}</span>`).join('')}</span>`;
+    }
     function normalizeMobile10(value) {
         const digits = showSheetText(value).replace(/\D/g, '');
         if (digits.length >= 10) return digits.slice(-10);
@@ -3304,7 +3331,7 @@
                 <td data-label="Due" class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
                 <td data-label="Setup +/-" style="color:${setupChange < 0 ? '#ee5d50' : '#05a660'};font-weight:700;">${setupChange > 0 ? '+' : ''}${formatLedgerMoney(setupChange)}</td>
                 <td data-label="Setup Balance" style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
-                <td data-label="UTR">${escapeHtml(row[idxUtr] || '-')}</td>
+                <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Actions" class="ledger-actions">
@@ -4201,7 +4228,7 @@
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
                 <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
                 <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
-                <td data-label="UTR">${row[idxUtr] || '-'}</td>
+                <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Actions">
                     <div class="action-icons">
