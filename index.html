@@ -1035,6 +1035,15 @@
         #tableContainer.mobile-card-view #dataTable td::before { content:attr(data-label); color:#65748b; font-size:11px; font-weight:700; letter-spacing:.02em; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { order:1; grid-column:span 2; min-height:104px; background:linear-gradient(135deg,#f5fff9,#fff) !important; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] strong { font-size:clamp(19px,2vw,28px); color:#102348; letter-spacing:.01em; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { grid-column:1 / -1; padding:14px 16px !important; }
+        #tableContainer.mobile-card-view .tracker-card-head { display:grid; grid-template-columns:minmax(1.6fr,2fr) repeat(3,minmax(0,1fr)); gap:10px; width:100%; align-items:stretch; }
+        #tableContainer.mobile-card-view .tracker-head-item { display:flex; flex-direction:column; justify-content:center; min-width:0; padding:7px 10px; border-right:1px solid #dce5ed; }
+        #tableContainer.mobile-card-view .tracker-head-item:last-child { border-right:0; }
+        #tableContainer.mobile-card-view .tracker-head-label { color:#65748b; font-size:10px; font-weight:800; }
+        #tableContainer.mobile-card-view .tracker-head-value { color:#102348; font-size:15px; font-weight:900; line-height:1.25; overflow-wrap:anywhere; }
+        #tableContainer.mobile-card-view .tracker-head-invoice .tracker-head-value { font-size:clamp(18px,2vw,26px); }
+        #tableContainer.mobile-card-view .tracker-head-status { align-items:center; text-align:center; }
+        #tableContainer.mobile-card-view .tracker-head-status .badge { margin-top:3px; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { order:2; min-height:104px; align-items:center; background:#f4fbf6 !important; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Status"]::before { align-self:center; }
         #tableContainer.mobile-card-view #dataTable td[data-label="ID No. / Count"] { order:3; }
@@ -1076,6 +1085,11 @@
             #tableContainer.mobile-card-view #dataTable td::before { font-size:8.5px; }
             #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { grid-column:1 / -1 !important; min-height:70px; }
             #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] strong { font-size:17px; }
+            #tableContainer.mobile-card-view .tracker-card-head { grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; }
+            #tableContainer.mobile-card-view .tracker-head-item { min-height:45px; padding:5px 6px; border:1px solid #dfe8ef; border-radius:7px; }
+            #tableContainer.mobile-card-view .tracker-head-label { font-size:7.5px; }
+            #tableContainer.mobile-card-view .tracker-head-value, #tableContainer.mobile-card-view .tracker-head-invoice .tracker-head-value { font-size:11px; }
+            #tableContainer.mobile-card-view .tracker-head-status { align-items:flex-start; text-align:left; }
             #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { min-height:50px; }
             #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1 !important; min-height:52px; font-size:11.5px !important; }
             #tableContainer.mobile-card-view #dataTable td[data-label="Actions"] { grid-column:1 / -1 !important; padding-top:8px !important; }
@@ -4300,9 +4314,6 @@
         filtered.forEach((row) => {
             const originalIdx = currentData.indexOf(row);
             const contactText = showSheetText(row[idxContact]).trim() || '-';
-            const callPhone = normalizeWhatsAppPhone(contactText);
-            const callButtonHtml = callPhone ?
-                `<a class="action-btn btn-call" href="tel:+${callPhone}" title="Call ${escapeHtml(formatWhatsAppPhone(callPhone))}"><i class="fas fa-phone-alt"></i><span class="action-text">Call</span></a>` : '';
             const contactLinkHtml = contactText !== '-' ?
                 `<button type="button" class="contact-ledger-link" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
@@ -4338,8 +4349,12 @@
                 : '<span style="color:#a3aed1;">-</span>';
 
             html += `<tr>
-                <td data-label="Invoice"><div class="tracker-invoice-stack"><strong>${escapeHtml(row[idxInv] || '-')}</strong>${invoiceSerialHtml}</div></td>
-                <td data-label="ID No. / Count" class="id-count-cell">${idDetailsHtml}</td>
+                <td data-label="Invoice"><div class="tracker-card-head">
+                    <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
+                    <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value">${escapeHtml(idActivationSerialNo || '-')}</span></div>
+                    <div class="tracker-head-item tracker-head-status"><span class="tracker-head-label">Status</span><span class="badge ${badgeClass}">${statusVal}</span></div>
+                    <div class="tracker-head-item"><span class="tracker-head-label">ID Count</span><span class="tracker-head-value">${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</span></div>
+                </div></td>
                 <td data-label="Date">${dateDisplay}</td>
                 <td data-label="Contact">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
@@ -4347,10 +4362,8 @@
                 <td data-label="Dealing Amt">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</td>
                 <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="Actions">
                     <div class="action-icons">
-                        ${callButtonHtml}
                         <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i><span class="action-text">WhatsApp</span></button>
                         ${idActivationButtonHtml}
                         ${activationDoneButtonHtml}
