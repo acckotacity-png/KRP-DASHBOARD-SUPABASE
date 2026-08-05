@@ -260,6 +260,14 @@
         .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { white-space: normal; vertical-align: middle; }
         .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(9) { white-space: normal; overflow: visible; overflow-wrap:anywhere; }
         .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { overflow: visible; }
+        @media (min-width: 769px) {
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(1), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(1) { width: 10%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(2), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(2) { width: 10%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(4), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(4) { width: 9%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(5), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(5) { width: 8%; }
+            .table-wrapper:not(.mobile-card-view) #dataTable th:nth-child(11), .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) { width: 18%; padding-left: 6px; padding-right: 6px; overflow: visible; }
+            .table-wrapper:not(.mobile-card-view) #dataTable td:nth-child(11) .action-icons { justify-content: flex-start; align-content: flex-start; width: 100%; }
+        }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #f4f7fe; color: #a3aed1; font-weight: 600; text-align: left; padding: 12px 10px; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #e0e5f2; color: #2b3674; font-weight: 500; }
