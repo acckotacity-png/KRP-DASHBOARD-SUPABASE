@@ -1009,6 +1009,66 @@
         .btn-settings, .btn-outline { background: #343a36 !important; color: #fff !important; border-color: #515a53 !important; }
         .status-badge, .notepad-status-badge, .reminder-badge { opacity: 1 !important; }
         }
+        /* KRP Ledger transaction-card redesign (active theme). */
+        .action-text { display:none; }
+        #tableContainer.mobile-card-view { overflow:visible !important; border:0 !important; background:transparent !important; }
+        #tableContainer.mobile-card-view #dataTable,
+        #tableContainer.mobile-card-view #dataTable tbody { display:block !important; width:100% !important; min-width:0 !important; }
+        #tableContainer.mobile-card-view #dataTable thead { position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0 0 0 0) !important; }
+        #tableContainer.mobile-card-view #tableBody { display:flex !important; flex-direction:column; gap:16px; }
+        #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) {
+            position:relative; display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
+            width:100%; margin:0 !important; padding:18px !important; overflow:hidden;
+            border:1px solid #dce5ed !important; border-radius:17px !important; background:#fff !important;
+            box-shadow:0 7px 22px rgba(17,43,73,.09) !important;
+        }
+        #tableContainer.mobile-card-view #tableBody tr:not(.empty-row)::before {
+            content:""; position:absolute; inset:0 0 auto; height:5px; background:linear-gradient(90deg,#079447,#35c66b 38%,transparent 38%);
+        }
+        #tableContainer.mobile-card-view #dataTable td {
+            display:flex !important; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px;
+            min-width:0; min-height:76px; margin:0 !important; padding:12px 14px !important;
+            border:1px solid #e0e8ef !important; border-radius:12px !important; background:#fbfdff !important;
+            color:#102348 !important; white-space:normal !important; overflow:visible !important; text-overflow:unset !important;
+            font-size:14px !important; line-height:1.35;
+        }
+        #tableContainer.mobile-card-view #dataTable td::before { content:attr(data-label); color:#65748b; font-size:11px; font-weight:700; letter-spacing:.02em; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { order:1; grid-column:span 2; min-height:104px; background:linear-gradient(135deg,#f5fff9,#fff) !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] strong { font-size:clamp(19px,2vw,28px); color:#102348; letter-spacing:.01em; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { order:2; min-height:104px; align-items:center; background:#f4fbf6 !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Status"]::before { align-self:center; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="ID No. / Count"] { order:3; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Date"] { order:4; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact"] { order:5; white-space:nowrap !important; overflow-x:auto !important; word-break:normal !important; overflow-wrap:normal !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact"] .contact-ledger-link { white-space:nowrap !important; word-break:normal !important; overflow-wrap:normal !important; font-size:15px; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Name"] { order:6; white-space:normal !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Bank"] { order:7; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Dealing Amt"] { order:8; font-size:18px !important; font-weight:800; color:#087443 !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Denominations"] { order:9; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { order:10; grid-column:span 2; font-size:14px !important; font-weight:800; }
+        #tableContainer.mobile-card-view .utr-stack { display:flex; flex-direction:column; gap:3px; }
+        #tableContainer.mobile-card-view .utr-value { display:block; color:#102348; overflow-wrap:anywhere; }
+        #tableContainer.mobile-card-view .utr-value:not(:last-child)::after { content:","; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Actions"] { order:20; grid-column:1 / -1; min-height:auto; background:#fff !important; border-width:1px 0 0 !important; border-radius:0 !important; padding:14px 2px 0 !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]::before { display:none; }
+        #tableContainer.mobile-card-view .action-icons { display:flex !important; flex-wrap:wrap !important; justify-content:flex-start !important; gap:8px !important; width:100%; }
+        #tableContainer.mobile-card-view .action-btn {
+            display:inline-flex !important; width:auto !important; min-width:92px; height:39px !important; padding:0 12px !important;
+            gap:7px; border:1px solid currentColor !important; border-radius:9px !important; font-size:12px !important; font-weight:800;
+        }
+        #tableContainer.mobile-card-view .action-text { display:inline !important; white-space:nowrap; }
+        @media (max-width:850px) {
+            #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) { grid-template-columns:repeat(2,minmax(0,1fr)); padding:14px !important; gap:9px; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] { grid-column:1 / -1; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1; }
+        }
+        @media (max-width:520px) {
+            #tableContainer.mobile-card-view #tableBody { gap:12px; }
+            #tableContainer.mobile-card-view #tableBody tr:not(.empty-row) { grid-template-columns:1fr; padding:11px !important; gap:7px; border-radius:13px !important; }
+            #tableContainer.mobile-card-view #dataTable td { grid-column:1 / -1 !important; min-height:63px; padding:10px 11px !important; font-size:12px !important; }
+            #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"], #tableContainer.mobile-card-view #dataTable td[data-label="Status"] { min-height:82px; }
+            #tableContainer.mobile-card-view .action-btn { min-width:0; flex:1 1 calc(50% - 5px); justify-content:center; }
+        }
         .profile-header .btn-logout-corner {
             background: transparent !important;
             border: 0 !important;
@@ -2643,11 +2703,11 @@
         if (!container) return;
         const width = container.getBoundingClientRect().width;
         const autoCompact = width > 0 && width < 1180;
-        const compact = isMobileView || autoCompact;
+        const compact = true;
         container.classList.toggle('mobile-card-view', compact);
         if (compact) {
             if (btn) {
-                btn.innerHTML = autoCompact && !isMobileView ? '<i class="fas fa-compress-arrows-alt"></i> Auto Compact' : '<i class="fas fa-desktop"></i> Desktop View';
+                btn.innerHTML = '<i class="fas fa-layer-group"></i> Card View';
                 btn.style.background = '#05cd99';
             }
         } else {
@@ -4222,7 +4282,7 @@
             const contactText = showSheetText(row[idxContact]).trim() || '-';
             const callPhone = normalizeWhatsAppPhone(contactText);
             const callButtonHtml = callPhone ?
-                `<a class="action-btn btn-call" href="tel:+${callPhone}" title="Call ${escapeHtml(formatWhatsAppPhone(callPhone))}"><i class="fas fa-phone-alt"></i></a>` : '';
+                `<a class="action-btn btn-call" href="tel:+${callPhone}" title="Call ${escapeHtml(formatWhatsAppPhone(callPhone))}"><i class="fas fa-phone-alt"></i><span class="action-text">Call</span></a>` : '';
             const contactLinkHtml = contactText !== '-' ?
                 `<button type="button" class="contact-ledger-link" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
@@ -4238,14 +4298,14 @@
 
             // Reminder Bell button visibility conditions
             let reminderButtonHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL') ? 
-                `<button type="button" class="action-btn btn-bell" onclick="sendWhatsAppReminder(${originalIdx})" title="Send WhatsApp Payment Reminder"><i class="fas fa-bell"></i></button>` : '';
+                `<button type="button" class="action-btn btn-bell" onclick="sendWhatsAppReminder(${originalIdx})" title="Send WhatsApp Payment Reminder"><i class="fas fa-bell"></i><span class="action-text">Reminder</span></button>` : '';
             let smsReminderButtonHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL') ?
-                `<button type="button" class="action-btn btn-sms" onclick="sendSmsReminder(${originalIdx})" title="Send SMS Payment Reminder"><i class="fas fa-sms"></i></button>` : '';
+                `<button type="button" class="action-btn btn-sms" onclick="sendSmsReminder(${originalIdx})" title="Send SMS Payment Reminder"><i class="fas fa-sms"></i><span class="action-text">SMS</span></button>` : '';
             const idActivationSerialNo = getIdActivationSerialNo(originalIdx);
             const idActivationButtonHtml = idActivationSerialNo ?
-                `<button type="button" class="action-btn btn-wa-direct" onclick="sendIdActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Send ID Activation WhatsApp"><i class="fab fa-whatsapp"></i></button>` : '';
+                `<button type="button" class="action-btn btn-wa-direct" onclick="sendIdActivationWhatsApp(${originalIdx}, '${idActivationSerialNo}')" title="Send ID Activation WhatsApp"><i class="fab fa-whatsapp"></i><span class="action-text">ID Message</span></button>` : '';
             const activationDoneButtonHtml = idActivationSerialNo ?
-                `<button type="button" class="action-btn btn-activation-done" onclick="sendActivationDoneWhatsApp(${originalIdx})" title="Send Activation Done Message"><i class="fas fa-check-circle"></i></button>` : '';
+                `<button type="button" class="action-btn btn-activation-done" onclick="sendActivationDoneWhatsApp(${originalIdx})" title="Send Activation Done Message"><i class="fas fa-check-circle"></i><span class="action-text">Done Message</span></button>` : '';
             const invoiceSerialHtml = idActivationSerialNo
                 ? `<small class="activation-serial-label"><i class="fas fa-bolt"></i>${escapeHtml(idActivationSerialNo)}. ID ACTIVATION</small>`
                 : '';
@@ -4271,15 +4331,15 @@
                 <td data-label="Actions">
                     <div class="action-icons">
                         ${callButtonHtml}
-                        <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i><span class="action-text">WhatsApp</span></button>
                         ${idActivationButtonHtml}
                         ${activationDoneButtonHtml}
                         ${reminderButtonHtml}
                         ${smsReminderButtonHtml}
-                        <button type="button" class="action-btn btn-print"    onclick="openPrintChoice(${originalIdx})" title="Print Invoice"><i class="fas fa-print"></i></button>
-                        <button type="button" class="action-btn btn-edit"     onclick="openFullEditModal(${originalIdx})" title="Full Edit"><i class="fas fa-edit"></i></button>
-                        <button type="button" class="action-btn btn-config"   onclick="openPaymentModal(${originalIdx})" title="Quick Update"><i class="fas fa-sliders-h"></i></button>
-                        <button type="button" class="action-btn btn-delete"   onclick="deleteRecord(${originalIdx})" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        <button type="button" class="action-btn btn-print"    onclick="openPrintChoice(${originalIdx})" title="Print Invoice"><i class="fas fa-print"></i><span class="action-text">Print</span></button>
+                        <button type="button" class="action-btn btn-edit"     onclick="openFullEditModal(${originalIdx})" title="Full Edit"><i class="fas fa-edit"></i><span class="action-text">Edit</span></button>
+                        <button type="button" class="action-btn btn-config"   onclick="openPaymentModal(${originalIdx})" title="Quick Update"><i class="fas fa-sliders-h"></i><span class="action-text">More</span></button>
+                        <button type="button" class="action-btn btn-delete"   onclick="deleteRecord(${originalIdx})" title="Delete"><i class="fas fa-trash-alt"></i><span class="action-text">Delete</span></button>
                     </div>
                 </td>
             </tr>`;
