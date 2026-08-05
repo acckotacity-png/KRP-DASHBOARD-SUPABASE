@@ -1956,6 +1956,14 @@
         }
     });
 
+    window.addEventListener('focus', () => refreshManagedDropdownSettings(false));
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') refreshManagedDropdownSettings(false);
+    });
+    setInterval(() => {
+        if (document.visibilityState === 'visible') refreshManagedDropdownSettings(false);
+    }, 60000);
+
     // ─── VYAPAR SETTINGS LOGIC ────────────────────────────────────
     const SETTINGS_FIELD_MAP = {
         businessName: ['bizName', 'biz_name'],
@@ -1974,6 +1982,8 @@
     const DEFAULT_STATE_NAMES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Other'];
     const DEFAULT_BANK_NAMES = ['SBI','Bank of Baroda','Punjab National Bank','HDFC Bank','ICICI Bank','Axis Bank','Other'];
     let purposeSettingsState = { purposes: [], years: [], states: [], banks: [] };
+    let dropdownSettingsLastSyncAt = 0;
+    let dropdownSettingsSyncPromise = null;
 
     function makePurposeSettingId(prefix) {
         return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -2063,19 +2073,31 @@
         if (bankValue && !Array.from(select.options).some(option => option.value === bankValue)) select.add(new Option(`${bankValue} (Hidden)`, bankValue));
         select.value = bankValue;
     }
-    async function loadPurposeManagerSettings() {
-        try {
-            const cached = JSON.parse(localStorage.getItem(PURPOSE_SETTINGS_CACHE_KEY) || 'null');
-            if (cached) applyPurposeSettings(cached, false);
-        } catch (_) {}
+    async function loadPurposeManagerSettings(useCache = true) {
+        if (useCache) {
+            try {
+                const cached = JSON.parse(localStorage.getItem(PURPOSE_SETTINGS_CACHE_KEY) || 'null');
+                if (cached) applyPurposeSettings(cached, false);
+            } catch (_) {}
+        }
         if (!purposeSettingsState.purposes.length) applyPurposeSettings(buildDefaultPurposeSettings(), false);
         try {
             const response = await fetch(`${APPS_SCRIPT_URL}?action=getPurposeSettings&t=${Date.now()}`, { cache:'no-store' });
             const result = await response.json();
-            if (result?.success && (result.purposes?.length || result.years?.length || result.states?.length || result.banks?.length)) applyPurposeSettings(result);
+            if (!result?.success) throw new Error(result?.error || result?.message || 'Dropdown settings load failed');
+            if (result.purposes?.length || result.years?.length || result.states?.length || result.banks?.length) applyPurposeSettings(result);
+            dropdownSettingsLastSyncAt = Date.now();
+            return result;
         } catch (error) {
             console.warn('Purpose settings load failed; cached defaults used.', error);
+            return null;
         }
+    }
+    function refreshManagedDropdownSettings(force = false) {
+        if (!force && Date.now() - dropdownSettingsLastSyncAt < 15000) return dropdownSettingsSyncPromise || Promise.resolve();
+        if (dropdownSettingsSyncPromise) return dropdownSettingsSyncPromise;
+        dropdownSettingsSyncPromise = loadPurposeManagerSettings(false).finally(() => { dropdownSettingsSyncPromise = null; });
+        return dropdownSettingsSyncPromise;
     }
     function renderPurposeManagerRows(items, type) {
         return items.map(item => `<div class="purpose-manager-row">
@@ -2226,7 +2248,7 @@
     function closeHeaderSettingsHub() { document.getElementById('headerSettingsHub').classList.remove('active'); }
     function openPaymentFromHub() { closeHeaderSettingsHub(); openUpiModal(); }
     function openBusinessFromHub() { closeHeaderSettingsHub(); openSettingsModal(); }
-    function openPurposeManagerFromHub() { closeHeaderSettingsHub(); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
+    async function openPurposeManagerFromHub() { closeHeaderSettingsHub(); await refreshManagedDropdownSettings(true); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
     function closePurposeManager() { document.getElementById('purposeManagerModal').classList.remove('active'); }
     function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
     function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
@@ -2609,6 +2631,7 @@
             document.querySelector('[data-tab="form"]').classList.add('active');
             dismissedDefaulterLookupKey = '';
             activeDefaulterMatch = null;
+            refreshManagedDropdownSettings(false);
             generateInvoiceNo();
         } else if (tab === 'dashboard') {
             document.body.classList.remove('form-view');
@@ -3221,10 +3244,10 @@
             .map((row, index) => ({ row, index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contactKey);
 
-        const ledgerCustomerName = idxCustomerName === -1 ? '' : ledgerRows
+        const ledgerCustomerName = (idxCustomerName === -1 ? '' : ledgerRows
             .map(item => showSheetText(item.row[idxCustomerName]).trim())
             .filter(Boolean)
-            .pop() || '';
+            .pop()) || getKnownCustomerNameForContact(contactText) || '';
 
         let totalDeal = 0, totalReceived = 0, totalRefund = 0, pendingDeal = 0, paymentApplied = 0, setupBalance = 0;
         const rowsHtml = ledgerRows.map(item => {
@@ -3775,37 +3798,73 @@
         return matches[0];
     }
 
+    function getKnownCustomerNameForContact(contactValue) {
+        const lookupKey = getContactLookupKey(contactValue);
+        if (!lookupKey) return '';
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxCustomer = getColIndex('CUSTOMER NAME');
+        const idxDate = getColIndex('DATE');
+        if (idxContact !== -1 && idxCustomer !== -1) {
+            const namedMatches = currentData.filter(row =>
+                getContactLookupKey(row[idxContact]) === lookupKey && showSheetText(row[idxCustomer]).trim()
+            ).sort((a, b) => {
+                const dateA = idxDate !== -1 ? getLocalISODate(a[idxDate]) : '';
+                const dateB = idxDate !== -1 ? getLocalISODate(b[idxDate]) : '';
+                if (dateA !== dateB) return dateB.localeCompare(dateA);
+                return currentData.indexOf(b) - currentData.indexOf(a);
+            });
+            if (namedMatches.length) return showSheetText(namedMatches[0][idxCustomer]).trim();
+        }
+        const notepadMatch = [...notepadRows].reverse().find(row =>
+            getContactLookupKey(row[1]) === lookupKey && showSheetText(row[3]).trim()
+        );
+        return notepadMatch ? showSheetText(notepadMatch[3]).trim() : '';
+    }
+
     function autofillEntryFormFromContact(contactValue) {
         const record = getLatestMatchingContactRecord(contactValue);
         const stateEl = document.getElementById('state');
         const bankEl = document.getElementById('bankOwner');
         const loginEl = document.getElementById('loginId');
+        const customerNameEl = document.getElementById('customerName');
         const remarksKey = 'SERVICE CHARGE REMARKS';
+
+        // Login ID is unique for each new activation and must never be copied.
+        if (loginEl) loginEl.value = '';
+        if (customerNameEl) customerNameEl.value = getKnownCustomerNameForContact(contactValue);
 
         if (!record) {
             if (stateEl) stateEl.value = '';
             if (bankEl) bankEl.value = '';
-            if (loginEl) loginEl.value = '';
             setMultiSelectState('serviceRemarks', '');
             return;
         }
 
-        if (stateEl) stateEl.value = record[getColIndex('STATE')] || '';
+        if (stateEl) setManagedStateValue('state', record[getColIndex('STATE')] || '');
         if (bankEl) setManagedBankValue('bankOwner', record[getColIndex('BANK OWNER NAME')] || '');
-        if (loginEl) loginEl.value = record[getColIndex('LOGIN ID')] || '';
         setMultiSelectState('serviceRemarks', record[getColIndex(remarksKey)] || '');
     }
 
     function wireContactAutofill() {
         const input = document.getElementById('contactName');
-        if (!input || input.dataset.autofillWired === '1') return;
+        if (input && input.dataset.autofillWired !== '1') {
+            const runAutofill = () => autofillEntryFormFromContact(input.value);
+            const debounced = debounce(runAutofill, 250);
+            input.addEventListener('input', debounced);
+            input.addEventListener('blur', runAutofill);
+            input.dataset.autofillWired = '1';
+        }
 
-        const runAutofill = () => autofillEntryFormFromContact(input.value);
-        const debounced = debounce(runAutofill, 250);
-
-        input.addEventListener('input', debounced);
-        input.addEventListener('blur', runAutofill);
-        input.dataset.autofillWired = '1';
+        const editInput = document.getElementById('edit_contactName');
+        if (editInput && editInput.dataset.nameAutofillWired !== '1') {
+            const fillEditName = () => {
+                const nameField = document.getElementById('edit_customerName');
+                if (nameField) nameField.value = getKnownCustomerNameForContact(editInput.value);
+            };
+            editInput.addEventListener('input', debounce(fillEditName, 250));
+            editInput.addEventListener('blur', fillEditName);
+            editInput.dataset.nameAutofillWired = '1';
+        }
     }
 
     function debounce(fn, wait = 200) {
@@ -4089,7 +4148,7 @@
                 `<button type="button" class="contact-ledger-link" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
             const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
-            const customerNameText = idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '';
+            const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
             let statusVal  = row[idxStatus]?.toString().toUpperCase() || 'PENDING';
             let badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
                              statusVal === 'FAILED'  ? 'badge-failed'  :
@@ -6776,11 +6835,19 @@
         const mobile = normalizeMobile10(value);
         if (!mobile) { lastNotepadAutofillMobile = ''; return; }
         if (mobile === lastNotepadAutofillMobile) return;
+        const knownCustomerName = getKnownCustomerNameForContact(value);
         const currentRow = document.getElementById('notepadRowIndex')?.value;
         const match = notepadRows.map((row, index) => ({ row, index })).reverse().find(item => {
             return (currentRow === '' || item.index !== Number(currentRow)) && normalizeMobile10(item.row[1]) === mobile;
         });
-        if (!match) return;
+        if (!match) {
+            if (knownCustomerName) {
+                document.getElementById('noteName').value = knownCustomerName;
+                lastNotepadAutofillMobile = mobile;
+                showMessage('Existing customer name autofilled', 'success');
+            }
+            return;
+        }
         lastNotepadAutofillMobile = mobile;
         const source = match.row;
         const fieldMap = [
@@ -6790,6 +6857,7 @@
             const field = document.getElementById(id);
             if (field) field.value = source[col] || '';
         });
+        if (knownCustomerName) document.getElementById('noteName').value = knownCustomerName;
         showMessage('Existing mobile details autofilled', 'success');
     }
 
