@@ -1239,6 +1239,9 @@
             #tableContainer.mobile-card-view .tracker-head-status { justify-content:center !important; padding-bottom:3px !important; }
             #tableContainer.mobile-card-view .tracker-invoice-date { font-size:8px !important; }
         }
+        #tableContainer.mobile-card-view .utr-stack { flex-direction:row !important; flex-wrap:wrap !important; column-gap:12px !important; row-gap:3px !important; }
+        #tableContainer.mobile-card-view .utr-value::after { content:none !important; }
+        #tableContainer.mobile-card-view .utr-separator { display:none; }
     </style>
 </head>
 <body class="form-view">
@@ -3149,7 +3152,12 @@
     function normalizeUtrValue(value) {
         const raw = showSheetText(value).trim();
         if (!raw) return '';
-        return raw.split(/[\s,;&/|]+/).map(part => part.trim()).filter(Boolean).join(', ');
+        return raw.split(/[\s,;&/|]+/).map(part => part.trim()).filter(Boolean).flatMap(part => {
+            if (/^\d+$/.test(part) && part.length > 12 && part.length % 12 === 0) {
+                return part.match(/\d{12}/g) || [part];
+            }
+            return [part];
+        }).join(', ');
     }
     function wireUtrNormalization() {
         ['utrNo','edit_utrNo','modalUtr','ledgerPaymentUtr'].forEach(id => {
@@ -3166,7 +3174,7 @@
         if (!raw) return '<span class="utr-value">-</span>';
         const parts = raw.split(',').map(part => part.trim()).filter(Boolean);
         const values = parts.length ? parts : [raw];
-        return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="utr-value">${escapeHtml(part)}</span>`).join('')}</span>`;
+        return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="utr-value">${escapeHtml(part)}</span>`).join('<span class="utr-separator"> </span>')}</span>`;
     }
     function normalizeMobile10(value) {
         const digits = showSheetText(value).replace(/\D/g, '');
@@ -4404,7 +4412,8 @@
         const idxBank    = getColIndex('BANK OWNER NAME');
         const idxStatus  = getColIndex('PAYMENT STATUS');
         const idxDealing = getColIndex('DEALING AMOUNT');
-        const idxAmtDeno = getColIndex('AMOUNT DENO');
+        const idxReceived = getColIndex('RECEIVED AMOUNT');
+        const idxIdActivationAmt = getColIndex('ID ACTIVATION AMOUNT');
         const idxUtr     = getColIndex('UTR / TRN NO.');
         const idxPurpose = getColIndex('PURPOSE');
         const idxLogin   = getColIndex('LOGIN ID');
@@ -4475,14 +4484,14 @@
                     <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value emphasis">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
-                    <div class="tracker-head-item tracker-head-status"><span class="tracker-head-label">Status</span><span class="badge ${badgeClass}">${statusVal}</span></div>
-                    <div class="tracker-head-item"><span class="tracker-head-label">ID Count</span><span class="tracker-head-value">${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</span></div>
-                    <div class="tracker-head-item"><span class="tracker-head-label">Amount</span><span class="tracker-head-value emphasis">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</span></div>
                 </div></td>
                 <td data-label="Contact">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
                 <td data-label="Bank">${row[idxBank] || '-'}</td>
-                <td data-label="Denominations" title="${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}">${escapeHtml(showSheetText(row[idxAmtDeno]) || '-')}</td>
+                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
+                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong></td>
+                <td data-label="Received Amt"><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong></td>
+                <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
                     <div class="action-icons">
