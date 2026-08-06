@@ -1187,7 +1187,7 @@
         #tableContainer.mobile-card-view .tracker-head-value.emphasis { font-weight:900; }
         #tableContainer.mobile-card-view .tracker-head-status { align-items:flex-start !important; text-align:left !important; }
         #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:12px !important; padding:3px 5px !important; }
-        #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:1 / -1 !important; min-height:45px !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="UTR"] { grid-column:span 2 !important; min-height:45px !important; }
         #tableContainer.mobile-card-view #dataTable td[data-label="Actions"] { grid-column:1 / -1 !important; padding:7px 0 0 !important; }
         #tableContainer.mobile-card-view .action-icons { gap:5px !important; }
         #tableContainer.mobile-card-view .action-btn {
@@ -1211,6 +1211,38 @@
             #tableContainer.mobile-card-view .activation-serial-label { font-size:5.5px !important; padding:1px 3px !important; }
             #tableContainer.mobile-card-view .tracker-head-status .badge { font-size:8px !important; padding:2px 3px !important; }
             #tableContainer.mobile-card-view .action-btn { flex:0 0 29px !important; width:29px !important; height:28px !important; padding:0 !important; }
+        }
+
+        /* Correct compact header layout: prevent the summary from stacking vertically. */
+        #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"] {
+            display:block !important; min-height:0 !important; height:auto !important;
+        }
+        #tableContainer.mobile-card-view .tracker-card-head {
+            display:grid !important;
+            grid-template-columns:minmax(0,1.65fr) repeat(4,minmax(0,1fr)) !important;
+            align-items:stretch !important; width:100% !important; height:auto !important;
+        }
+        #tableContainer.mobile-card-view .tracker-head-item {
+            display:flex !important; min-height:48px !important; height:auto !important;
+            justify-content:center !important; overflow:hidden;
+        }
+        #tableContainer.mobile-card-view .tracker-head-value { white-space:normal; overflow-wrap:anywhere; }
+        #tableContainer.mobile-card-view .tracker-invoice-date { margin-left:auto; text-align:right; white-space:nowrap; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact"] .contact-ledger-link {
+            font-size:12px !important; line-height:1.2 !important;
+        }
+        @media (max-width:700px) {
+            #tableContainer.mobile-card-view .tracker-card-head {
+                grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+            }
+            #tableContainer.mobile-card-view .tracker-head-invoice { grid-column:span 2; }
+            #tableContainer.mobile-card-view .tracker-head-status { grid-column:3; grid-row:1; }
+            #tableContainer.mobile-card-view .tracker-head-item { min-height:42px !important; }
+            #tableContainer.mobile-card-view .tracker-head-item:nth-child(2) { grid-column:1; grid-row:2; }
+            #tableContainer.mobile-card-view .tracker-head-item:nth-child(4) { grid-column:2; grid-row:2; }
+            #tableContainer.mobile-card-view .tracker-head-item:nth-child(5) { grid-column:3; grid-row:2; }
+            #tableContainer.mobile-card-view .tracker-head-status { justify-content:center !important; padding-bottom:3px !important; }
+            #tableContainer.mobile-card-view .tracker-invoice-date { font-size:8px !important; }
         }
     </style>
 </head>
@@ -4445,11 +4477,10 @@
 
             html += `<tr>
                 <td data-label="Invoice"><div class="tracker-card-head">
-                    <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value emphasis">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
+                    <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value emphasis">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}<span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item tracker-head-status"><span class="tracker-head-label">Status</span><span class="badge ${badgeClass}">${statusVal}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Count</span><span class="tracker-head-value">${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</span></div>
-                    <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis">${dateDisplay}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">Amount</span><span class="tracker-head-value emphasis">₹${parseFloat(row[idxDealing]||0).toLocaleString('en-IN')}</span></div>
                 </div></td>
                 <td data-label="Contact">${contactHtml}</td>
