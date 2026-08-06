@@ -1242,6 +1242,13 @@
         #tableContainer.mobile-card-view .utr-stack { flex-direction:row !important; flex-wrap:wrap !important; column-gap:12px !important; row-gap:3px !important; }
         #tableContainer.mobile-card-view .utr-value::after { content:none !important; }
         #tableContainer.mobile-card-view .utr-separator { display:none; }
+        #tableContainer.mobile-card-view #dataTable td { order:initial !important; }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"] {
+            white-space:nowrap !important; overflow-x:auto !important; background:#f7fff9 !important;
+        }
+        #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"] .contact-ledger-link {
+            white-space:nowrap !important; font-size:12px !important; line-height:1.2 !important;
+        }
     </style>
 </head>
 <body class="form-view">
@@ -4485,13 +4492,13 @@
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
                 </div></td>
-                <td data-label="Contact">${contactHtml}</td>
-                <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
-                <td data-label="Bank">${row[idxBank] || '-'}</td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
                 <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong></td>
                 <td data-label="Received Amt"><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
+                <td data-label="Contact / Login ID">${contactHtml}</td>
+                <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
+                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
+                <td data-label="Bank">${row[idxBank] || '-'}</td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
                     <div class="action-icons">
