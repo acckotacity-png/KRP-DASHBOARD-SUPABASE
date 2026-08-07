@@ -40,11 +40,56 @@
         auth: { persistSession: true, storage: window.sessionStorage, autoRefreshToken: true, detectSessionInUrl: true }
       });
 
+      let signedInUser = null;
+      const formatTime = value => value ? new Intl.DateTimeFormat('en-IN', { dateStyle:'medium', timeStyle:'short' }).format(new Date(value)) : '';
+
+      async function sendAccessRequest() {
+        button.disabled = true;
+        message.textContent = "Access request भेजी जा रही है...";
+        const { data, error } = await client.rpc('submit_access_request', { requested_expiry: null });
+        if (error) {
+          message.textContent = /blocked/i.test(error.message) ? "यह account admin द्वारा BLOCK किया गया है।" : error.message;
+          button.disabled = /blocked/i.test(error.message);
+          return false;
+        }
+        const request = Array.isArray(data) ? data[0] : data;
+        message.textContent = `Request भेज दी गई है · ${formatTime(request?.requested_at || new Date())}. Admin approval के बाद login करें।`;
+        button.textContent = "Request Pending";
+        button.disabled = true;
+        return false;
+      }
+
       async function checkAccessAndContinue() {
         const { data: sessionData } = await client.auth.getSession();
         const user = sessionData?.session?.user;
         if (!user) return false;
-        const { data: access, error } = await client.from("app_users").select("active").eq("user_id", user.id).maybeSingle();
+        signedInUser = user;
+        const { data: access } = await client.from("app_users").select("*").eq("user_id", user.id).maybeSingle();
+        const expired = access?.access_expires_at && new Date(access.access_expires_at) <= new Date();
+        const allowed = access?.active && access?.access_status !== 'blocked' && access?.access_status !== 'declined' && !expired;
+        if (!allowed) {
+          const { data: request } = await client.from('access_requests').select('*').eq('user_id', user.id).maybeSingle();
+          if (access?.access_status === 'blocked' || request?.status === 'blocked') {
+            message.textContent = "यह account admin द्वारा BLOCK किया गया है।";
+            button.disabled = true;
+            return false;
+          }
+          if (request?.status === 'pending') {
+            message.textContent = `Request pending है · ${formatTime(request.requested_at)}. Admin approval का इंतजार करें।`;
+            button.textContent = "Request Pending";
+            button.disabled = true;
+            return false;
+          }
+          if (request?.status === 'declined') {
+            message.textContent = `Request declined है${request.admin_note ? ` · ${request.admin_note}` : ''}. आप दोबारा request भेज सकते हैं।`;
+            button.textContent = "Send Request Again";
+            button.dataset.requestOnly = '1';
+            button.disabled = false;
+            return false;
+          }
+          return sendAccessRequest();
+        }
+        const error = null;
         if (error || !access?.active) {
           await client.auth.signOut();
           message.textContent = "इस Google account को dashboard access नहीं दिया गया है।";
@@ -56,9 +101,15 @@
       }
 
       if (query.get("error") === "access_denied") message.textContent = "इस account को access नहीं दिया गया है।";
+      if (query.get("error") === "blocked") message.textContent = "यह account admin द्वारा BLOCK किया गया है।";
+      if (query.get("error") === "expired") message.textContent = "आपका access expire हो गया है। दोबारा login करके नई request भेजें।";
       await checkAccessAndContinue();
 
       button.addEventListener("click", async () => {
+        if (button.dataset.requestOnly === '1' && signedInUser) {
+          await sendAccessRequest();
+          return;
+        }
         button.disabled = true;
         message.textContent = "Google login खुल रहा है...";
         const redirectTo = new URL(`login.html?next=${encodeURIComponent(nextPage)}`, location.href).href;

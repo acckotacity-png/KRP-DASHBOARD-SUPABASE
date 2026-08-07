@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
-<script type="module" src="auth-guard.js?v=9"></script>
+<script type="module" src="auth-guard.js?v=10"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/app.css?v=20260807-1">
+    <link rel="stylesheet" href="assets/app.css?v=20260808-1">
 </head>
 <body class="form-view">
 <div class="container">
@@ -34,7 +34,8 @@
             </p>
         </div>
         <div class="view-filter">
-            <button class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
+            <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
+            <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
             <button class="btn-notepad" onclick="switchTab('expense')"><i class="fas fa-receipt"></i> Expenses</button>
             <button class="btn-notepad" onclick="switchTab('udhari')"><i class="fas fa-book-open"></i> Udhari Khata</button>
             <button class="btn-notepad" onclick="switchTab('notepad')"><i class="fas fa-note-sticky"></i> Notepad</button>
@@ -787,7 +788,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260807-1" defer></script>
+<script src="assets/app.js?v=20260808-1" defer></script>
 </body>
 </html>
 

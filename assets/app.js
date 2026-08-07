@@ -166,7 +166,20 @@
         return `${day}-${month}-${year}`;
     }
 
+    function applyCurrentUserAccess(user) {
+        if (!user) return;
+        const permissions = user.permissions || {};
+        document.body.classList.toggle('krp-no-create', permissions.create === false);
+        document.body.classList.toggle('krp-no-edit', permissions.edit === false);
+        document.body.classList.toggle('krp-no-delete', permissions.delete === false);
+        document.body.classList.toggle('krp-no-settings', permissions.settings === false);
+        const adminButton = document.getElementById('adminAccessBtn');
+        if (adminButton) adminButton.style.display = user.role === 'admin' ? '' : 'none';
+    }
+    window.addEventListener('krp-auth-ready', event => applyCurrentUserAccess(event.detail));
+
     document.addEventListener('DOMContentLoaded', function() {
+        applyCurrentUserAccess(window.currentKrpUser);
         document.getElementById('date').value = getLocalISODate(new Date());
         resetNotepadForm();
         populateMonthsDropdown();

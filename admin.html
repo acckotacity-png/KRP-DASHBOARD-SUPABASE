@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+  <title>Access Control · KRP Dashboard</title>
+  <link rel="icon" href="favicon.svg"><link rel="preconnect" href="https://esm.sh">
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14213d;font-family:Arial,sans-serif}.wrap{width:min(1180px,calc(100% - 20px));margin:14px auto}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#15245b;color:#fff;padding:14px 16px;border-radius:13px}.top h1{font-size:19px;margin:0}.top p{font-size:11px;margin:4px 0 0;color:#cbd6ff}.btn{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}.btn.light{background:#fff;color:#15245b}.tabs{display:flex;gap:7px;margin:12px 0}.tab{background:#fff;border:1px solid #dce3ee;color:#53617a}.tab.active{background:#168447;color:#fff;border-color:#168447}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.stat{background:#fff;border:1px solid #e0e6ee;border-radius:10px;padding:10px}.stat small{color:#68758b}.stat strong{display:block;font-size:20px;margin-top:3px}.panel{background:#fff;border:1px solid #dce3ee;border-radius:12px;overflow:hidden}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-bottom:1px solid #e5eaf1}.toolbar input{width:min(300px,60vw);padding:9px;border:1px solid #d9e0e9;border-radius:8px}.list{display:grid;gap:7px;padding:9px}.card{display:grid;grid-template-columns:1.5fr .8fr .9fr 1fr auto;align-items:center;gap:9px;border:1px solid #e1e7ef;border-radius:10px;padding:10px}.identity strong,.identity span{display:block}.identity span,.muted{font-size:11px;color:#6f7b8f;margin-top:3px}.pill{display:inline-flex;width:max-content;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase}.pending{background:#fff2cd;color:#9a6800}.approved{background:#dcf8e7;color:#08753b}.declined{background:#fee8e7;color:#b42720}.blocked{background:#252b38;color:#fff}.rights{font-size:10px;line-height:1.5}.actions{display:flex;gap:5px;flex-wrap:wrap}.approve{background:#11834a;color:#fff}.decline{background:#ef9a25;color:#fff}.block{background:#d63b32;color:#fff}.edit{background:#e8ecff;color:#273b9d}.empty{text-align:center;padding:32px;color:#7a8598}.modal{position:fixed;inset:0;background:#0d153566;display:none;align-items:center;justify-content:center;padding:12px;z-index:10}.modal.open{display:flex}.box{width:min(520px,100%);background:#fff;border-radius:14px;padding:16px}.box h2{font-size:18px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field label{display:block;font-size:11px;font-weight:700;margin-bottom:4px}.field input,.field textarea,.field select{width:100%;padding:9px;border:1px solid #d9e0e9;border-radius:7px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.check{border:1px solid #e0e6ee;border-radius:8px;padding:8px;font-size:12px}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}.message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}.hidden{display:none!important}
+    @media(max-width:720px){.stats{grid-template-columns:1fr 1fr}.card{grid-template-columns:1fr 1fr}.identity{grid-column:1/-1}.actions{grid-column:1/-1}.grid{grid-template-columns:1fr}.top h1{font-size:16px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><div><h1>Admin · Access Control</h1><p id="adminIdentity">Admin verification...</p></div><button class="btn light" onclick="location.href='index.html'">← Dashboard</button></header>
+  <div class="tabs"><button class="btn tab active" data-filter="requests">Requests</button><button class="btn tab" data-filter="users">All Users</button></div>
+  <section class="stats"><div class="stat"><small>Pending</small><strong id="sPending">0</strong></div><div class="stat"><small>Approved</small><strong id="sApproved">0</strong></div><div class="stat"><small>Declined</small><strong id="sDeclined">0</strong></div><div class="stat"><small>Blocked</small><strong id="sBlocked">0</strong></div></section>
+  <section class="panel"><div class="toolbar"><strong id="listTitle">Access Requests</strong><input id="search" placeholder="Name या email खोजें"></div><div id="list" class="list"><div class="empty">Loading...</div></div></section>
+</main>
+
+<div id="modal" class="modal"><form id="accessForm" class="box">
+  <h2 id="modalTitle">Manage Access</h2><input type="hidden" id="targetUser"><input type="hidden" id="decision" value="approved">
+  <div class="grid"><div class="field"><label>Access Status</label><select id="status"><option value="approved">Approved</option><option value="declined">Declined</option><option value="blocked">Blocked</option></select></div><div class="field"><label>Access valid until</label><input type="datetime-local" id="expiry"></div></div>
+  <div class="checks"><label class="check"><input type="checkbox" id="canView" checked> Data देखना</label><label class="check"><input type="checkbox" id="canCreate"> Data fill/add करना</label><label class="check"><input type="checkbox" id="canEdit"> Data edit/update करना</label><label class="check"><input type="checkbox" id="canDelete"> Data delete करना</label><label class="check"><input type="checkbox" id="canSettings"> Settings manage करना</label></div>
+  <div class="field"><label>Admin note</label><textarea id="note" rows="3" placeholder="Optional remark"></textarea></div>
+  <div class="modal-actions"><button type="button" class="btn tab" id="cancel">Cancel</button><button class="btn approve" type="submit">Save Access</button></div>
+</form></div>
+
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,AUTH_OPTIONS} from './supabase-config.js';
+const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:sessionStorage,autoRefreshToken:true}});
+const state={requests:[],users:[],mode:'requests'};
+const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
+const toLocal=v=>{if(!v)return'';const d=new Date(v),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+function msg(text){const e=document.createElement('div');e.className='message';e.textContent=text;document.body.append(e);setTimeout(()=>e.remove(),3000)}
+async function boot(){
+ const {data:{session}}=await client.auth.getSession(); if(!session?.user){location.replace(`${AUTH_OPTIONS.loginPage}?next=admin.html`);return}
+ const {data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle();
+ if(error||!me?.active||me.role!=='admin'||me.access_status==='blocked'){location.replace('index.html');return}
+ $('adminIdentity').textContent=`${me.full_name||'Admin'} · ${me.email}`; await load();
+ client.channel('admin-access-requests').on('postgres_changes',{event:'*',schema:'public',table:'access_requests'},()=>load()).subscribe();
+}
+async function load(){
+ const [{data:r,error:re},{data:u,error:ue}]=await Promise.all([
+  client.from('access_requests').select('*').order('requested_at',{ascending:false}),
+  client.from('app_users').select('*').order('created_at',{ascending:false})
+ ]);
+ if(re||ue){msg((re||ue).message);return} state.requests=r||[];state.users=u||[];render();
+}
+function render(){
+ $('sPending').textContent=state.requests.filter(v=>v.status==='pending').length;$('sApproved').textContent=state.users.filter(v=>v.access_status==='approved'&&v.active).length;$('sDeclined').textContent=state.users.filter(v=>v.access_status==='declined').length;$('sBlocked').textContent=state.users.filter(v=>v.access_status==='blocked').length;
+ const term=$('search').value.trim().toLowerCase(); const rows=(state.mode==='requests'?state.requests:state.users).filter(v=>`${v.full_name} ${v.email}`.toLowerCase().includes(term));
+ $('listTitle').textContent=state.mode==='requests'?'Access Requests':'All Users';
+ $('list').innerHTML=rows.length?rows.map(v=>card(v)).join(''):'<div class="empty">कोई record नहीं मिला</div>';
+}
+function card(v){
+ const status=v.status||v.access_status||'pending',isUser=!!v.role;
+ const rights=isUser?`View ${v.can_view?'✓':'✕'} · Add ${v.can_create?'✓':'✕'} · Edit ${v.can_edit?'✓':'✕'} · Delete ${v.can_delete?'✓':'✕'}`:'Requested access';
+ const expiry=isUser?v.access_expires_at:v.requested_until;
+ return `<article class="card"><div class="identity"><strong>${esc(v.full_name||'Unnamed user')}</strong><span>${esc(v.email)}</span><span>Requested: ${fmt(v.requested_at||v.created_at)}</span></div><div><span class="pill ${esc(status)}">${esc(status)}</span></div><div class="muted">Valid until<br><b>${fmt(expiry)}</b></div><div class="rights">${rights}<br>${esc(v.admin_note||'')}</div><div class="actions"><button class="btn approve" onclick="manage('${v.user_id}','approved',${isUser})">Accept</button><button class="btn edit" onclick="manage('${v.user_id}','${status}',${isUser})">Rights</button><button class="btn decline" onclick="manage('${v.user_id}','declined',${isUser})">Decline</button><button class="btn block" onclick="manage('${v.user_id}','blocked',${isUser})">Block</button></div></article>`;
+}
+window.manage=(uid,decision,isUser)=>{
+ const v=(isUser?state.users:state.requests).find(x=>x.user_id===uid)||{};$('targetUser').value=uid;$('decision').value=decision;$('status').value=decision;$('expiry').value=toLocal(v.access_expires_at||v.requested_until);
+ $('canView').checked=v.can_view??true;$('canCreate').checked=v.can_create??false;$('canEdit').checked=v.can_edit??false;$('canDelete').checked=v.can_delete??false;$('canSettings').checked=v.can_manage_settings??false;$('note').value=v.admin_note||'';$('modalTitle').textContent=`Manage · ${v.full_name||v.email||'User'}`;$('modal').classList.add('open');
+};
+$('accessForm').addEventListener('submit',async e=>{e.preventDefault();const uid=$('targetUser').value,status=$('status').value,isExisting=state.users.some(v=>v.user_id===uid);const args={target_user:uid,[isExisting?'new_status':'decision']:status,expiry_at:$('expiry').value?new Date($('expiry').value).toISOString():null,allow_view:$('canView').checked,allow_create:$('canCreate').checked,allow_edit:$('canEdit').checked,allow_delete:$('canDelete').checked,allow_settings:$('canSettings').checked,note_text:$('note').value.trim()};const {error}=await client.rpc(isExisting?'admin_update_user_access':'admin_review_access_request',args);if(error){msg(error.message);return}$('modal').classList.remove('open');msg('Access updated');await load()});
+$('cancel').onclick=()=>$('modal').classList.remove('open');$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('modal').classList.remove('open')});$('search').addEventListener('input',render);document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{if(!b.dataset.filter)return;document.querySelectorAll('.tab[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.filter;render()}));boot();
+</script>
+</body></html>

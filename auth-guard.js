@@ -40,13 +40,17 @@ if (!session?.user) {
 
 const { data: access, error: accessError } = await client
   .from("app_users")
-  .select("user_id,email,full_name,role,active")
+  .select("*")
   .eq("user_id", session.user.id)
   .maybeSingle();
 
-if (accessError || !access?.active) {
+const accessExpired = access?.access_expires_at && new Date(access.access_expires_at) <= new Date();
+const accessDenied = accessError || !access?.active || access?.access_status === "blocked" ||
+  access?.access_status === "declined" || accessExpired || access?.can_view === false;
+if (accessDenied) {
   await client.auth.signOut();
-  location.replace(loginUrl("access_denied"));
+  const reason = access?.access_status === "blocked" ? "blocked" : accessExpired ? "expired" : "access_denied";
+  location.replace(loginUrl(reason));
   throw new Error("This account is not authorized");
 }
 
@@ -54,8 +58,25 @@ window.currentKrpUser = {
   uid: session.user.id,
   email: session.user.email || access.email || "",
   name: access.full_name || session.user.user_metadata?.full_name || "",
-  role: access.role || "staff"
+  role: access.role || "staff",
+  accessExpiresAt: access.access_expires_at || null,
+  permissions: {
+    view: access.can_view !== false,
+    create: access.role === "admin" || access.can_create !== false,
+    edit: access.role === "admin" || access.can_edit !== false,
+    delete: access.role === "admin" || access.can_delete !== false,
+    settings: access.role === "admin" || access.can_manage_settings === true
+  }
 };
+window.dispatchEvent(new CustomEvent("krp-auth-ready", { detail: window.currentKrpUser }));
+if (window.currentKrpUser.accessExpiresAt) {
+  setInterval(async () => {
+    if (new Date(window.currentKrpUser.accessExpiresAt) <= new Date()) {
+      await client.auth.signOut();
+      location.replace(loginUrl("expired"));
+    }
+  }, 30000);
+}
 
 const sessionTokenKey = `krp_active_session_${session.user.id}`;
 const storedSessionToken = sessionStorage.getItem(sessionTokenKey);
