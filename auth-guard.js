@@ -31,22 +31,46 @@ const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 
 window.supabaseClient = client;
 
-const { data: sessionData } = await client.auth.getSession();
-const session = sessionData?.session;
+let { data: sessionData } = await client.auth.getSession();
+let session = sessionData?.session;
+if (session) {
+  const { error: userCheckError } = await client.auth.getUser();
+  if (userCheckError) {
+    const { data: refreshed } = await client.auth.refreshSession();
+    session = refreshed?.session || null;
+  }
+}
 if (!session?.user) {
   location.replace(loginUrl());
   throw new Error("Authentication required");
 }
 sessionStorage.setItem("krp_cache_user_uid", session.user.id);
 
-const { data: access, error: accessError } = await client
-  .from("app_users")
-  .select("*")
-  .eq("user_id", session.user.id)
-  .maybeSingle();
+async function readMyAccess() {
+  return client.from("app_users").select("*").eq("user_id", session.user.id).maybeSingle();
+}
+
+let { data: access, error: accessError } = await readMyAccess();
+if (accessError) {
+  const { data: refreshed } = await client.auth.refreshSession();
+  if (refreshed?.session) {
+    session = refreshed.session;
+    ({ data: access, error: accessError } = await readMyAccess());
+  }
+}
+
+if (accessError) {
+  reveal();
+  document.body.innerHTML = `<main style="max-width:620px;margin:70px auto;padding:24px;font-family:Arial;color:#1b2559;text-align:center">
+    <h2>Session verify नहीं हो सकी</h2>
+    <p style="color:#687386">Internet या authentication service में temporary problem है। आपका account logout नहीं किया गया है।</p>
+    <button onclick="location.reload()" style="border:0;border-radius:9px;padding:11px 18px;background:#168447;color:white;font-weight:700;cursor:pointer">Retry</button>
+  </main>`;
+  throw new Error("Access verification temporarily failed");
+}
 
 const accessExpired = access?.access_expires_at && new Date(access.access_expires_at) <= new Date();
-const accessDenied = accessError || !access?.active || access?.access_status === "blocked" ||
+const accessDenied = !access?.active || access?.access_status === "blocked" ||
   access?.access_status === "declined" || accessExpired || access?.can_view === false;
 if (accessDenied) {
   await client.auth.signOut();

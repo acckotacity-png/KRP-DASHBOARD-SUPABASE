@@ -38,9 +38,11 @@ const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'sh
 const toLocal=v=>{if(!v)return'';const d=new Date(v),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
 function msg(text){const e=document.createElement('div');e.className='message';e.textContent=text;document.body.append(e);setTimeout(()=>e.remove(),3000)}
 async function boot(){
- const {data:{session}}=await client.auth.getSession(); if(!session?.user){location.replace(`${AUTH_OPTIONS.loginPage}?next=admin.html`);return}
- const {data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle();
- if(error||!me?.active||me.role!=='admin'||me.access_status==='blocked'){location.replace('index.html');return}
+ let {data:{session}}=await client.auth.getSession(); if(!session?.user){location.replace(`${AUTH_OPTIONS.loginPage}?next=admin.html`);return}
+ let {data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle();
+ if(error){const {data:refreshed}=await client.auth.refreshSession();session=refreshed?.session||session;if(session?.user)({data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle())}
+ if(error){msg('Session verify नहीं हुई। Page refresh करें।');return}
+ if(!me?.active||me.role!=='admin'||me.access_status==='blocked'){location.replace('index.html');return}
  $('adminIdentity').textContent=`${me.full_name||'Admin'} · ${me.email}`; await load();
  client.channel('admin-access-requests').on('postgres_changes',{event:'*',schema:'public',table:'access_requests'},()=>load()).subscribe();
 }
