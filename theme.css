@@ -1,0 +1,17 @@
+html body,html button,html input,html select,html textarea,html table{font-family:Inter,"Noto Sans Devanagari","Segoe UI",Arial,sans-serif;letter-spacing:0;text-shadow:none}
+html.krp-dark-theme{color-scheme:dark;background:#111827!important}
+html.krp-dark-theme body{background:#111827!important;color:#e5e7eb!important}
+html.krp-dark-theme .profile-header,html.krp-dark-theme .nav-tabs,html.krp-dark-theme .tracker-container,html.krp-dark-theme .stat-card,html.krp-dark-theme .stat-pair-card,html.krp-dark-theme .analytics-panel,html.krp-dark-theme .notepad-dashboard-panel,html.krp-dark-theme .transaction-frame-wrap,html.krp-dark-theme .top,html.krp-dark-theme .tools,html.krp-dark-theme .panel,html.krp-dark-theme .card,html.krp-dark-theme .modal-content,html.krp-dark-theme .modal,html.krp-dark-theme .box{background:#1f2937!important;color:#e5e7eb!important;border-color:#374151!important;box-shadow:none!important}
+html.krp-dark-theme h1,html.krp-dark-theme h2,html.krp-dark-theme h3,html.krp-dark-theme h4,html.krp-dark-theme label,html.krp-dark-theme .section-title,html.krp-dark-theme .profile-info h1{color:#f9fafb!important}
+html.krp-dark-theme p,html.krp-dark-theme small,html.krp-dark-theme .muted,html.krp-dark-theme .profile-info p{color:#b7c0ce!important}
+html.krp-dark-theme input,html.krp-dark-theme select,html.krp-dark-theme textarea,html.krp-dark-theme .search-box,html.krp-dark-theme .filter-select{background:#111827!important;color:#f9fafb!important;border-color:#4b5563!important}
+html.krp-dark-theme option{background:#111827;color:#f9fafb}
+html.krp-dark-theme table,html.krp-dark-theme thead,html.krp-dark-theme tbody,html.krp-dark-theme tr,html.krp-dark-theme td{background:#1f2937!important;color:#e5e7eb!important;border-color:#374151!important}
+html.krp-dark-theme th{background:#172033!important;color:#d1d5db!important;border-color:#374151!important}
+html.krp-dark-theme tr:hover td{background:#263449!important}
+html.krp-dark-theme .tab-btn,html.krp-dark-theme .view-filter>button,html.krp-dark-theme .outline,html.krp-dark-theme .btn.light,html.krp-dark-theme .tab{background:#273449!important;color:#dbeafe!important;border-color:#46556d!important}
+html.krp-dark-theme .tab-btn i,html.krp-dark-theme .view-filter>button i{color:#93c5fd!important}
+html.krp-dark-theme .tab-btn.active{background:#174b36!important;color:#d1fae5!important;border-color:#2f7d5a!important}
+html.krp-dark-theme .mobile-nav-toggle{background:#1f2937;color:#e5e7eb;border-color:#46556d}
+html.krp-dark-theme .modal-overlay{background:rgba(3,7,18,.72)!important}
+html.krp-dark-theme .badge,html.krp-dark-theme .pill{filter:saturate(.85) brightness(.92)}

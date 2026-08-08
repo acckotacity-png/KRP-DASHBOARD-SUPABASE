@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Udhari Bahi Khata</title>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
-  <script type="module" src="auth-guard.js?v=14"></script>
+  <script src="api-gate.js?v=1"></script>
+  <script type="module" src="auth-guard.js?v=15"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="theme.css?v=1"><script src="theme.js?v=1"></script>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; padding: 12px; background: #f4f7fe; color: #2b3674; font-family: Inter, Arial, sans-serif; }
@@ -107,11 +109,11 @@
 
   <section class="cards">
     <div class="card"><span>Customers</span><strong id="customerCount">0</strong></div>
-    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">â‚¹0</strong></div>
-    <div class="card"><span>Payment Mila</span><strong id="totalPayment">â‚¹0</strong></div>
-    <div class="card"><span>Current Balance</span><strong id="totalBalance">â‚¹0</strong></div>
-    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">â‚¹0</strong></div>
-    <div class="card"><span>Total Payable</span><strong id="totalPayable">â‚¹0</strong></div>
+    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">₹0</strong></div>
+    <div class="card"><span>Payment Mila</span><strong id="totalPayment">₹0</strong></div>
+    <div class="card"><span>Current Balance</span><strong id="totalBalance">₹0</strong></div>
+    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">₹0</strong></div>
+    <div class="card"><span>Total Payable</span><strong id="totalPayable">₹0</strong></div>
   </section>
 
   <div class="tools">
@@ -184,7 +186,7 @@
   let activeLedgerKey = '';
   let returnToLedgerKey = '';
 
-  const money = value => 'â‚¹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const money = value => '₹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const num = value => Number(String(value || 0).replace(/,/g,'')) || 0;
   const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const isoToDisplay = value => { const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:value||''; };
@@ -223,7 +225,7 @@
           records=cached.records;
           render();
           showingCache=true;
-          setStatus('Ready Â· Cached JSON');
+          setStatus('Ready · Cached JSON');
         }
       } catch(e){}
     }
@@ -236,7 +238,7 @@
       render();
       setStatus(showingCache?'Background sync complete':'Updated');
     } catch(error) {
-      if(showingCache)setStatus('Cached data Â· Background sync pending',true);
+      if(showingCache)setStatus('Cached data · Background sync pending',true);
       else setStatus(error.message,true);
     }
   }
@@ -354,7 +356,7 @@
     if(customer) {
       document.getElementById('customerName').value=customer.name||'';
       document.getElementById('address').value=customer.address||'';
-      note.textContent=`Existing customer à¤®à¤¿à¤²à¤¾: ${customer.name} Â· Balance ${money(customer.latest[COL.balance])}`;
+      note.textContent=`Existing customer मिला: ${customer.name} · Balance ${money(customer.latest[COL.balance])}`;
       note.style.color='#008f68';
     } else {
       note.textContent=mobile.length>=10?'New customer mobile number':'';
@@ -407,16 +409,16 @@
     const mobile=normalizeMobile(customer.mobile||latest[COL.mobile]);
     if(mobile.length!==10)return alert('Customer ka sahi 10-digit mobile number nahi mila');
     const dueEntry=[...customer.entries].reverse().find(r=>r[COL.due]);
-    const dueDate=dueEntry?.[COL.due]||'à¤œà¤²à¥à¤¦ à¤¸à¥‡ à¤œà¤²à¥à¤¦';
+    const dueDate=dueEntry?.[COL.due]||'जल्द से जल्द';
     const message=[
-      `à¤¨à¤®à¤¸à¥à¤¤à¥‡ ${customer.name||'à¤œà¥€'},`,
+      `नमस्ते ${customer.name||'जी'},`,
       '',
-      'à¤¯à¤¹ à¤†à¤ªà¤•à¥‡ à¤¬à¤•à¤¾à¤¯à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤•à¤¾ reminder à¤¹à¥ˆà¥¤',
-      `à¤¬à¤•à¤¾à¤¯à¤¾ à¤°à¤¾à¤¶à¤¿: ${money(latest[COL.balance])}`,
-      `à¤¬à¥à¤¯à¤¾à¤œ à¤¸à¤¹à¤¿à¤¤ à¤•à¥à¤² à¤¦à¥‡à¤¯: ${money(latest[COL.total])}`,
+      'यह आपके बकाया भुगतान का reminder है।',
+      `बकाया राशि: ${money(latest[COL.balance])}`,
+      `ब्याज सहित कुल देय: ${money(latest[COL.total])}`,
       `Due Date: ${dueDate}`,
       '',
-      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤•à¤°à¤•à¥‡ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚à¥¤ à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦à¥¤'
+      'कृपया भुगतान करके जानकारी साझा करें। धन्यवाद।'
     ].join('\n');
     window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
   }
@@ -429,7 +431,7 @@
     const latest=customer.latest;
     const totalUdhari=entries.reduce((s,r)=>s+num(r[COL.udhar]),0);
     const totalPayment=entries.reduce((s,r)=>s+num(r[COL.payment]),0);
-    document.getElementById('ledgerTitle').textContent=`${customer.name} Â· ${customer.mobile||latest[COL.mobile]} Ledger`;
+    document.getElementById('ledgerTitle').textContent=`${customer.name} · ${customer.mobile||latest[COL.mobile]} Ledger`;
     document.getElementById('ledgerSummary').innerHTML=`
       <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
       <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>

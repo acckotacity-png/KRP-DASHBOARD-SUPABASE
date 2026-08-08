@@ -233,9 +233,9 @@
         }
     });
 
-    window.addEventListener('focus', () => refreshManagedDropdownSettings(false));
+    window.addEventListener('focus', () => { refreshManagedDropdownSettings(false); loadSavedBusinessSettings(); });
     document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') refreshManagedDropdownSettings(false);
+        if (document.visibilityState === 'visible') { refreshManagedDropdownSettings(false); loadSavedBusinessSettings(); }
     });
     setInterval(() => {
         if (document.visibilityState === 'visible') refreshManagedDropdownSettings(false);
@@ -540,7 +540,7 @@
             showMessage(result.message || 'Business settings saved successfully!', 'success');
             closeSettingsModal();
         } catch (error) {
-            showMessage('Settings save nahi hui. Apps Script deployment check karein.', 'error');
+            showMessage(error.message || 'Settings Supabase me save nahi hui.', 'error');
         }
     }
 
@@ -571,16 +571,17 @@
         const record = currentData[selectedRowForPrint];
         if(!record) return;
 
-        document.getElementById('p_fromName').innerText = localStorage.getItem('biz_name') || "KRP ID Activation";
-        document.getElementById('p_companyName').innerText = localStorage.getItem('biz_name') || "KRP ID Activation";
-        document.getElementById('p_fromPhone').innerText = localStorage.getItem('biz_phone') || "+91 9521867142";
-        document.getElementById('p_fromAddress').innerText = localStorage.getItem('biz_address') || "Kota, RJ";
-        const gst = localStorage.getItem('biz_gst');
+        const liveSettings = getSettingsPayload();
+        document.getElementById('p_fromName').innerText = liveSettings.businessName || "KRP ID Activation";
+        document.getElementById('p_companyName').innerText = liveSettings.businessName || "KRP ID Activation";
+        document.getElementById('p_fromPhone').innerText = liveSettings.contactNumber || "+91 9521867142";
+        document.getElementById('p_fromAddress').innerText = liveSettings.businessAddress || "Kota, RJ";
+        const gst = liveSettings.gstin;
         document.getElementById('p_fromGst').innerText = gst ? "GSTIN: " + gst : "";
-        renderInvoiceTerms(localStorage.getItem('biz_terms') || '');
-        const accountHolder = (localStorage.getItem('merchant_account_holder') || '').trim();
-        const accountNo = (localStorage.getItem('merchant_account_no') || '').trim();
-        const ifscCode = (localStorage.getItem('merchant_ifsc_code') || '').trim().toUpperCase();
+        renderInvoiceTerms(liveSettings.termsAndConditions || '');
+        const accountHolder = (liveSettings.accountHolderName || '').trim();
+        const accountNo = (liveSettings.accountNumber || '').trim();
+        const ifscCode = (liveSettings.ifsc || '').trim().toUpperCase();
         const bankDetailsEl = document.getElementById('p_fromBankDetails');
         const bankDetailLines = [
             accountHolder,
@@ -958,7 +959,7 @@
             document.querySelector('[data-tab="expense"]').classList.add('active');
             const expenseFrame = document.getElementById('expenseFrame');
             if (expenseFrame && !expenseFrame.getAttribute('src')) {
-                expenseFrame.src = `expense.html?api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                expenseFrame.src = `expense.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'udhari') {
             document.body.classList.remove('form-view');
@@ -966,7 +967,7 @@
             document.querySelector('[data-tab="udhari"]').classList.add('active');
             const udhariFrame = document.getElementById('udhariFrame');
             if (udhariFrame && !udhariFrame.getAttribute('src')) {
-                udhariFrame.src = `udhari.html?api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                udhariFrame.src = `udhari.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'transaction') {
             document.body.classList.remove('form-view');
@@ -974,7 +975,7 @@
             document.querySelector('[data-tab="transaction"]').classList.add('active');
             const transactionFrame = document.getElementById('transactionFrame');
             if (transactionFrame && !transactionFrame.getAttribute('src')) {
-                transactionFrame.src = `transaction.html?api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                transactionFrame.src = `transaction.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else {
             document.body.classList.remove('form-view');
@@ -3999,12 +4000,12 @@
             closeUpiModal();
             showMessage(result.message || 'Payment settings saved successfully!', 'success');
         } catch (error) {
-            showMessage('Payment settings save nahi hui. Apps Script deployment check karein.', 'error');
+            showMessage(error.message || 'Payment settings Supabase me save nahi hui.', 'error');
         }
     }
 
     // ─── MESSAGES ─────────────────────────────────────────────────
-    // â”€â”€â”€ SHEET2 RECORDS TRACKER OVERRIDE â”€â”€â”€â€”â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // SHEET2 RECORDS TRACKER OVERRIDE
     function getRecordsColIndex(name) {
         return recordsCurrentHeaders.findIndex(h => h && h.toString().trim().toUpperCase() === name.toUpperCase());
     }

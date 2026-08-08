@@ -1,6 +1,6 @@
 ﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
-import { installSupabaseApiAdapter } from "./supabase-api.js?v=11";
+import { installSupabaseApiAdapter } from "./supabase-api.js?v=12";
 
 const guardStyle = document.getElementById("auth-guard-style");
 const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
@@ -112,8 +112,8 @@ if (window.currentKrpUser.avatarPath) {
 window.dispatchEvent(new CustomEvent("krp-auth-ready", { detail: window.currentKrpUser }));
 const permissionStyle = document.createElement("style");
 permissionStyle.textContent = `${window.currentKrpUser.permissions.delete ? "" : '[onclick*="delete" i],.delete-btn,.btn-delete{display:none!important}'}
-${window.currentKrpUser.permissions.edit ? "" : '[onclick*="editRecord" i],[onclick*="openEdit" i],.edit-btn,.btn-edit,.btn-config,.records-action-btn.update{display:none!important}'}
-${window.currentKrpUser.permissions.create ? "" : '[onclick*="openForm" i],[onclick*="addCustomer" i],.btn-add{display:none!important}'}
+${window.currentKrpUser.permissions.edit ? "" : 'button[onclick^="edit" i],button[onclick*=";edit" i],[onclick*="editRecord" i],[onclick*="openEdit" i],[onclick*="openFullEdit" i],[onclick*="savePaymentUpdate" i],.edit-btn,.btn-edit,.btn-config,.records-action-btn.update{display:none!important}'}
+${window.currentKrpUser.permissions.create ? "" : '[onclick*="openForm" i],[onclick*="toggleForm" i],[onclick*="openExpense" i],[onclick*="openNotepadModal" i],[onclick*="openAddRecordsModal" i],[onclick*="addCustomer" i],.btn-add{display:none!important}'}
 ${window.currentKrpUser.permissions.settings ? "" : '#mainSettingsBtn,[onclick*="openHeaderSettingsHub"]{display:none!important}'}
 ${Object.entries(window.currentKrpUser.permissions.sections).filter(([,allowed])=>!allowed).map(([section])=>`[data-tab="${section}"],[data-section="${section}"]{display:none!important}`).join('\n')}`;
 document.head.appendChild(permissionStyle);
@@ -228,12 +228,17 @@ let idleTimer;
 const idleMs = Math.max(1, Number(AUTH_OPTIONS.idleLogoutMinutes) || 5) * 60 * 1000;
 function resetIdleTimer() {
   clearTimeout(idleTimer);
+  if (document.visibilityState === "hidden") return;
   idleTimer = setTimeout(() => window.logoutKrpDashboard(), idleMs);
 }
 ["click", "keydown", "touchstart", "pointerdown", "scroll"].forEach(eventName =>
   addEventListener(eventName, resetIdleTimer, { passive: true })
 );
 resetIdleTimer();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") clearTimeout(idleTimer);
+  else resetIdleTimer();
+});
 
 client.auth.onAuthStateChange((event, nextSession) => {
   if (event === "SIGNED_OUT" || !nextSession) location.replace(AUTH_OPTIONS.loginPage);
