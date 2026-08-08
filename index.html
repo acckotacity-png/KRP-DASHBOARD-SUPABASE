@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/app.css?v=20260809-4">
+    <link rel="stylesheet" href="assets/app.css?v=20260809-5">
 </head>
 <body class="form-view">
 <div class="container">
@@ -33,10 +33,6 @@
             <button class="btn-settings" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i> My Profile</button>
             <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
             <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
-            <button class="btn-notepad" data-section="expense" onclick="switchTab('expense')"><i class="fas fa-receipt"></i> Expenses</button>
-            <button class="btn-notepad" data-section="udhari" onclick="switchTab('udhari')"><i class="fas fa-book-open"></i> Udhari Khata</button>
-            <button class="btn-notepad" data-section="notepad" onclick="switchTab('notepad')"><i class="fas fa-note-sticky"></i> Notepad</button>
-            <button class="btn-upi" data-section="transaction" onclick="switchTab('transaction')"><i class="fas fa-money-bill-transfer"></i> KRP Transaction</button>
             <div class="tracker-dashboard-only tracker-dashboard-controls">
                 <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
             </div>
