@@ -1007,19 +1007,19 @@
 
     // ─── MONTH DROPDOWN ───────────────────────────────────────────
     function toggleMobileNav() {
-        const nav = document.getElementById('mainNavTabs');
-        const button = document.querySelector('.mobile-nav-toggle');
+        const nav = document.getElementById('unifiedDashboardMenu');
+        const button = document.querySelector('.unified-menu-toggle');
         const chevron = document.getElementById('mobileNavChevron');
-        const isOpen = nav.classList.toggle('mobile-open');
+        const isOpen = nav.classList.toggle('menu-open');
         button.setAttribute('aria-expanded', String(isOpen));
         chevron.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
     }
 
     function closeMobileNav() {
-        const nav = document.getElementById('mainNavTabs');
-        const button = document.querySelector('.mobile-nav-toggle');
+        const nav = document.getElementById('unifiedDashboardMenu');
+        const button = document.querySelector('.unified-menu-toggle');
         const chevron = document.getElementById('mobileNavChevron');
-        if (nav) nav.classList.remove('mobile-open');
+        if (nav) nav.classList.remove('menu-open');
         if (button) button.setAttribute('aria-expanded', 'false');
         if (chevron) chevron.className = 'fas fa-chevron-down';
     }
