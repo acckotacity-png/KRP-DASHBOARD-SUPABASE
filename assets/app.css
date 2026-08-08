@@ -1235,3 +1235,4 @@ body.krp-no-create #entryForm button[type="submit"],body.krp-no-create #notepadF
 body.krp-no-edit .btn-edit,body.krp-no-edit .btn-config,body.krp-no-edit .records-action-btn.update{display:none!important}
 body.krp-no-delete .btn-delete,body.krp-no-delete .records-action-btn.delete{display:none!important}
 body.krp-no-settings #mainSettingsBtn{display:none!important}
+.entry-owner{display:block;margin-top:3px;color:#718096;font-size:8px;font-weight:600;line-height:1.25}

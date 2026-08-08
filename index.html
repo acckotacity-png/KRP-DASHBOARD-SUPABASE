@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
-<script type="module" src="auth-guard.js?v=10"></script>
+<script type="module" src="auth-guard.js?v=13"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -19,27 +19,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/app.css?v=20260808-1">
+    <link rel="stylesheet" href="assets/app.css?v=20260809-4">
 </head>
 <body class="form-view">
 <div class="container">
 
     <div class="profile-header">
         <div class="profile-info">
-            <h1><i class="fas fa-chart-line"></i> Arjun Malviya</h1>
-            <p>
-                <span><i class="fas fa-phone-alt"></i> +91 9521867142</span> |
-                <span><i class="fas fa-envelope"></i> arjunmalviya166@gmail.com</span> |
-                <span><i class="fas fa-map-marker-alt"></i> Kota, RJ</span>
-            </p>
+            <h1><img id="headerAvatar" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:7px"><i id="headerDefaultIcon" class="fas fa-chart-line"></i> <span id="headerProfileName">KRP User</span></h1>
+            <p id="headerProfileMeta"></p>
         </div>
         <div class="view-filter">
+            <button class="btn-settings" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i> My Profile</button>
             <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
             <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
-            <button class="btn-notepad" onclick="switchTab('expense')"><i class="fas fa-receipt"></i> Expenses</button>
-            <button class="btn-notepad" onclick="switchTab('udhari')"><i class="fas fa-book-open"></i> Udhari Khata</button>
-            <button class="btn-notepad" onclick="switchTab('notepad')"><i class="fas fa-note-sticky"></i> Notepad</button>
-            <button class="btn-upi" onclick="switchTab('transaction')"><i class="fas fa-money-bill-transfer"></i> KRP Transaction</button>
+            <button class="btn-notepad" data-section="expense" onclick="switchTab('expense')"><i class="fas fa-receipt"></i> Expenses</button>
+            <button class="btn-notepad" data-section="udhari" onclick="switchTab('udhari')"><i class="fas fa-book-open"></i> Udhari Khata</button>
+            <button class="btn-notepad" data-section="notepad" onclick="switchTab('notepad')"><i class="fas fa-note-sticky"></i> Notepad</button>
+            <button class="btn-upi" data-section="transaction" onclick="switchTab('transaction')"><i class="fas fa-money-bill-transfer"></i> KRP Transaction</button>
             <div class="tracker-dashboard-only tracker-dashboard-controls">
                 <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
             </div>
@@ -196,7 +193,7 @@
         <div class="modal-content large-modal" style="max-width:760px;">
             <div class="modal-header">
                 <span><i class="fas fa-plus-circle"></i> Add Records Tracker Entry</span>
-                <span class="close-modal" onclick="closeAddRecordsModal()">×</span>
+                <span class="close-modal" onclick="closeAddRecordsModal()">Ã—</span>
             </div>
             <form id="addRecordsForm" onsubmit="submitAddRecordsEntry(event)">
                 <div class="form-grid">
@@ -370,11 +367,11 @@
                         </div>
                     </div>
                     <div class="form-group"><label>Login ID</label><input type="text" id="loginId"></div>
-                    <div class="form-group"><label>Dealing Amount (₹)</label><input type="number" id="dealingAmount" step="0.01" oninput="calcNewAmt()"></div>
+                    <div class="form-group"><label>Dealing Amount (â‚¹)</label><input type="number" id="dealingAmount" step="0.01" oninput="calcNewAmt()"></div>
                     <div class="form-group"><label>Amount Denominations</label><input type="text" id="amountDeno" placeholder="Example: 2000, 500, 150"></div>
-                    <div class="form-group"><label>Received Amount (₹)</label><input type="number" id="receivedAmount" step="0.01" oninput="calcNewAmt()"></div>
-                    <div class="form-group"><label>ID Activation Amount (₹)</label><input type="number" id="idActivationAmount" step="0.01" oninput="calcNewAmt()"></div>
-                    <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (₹)</label><input type="number" id="uploadingAmount" step="0.01" readonly></div>
+                    <div class="form-group"><label>Received Amount (â‚¹)</label><input type="number" id="receivedAmount" step="0.01" oninput="calcNewAmt()"></div>
+                    <div class="form-group"><label>ID Activation Amount (â‚¹)</label><input type="number" id="idActivationAmount" step="0.01" oninput="calcNewAmt()"></div>
+                    <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (â‚¹)</label><input type="number" id="uploadingAmount" step="0.01" readonly></div>
                     <div class="form-group"><label>UTR / TRN NO.</label><input type="text" id="utrNo"></div>
                     <div class="form-group">
                         <label class="required">Payment Status</label>
@@ -464,11 +461,11 @@
                     </div>
                 </div>
                 <div class="form-group"><label>Login ID</label><input type="text" id="edit_loginId"></div>
-                <div class="form-group"><label>Dealing Amount (₹)</label><input type="number" id="edit_dealingAmount" step="0.01" oninput="calcEditAmt()"></div>
+                <div class="form-group"><label>Dealing Amount (â‚¹)</label><input type="number" id="edit_dealingAmount" step="0.01" oninput="calcEditAmt()"></div>
                 <div class="form-group"><label>Amount Denominations</label><input type="text" id="edit_amountDeno" placeholder="Example: 2000, 500, 150"></div>
-                <div class="form-group"><label>Received Amount (₹)</label><input type="number" id="edit_receivedAmount" step="0.01" oninput="calcEditAmt()"></div>
-                <div class="form-group"><label>ID Activation Amount (₹)</label><input type="number" id="edit_idActivationAmount" step="0.01" oninput="calcEditAmt()"></div>
-                <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (₹)</label><input type="number" id="edit_uploadingAmount" step="0.01" readonly></div>
+                <div class="form-group"><label>Received Amount (â‚¹)</label><input type="number" id="edit_receivedAmount" step="0.01" oninput="calcEditAmt()"></div>
+                <div class="form-group"><label>ID Activation Amount (â‚¹)</label><input type="number" id="edit_idActivationAmount" step="0.01" oninput="calcEditAmt()"></div>
+                <div class="form-group"><label>UPLOADING OR SETUP AMOUNT (â‚¹)</label><input type="number" id="edit_uploadingAmount" step="0.01" readonly></div>
                 <div class="form-group"><label>UTR / TRN NO.</label><input type="text" id="edit_utrNo"></div>
                 <div class="form-group">
                     <label class="required">Payment Status</label>
@@ -491,7 +488,7 @@
 <div class="modal-overlay" id="paymentModal">
     <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">
-            <span>💳 Quick Update</span>
+            <span>ðŸ’³ Quick Update</span>
             <i class="fas fa-times close-modal" onclick="closePaymentModal()"></i>
         </div>
         <input type="hidden" id="modalRowIndex">
@@ -553,7 +550,7 @@
             <div class="form-group"><label>Customer</label><input type="text" id="ledgerPaymentCustomer" readonly></div>
             <div class="form-group"><label class="required">Entry Type</label><select id="ledgerPaymentType"><option value="PAYMENT">Payment Received</option><option value="PENDING">Pending / New Due</option><option value="REFUND">Refund Paid</option></select></div>
             <div class="form-group"><label class="required">Date</label><input type="date" id="ledgerPaymentDate" required></div>
-            <div class="form-group"><label class="required">Amount (₹)</label><input type="number" id="ledgerPaymentAmount" min="0.01" step="0.01" inputmode="decimal" required></div>
+            <div class="form-group"><label class="required">Amount (â‚¹)</label><input type="number" id="ledgerPaymentAmount" min="0.01" step="0.01" inputmode="decimal" required></div>
             <div class="form-group"><label>UTR / TRN No.</label><input type="text" id="ledgerPaymentUtr" inputmode="numeric" autocomplete="off"></div>
         </div>
         <div class="form-group" style="margin-top:12px;"><label>Remarks</label><textarea id="ledgerPaymentRemarks" rows="2" placeholder="Optional pending/payment/refund remarks"></textarea></div>
@@ -586,8 +583,8 @@
         </div>
         <button class="btn-share-wa" id="whatsappShareBtn"><i class="fab fa-whatsapp"></i> Share QR + Link on WhatsApp</button>
         <p style="font-size: 11px; margin-top: 14px; color: #777;">
-            ✅ Customer can scan QR or click link to pay instantly.<br>
-            📱 Mobile: QR image auto-attached. Desktop: image downloads, attach manually.
+            âœ… Customer can scan QR or click link to pay instantly.<br>
+            ðŸ“± Mobile: QR image auto-attached. Desktop: image downloads, attach manually.
         </p>
     </div>
 </div>
@@ -686,7 +683,7 @@
 <div id="printChoiceModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">
-            <span>📄 Generate Document</span>
+            <span>ðŸ“„ Generate Document</span>
             <i class="fas fa-times close-modal" onclick="closePrintChoiceModal()"></i>
         </div>
         <p style="font-size:13px; color:#a3aed1;">Aap is record ke liye kya generate karna chahte hain?</p>
@@ -699,7 +696,7 @@
 <div id="invoicePreviewModal" class="modal-overlay">
     <div class="modal-content large-modal" style="background: #f4f7fe; max-width: 850px;">
         <div class="modal-header">
-            <span>📄 Document Preview</span>
+            <span>ðŸ“„ Document Preview</span>
             <i class="fas fa-times close-modal" onclick="closeInvoicePreviewModal()"></i>
         </div>
         <div id="previewContainer" style="background: white; padding: 20px; border-radius: 10px; max-height: 60vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px;">
@@ -759,18 +756,18 @@
             </tr>
             <tr class="item">
                 <td><span id="p_purpose">ID Activation Charges</span><br><small style="color:#666;" id="p_remarks"></small></td>
-                <td style="text-align: right;">₹<span id="p_amount">0.00</span></td>
+                <td style="text-align: right;">â‚¹<span id="p_amount">0.00</span></td>
             </tr>
             <tr class="total">
                 <td></td>
                 <td style="text-align: right; font-size:15px;">
-                   <strong>Total Received: ₹<span id="p_total">0.00</span></strong>
+                   <strong>Total Received: â‚¹<span id="p_total">0.00</span></strong>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="padding-top: 45px; text-align:right;">
                     <strong>Authorized Signatory</strong><br>
-                    <small style="color:#777; font-weight:normal;">Digital invoice — signature not required.</small>
+                    <small style="color:#777; font-weight:normal;">Digital invoice â€” signature not required.</small>
                 </td>
             </tr>
             <tr>
@@ -788,9 +785,10 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260808-1" defer></script>
+<script src="assets/app.js?v=20260809-4" defer></script>
 </body>
 </html>
+
 
 
 

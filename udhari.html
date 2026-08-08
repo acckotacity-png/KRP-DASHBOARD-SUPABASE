@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Udhari Bahi Khata</title>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
-  <script type="module" src="auth-guard.js?v=10"></script>
+  <script type="module" src="auth-guard.js?v=13"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; }
@@ -107,11 +107,11 @@
 
   <section class="cards">
     <div class="card"><span>Customers</span><strong id="customerCount">0</strong></div>
-    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">₹0</strong></div>
-    <div class="card"><span>Payment Mila</span><strong id="totalPayment">₹0</strong></div>
-    <div class="card"><span>Current Balance</span><strong id="totalBalance">₹0</strong></div>
-    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">₹0</strong></div>
-    <div class="card"><span>Total Payable</span><strong id="totalPayable">₹0</strong></div>
+    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">â‚¹0</strong></div>
+    <div class="card"><span>Payment Mila</span><strong id="totalPayment">â‚¹0</strong></div>
+    <div class="card"><span>Current Balance</span><strong id="totalBalance">â‚¹0</strong></div>
+    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">â‚¹0</strong></div>
+    <div class="card"><span>Total Payable</span><strong id="totalPayable">â‚¹0</strong></div>
   </section>
 
   <div class="tools">
@@ -175,7 +175,7 @@
 
 <script>
   const API_URL = new URLSearchParams(location.search).get('api') || '';
-  const CACHE_KEY = 'krp_udhari_cache_v1';
+  const CACHE_KEY = 'krp_udhari_cache_v1_' + (sessionStorage.getItem('krp_cache_user_uid') || 'signed_out');
   const COL = { id:0,date:1,name:2,mobile:3,address:4,type:5,description:6,udhar:7,payment:8,balance:9,due:10,mode:11,ref:12,status:13,reminder:14,remarks:15,createdBy:16,timestamp:17,rate:18,interestType:19,interestStart:20,interestTill:21,interest:22,total:23 };
   let records = [];
   let query = '';
@@ -184,7 +184,7 @@
   let activeLedgerKey = '';
   let returnToLedgerKey = '';
 
-  const money = value => '₹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const money = value => 'â‚¹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const num = value => Number(String(value || 0).replace(/,/g,'')) || 0;
   const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const isoToDisplay = value => { const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:value||''; };
@@ -223,7 +223,7 @@
           records=cached.records;
           render();
           showingCache=true;
-          setStatus('Ready · Cached JSON');
+          setStatus('Ready Â· Cached JSON');
         }
       } catch(e){}
     }
@@ -236,7 +236,7 @@
       render();
       setStatus(showingCache?'Background sync complete':'Updated');
     } catch(error) {
-      if(showingCache)setStatus('Cached data · Background sync pending',true);
+      if(showingCache)setStatus('Cached data Â· Background sync pending',true);
       else setStatus(error.message,true);
     }
   }
@@ -282,6 +282,7 @@
           <div><span>Remaining Interest</span><b>${money(r[COL.interest])}</b></div>
           <div><span>Total Payable</span><b>${money(r[COL.total])}</b></div>
           <div><span>Last Entry</span><b>${escapeHtml(r[COL.date])}</b></div>
+          <div><span>Created By</span><b>${escapeHtml(r[COL.createdBy]||'-')}</b><small style="display:block;color:#718096;font-size:9px;">${escapeHtml(r[COL.timestamp]||'-')}</small></div>
         </div>
         <div class="customer-actions">
           <button class="primary" onclick="addCustomerUdhari('${escapeHtml(c.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
@@ -353,7 +354,7 @@
     if(customer) {
       document.getElementById('customerName').value=customer.name||'';
       document.getElementById('address').value=customer.address||'';
-      note.textContent=`Existing customer मिला: ${customer.name} · Balance ${money(customer.latest[COL.balance])}`;
+      note.textContent=`Existing customer à¤®à¤¿à¤²à¤¾: ${customer.name} Â· Balance ${money(customer.latest[COL.balance])}`;
       note.style.color='#008f68';
     } else {
       note.textContent=mobile.length>=10?'New customer mobile number':'';
@@ -406,16 +407,16 @@
     const mobile=normalizeMobile(customer.mobile||latest[COL.mobile]);
     if(mobile.length!==10)return alert('Customer ka sahi 10-digit mobile number nahi mila');
     const dueEntry=[...customer.entries].reverse().find(r=>r[COL.due]);
-    const dueDate=dueEntry?.[COL.due]||'जल्द से जल्द';
+    const dueDate=dueEntry?.[COL.due]||'à¤œà¤²à¥à¤¦ à¤¸à¥‡ à¤œà¤²à¥à¤¦';
     const message=[
-      `नमस्ते ${customer.name||'जी'},`,
+      `à¤¨à¤®à¤¸à¥à¤¤à¥‡ ${customer.name||'à¤œà¥€'},`,
       '',
-      'यह आपके बकाया भुगतान का reminder है।',
-      `बकाया राशि: ${money(latest[COL.balance])}`,
-      `ब्याज सहित कुल देय: ${money(latest[COL.total])}`,
+      'à¤¯à¤¹ à¤†à¤ªà¤•à¥‡ à¤¬à¤•à¤¾à¤¯à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤•à¤¾ reminder à¤¹à¥ˆà¥¤',
+      `à¤¬à¤•à¤¾à¤¯à¤¾ à¤°à¤¾à¤¶à¤¿: ${money(latest[COL.balance])}`,
+      `à¤¬à¥à¤¯à¤¾à¤œ à¤¸à¤¹à¤¿à¤¤ à¤•à¥à¤² à¤¦à¥‡à¤¯: ${money(latest[COL.total])}`,
       `Due Date: ${dueDate}`,
       '',
-      'कृपया भुगतान करके जानकारी साझा करें। धन्यवाद।'
+      'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤•à¤°à¤•à¥‡ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚à¥¤ à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦à¥¤'
     ].join('\n');
     window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
   }
@@ -428,7 +429,7 @@
     const latest=customer.latest;
     const totalUdhari=entries.reduce((s,r)=>s+num(r[COL.udhar]),0);
     const totalPayment=entries.reduce((s,r)=>s+num(r[COL.payment]),0);
-    document.getElementById('ledgerTitle').textContent=`${customer.name} · ${customer.mobile||latest[COL.mobile]} Ledger`;
+    document.getElementById('ledgerTitle').textContent=`${customer.name} Â· ${customer.mobile||latest[COL.mobile]} Ledger`;
     document.getElementById('ledgerSummary').innerHTML=`
       <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
       <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
@@ -539,3 +540,4 @@
 </script>
 </body>
 </html>
+

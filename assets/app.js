@@ -1,16 +1,18 @@
     // ─── CONFIG ───────────────────────────────────────────────────
     // YAHAN APNA APPS SCRIPT URL ZAROOR PASTE KAREIN
     const APPS_SCRIPT_URL = './__krp_supabase_api__';
-    const TRACKER_CACHE_KEY = 'krp_tracker_data_cache_v1';
-    const NOTEPAD_CACHE_KEY = 'krp_notepad_data_cache_v1';
-    const NOTEPAD_HISTORY_KEY = 'krp_notepad_history_v1';
+    const USER_CACHE_SUFFIX = sessionStorage.getItem('krp_cache_user_uid') || 'anonymous';
+    const userCacheKey = base => `${base}_${USER_CACHE_SUFFIX}`;
+    const TRACKER_CACHE_KEY = userCacheKey('krp_tracker_data_cache_v1');
+    const NOTEPAD_CACHE_KEY = userCacheKey('krp_notepad_data_cache_v1');
+    const NOTEPAD_HISTORY_KEY = userCacheKey('krp_notepad_history_v1');
     const NOTEPAD_CACHE_TTL = 60000;
-    const RECORDS_DATA_CACHE_KEY = 'krp_records_data_cache_v1';
-    const RECORDS_TRACKER_DRAFT_KEY = 'krp_records_tracker_draft_v1';
-    const RECORDS_TRACKER_CUSTOM_KEY = 'krp_records_tracker_custom_v1';
-    const RECORDS_TRACKER_DELETED_KEY = 'krp_records_tracker_deleted_v1';
-    const RECORDS_TRACKER_ARCHIVE_KEY = 'krp_records_tracker_archive_v1';
-    const LEDGER_HISTORY_KEY = 'krp_ledger_history_v1';
+    const RECORDS_DATA_CACHE_KEY = userCacheKey('krp_records_data_cache_v1');
+    const RECORDS_TRACKER_DRAFT_KEY = userCacheKey('krp_records_tracker_draft_v1');
+    const RECORDS_TRACKER_CUSTOM_KEY = userCacheKey('krp_records_tracker_custom_v1');
+    const RECORDS_TRACKER_DELETED_KEY = userCacheKey('krp_records_tracker_deleted_v1');
+    const RECORDS_TRACKER_ARCHIVE_KEY = userCacheKey('krp_records_tracker_archive_v1');
+    const LEDGER_HISTORY_KEY = userCacheKey('krp_ledger_history_v1');
     const externalScriptPromises = new Map();
 
     function loadExternalScript(src, globalName) {
@@ -165,16 +167,36 @@
         const [year, month, day] = isoDate.split('-');
         return `${day}-${month}-${year}`;
     }
+    function formatEntryDateTime(value) {
+        const date = new Date(value);
+        if (!value || isNaN(date)) return '-';
+        const p = number => String(number).padStart(2, '0');
+        return `${p(date.getDate())}/${p(date.getMonth()+1)}/${String(date.getFullYear()).slice(-2)}, ${p(date.getHours())}:${p(date.getMinutes())}`;
+    }
 
     function applyCurrentUserAccess(user) {
         if (!user) return;
         const permissions = user.permissions || {};
+        const nameElement = document.getElementById('headerProfileName');
+        const metaElement = document.getElementById('headerProfileMeta');
+        if (nameElement) nameElement.textContent = user.name || 'KRP User';
+        if (metaElement) metaElement.innerHTML = `${user.mobile ? `<span><i class="fas fa-phone-alt"></i> ${escapeHtml(user.mobile)}</span> | ` : ''}<span><i class="fas fa-envelope"></i> ${escapeHtml(user.email || '')}</span>${user.designation ? ` | <span>${escapeHtml(user.designation)}</span>` : ''}`;
+        const avatarElement = document.getElementById('headerAvatar');
+        const defaultIcon = document.getElementById('headerDefaultIcon');
+        if (avatarElement && user.avatarUrl) { avatarElement.src = user.avatarUrl; avatarElement.style.display = 'inline-block'; if (defaultIcon) defaultIcon.style.display = 'none'; }
         document.body.classList.toggle('krp-no-create', permissions.create === false);
         document.body.classList.toggle('krp-no-edit', permissions.edit === false);
         document.body.classList.toggle('krp-no-delete', permissions.delete === false);
         document.body.classList.toggle('krp-no-settings', permissions.settings === false);
         const adminButton = document.getElementById('adminAccessBtn');
         if (adminButton) adminButton.style.display = user.role === 'admin' ? '' : 'none';
+        const sections = permissions.sections || {};
+        DASHBOARD_TABS.forEach(tab => {
+            if (tab === 'form' || tab === 'tracker' || tab === 'dashboard' || tab === 'expense' || tab === 'udhari' || tab === 'notepad' || tab === 'transaction') {
+                const allowed = user.role === 'admin' || sections[tab] !== false;
+                document.querySelectorAll(`[data-tab="${tab}"],[data-section="${tab}"]`).forEach(el => el.style.display = allowed ? '' : 'none');
+            }
+        });
     }
     window.addEventListener('krp-auth-ready', event => applyCurrentUserAccess(event.detail));
 
@@ -895,6 +917,15 @@
     // ─── TABS ─────────────────────────────────────────────────────
     function switchTab(tab, options = {}) {
         if (!DASHBOARD_TABS.includes(tab)) tab = 'form';
+        const userSections = window.currentKrpUser?.permissions?.sections || {};
+        if (window.currentKrpUser?.role !== 'admin' && userSections[tab] === false) {
+            tab = DASHBOARD_TABS.find(candidate => userSections[candidate] !== false) || '';
+            if (!tab) {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                showMessage('Admin ने किसी section का access नहीं दिया है', 'error');
+                return;
+            }
+        }
         const previousTab = currentActiveTab;
         closeMobileNav();
         document.body.classList.toggle('notepad-view', tab === 'notepad');
@@ -1538,6 +1569,8 @@
         const idxPurpose = getColIndex('PURPOSE');
         const idxServiceRemarks = getColIndex('SERVICE CHARGE REMARKS');
         const idxLogin   = getColIndex('LOGIN ID');
+        const idxCreatedBy = getColIndex('CREATED BY');
+        const idxTimestamp = getColIndex('Timestamp');
         const idxDeal    = getColIndex('DEALING AMOUNT');
         const idxRecv    = getColIndex('RECEIVED AMOUNT');
         const idxSetup   = getColIndex('UPLOADING OR SETUP AMOUNT');
@@ -2419,6 +2452,8 @@
         const idxUtr     = getColIndex('UTR / TRN NO.');
         const idxPurpose = getColIndex('PURPOSE');
         const idxLogin   = getColIndex('LOGIN ID');
+        const idxCreatedBy = getColIndex('CREATED BY');
+        const idxTimestamp = getColIndex('Timestamp');
 
         let filtered = currentData.filter(row => {
             if (filters.statusF !== 'all' && idxStatus !== -1 && (row[idxStatus]?.toString().toUpperCase() || '') !== filters.statusF) return false;
@@ -2493,7 +2528,7 @@
                 <td data-label="Contact / Login ID">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
-                <td data-label="Bank">${row[idxBank] || '-'}</td>
+                <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
                     <div class="action-icons">
@@ -5483,6 +5518,7 @@
         body.innerHTML = filtered.map(({ row, index }) => `<tr class="notepad-card-collapsed">
             ${row.slice(0, 13).map((value, col) => `<td class="${col >= 6 ? 'notepad-detail-cell' : ''}" data-label="${notepadLabels[col]}"${col === 0 ? ' ondblclick="toggleNotepadCardFromDate(this)" title="Double-click to show or hide details"' : ''}>${getNotepadCellHtml(value, col, index)}</td>`).join('')}
             <td class="notepad-detail-cell" data-label="Reminder">${getNotepadReminderHtml(row)}</td>
+            <td class="notepad-detail-cell" data-label="Created By"><strong>${escapeHtml(row[14] || '-')}</strong><small class="entry-owner">${escapeHtml(row[15] || '-')}</small></td>
             <td class="notepad-detail-cell" data-label="Actions"><div class="records-row-actions"><button class="records-action-btn update" type="button" onclick="editNotepadEntry(${index})">Edit</button><button class="records-action-btn delete" type="button" onclick="deleteNotepadEntry(${index})">Delete</button></div></td>
             <td class="notepad-toggle-cell"><button type="button" class="notepad-card-toggle" aria-expanded="false" onclick="toggleNotepadCard(this)">Show <i class="fas fa-chevron-down"></i></button></td>
         </tr>`).join('');

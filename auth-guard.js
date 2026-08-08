@@ -1,6 +1,6 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
-import { installSupabaseApiAdapter } from "./supabase-api.js?v=9";
+import { installSupabaseApiAdapter } from "./supabase-api.js?v=11";
 
 const guardStyle = document.getElementById("auth-guard-style");
 const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
@@ -37,6 +37,7 @@ if (!session?.user) {
   location.replace(loginUrl());
   throw new Error("Authentication required");
 }
+sessionStorage.setItem("krp_cache_user_uid", session.user.id);
 
 const { data: access, error: accessError } = await client
   .from("app_users")
@@ -58,6 +59,9 @@ window.currentKrpUser = {
   uid: session.user.id,
   email: session.user.email || access.email || "",
   name: access.full_name || session.user.user_metadata?.full_name || "",
+  mobile: access.mobile_no || "",
+  designation: access.designation || "",
+  avatarPath: access.avatar_path || "",
   role: access.role || "staff",
   accessExpiresAt: access.access_expires_at || null,
   permissions: {
@@ -65,10 +69,39 @@ window.currentKrpUser = {
     create: access.role === "admin" || access.can_create !== false,
     edit: access.role === "admin" || access.can_edit !== false,
     delete: access.role === "admin" || access.can_delete !== false,
-    settings: access.role === "admin" || access.can_manage_settings === true
+    settings: access.role === "admin" || access.can_manage_settings === true,
+    sections: {
+      form: access.role === "admin" || access.can_data_entry !== false,
+      tracker: access.role === "admin" || access.can_tracker !== false,
+      dashboard: access.role === "admin" || access.can_dashboard !== false,
+      notepad: access.role === "admin" || access.can_notepad !== false,
+      transaction: access.role === "admin" || access.can_transactions !== false,
+      udhari: access.role === "admin" || access.can_udhari !== false,
+      expense: access.role === "admin" || access.can_expenses !== false
+    }
   }
 };
+if (window.currentKrpUser.avatarPath) {
+  const { data: avatarData } = await client.storage.from("krp-avatars").createSignedUrl(window.currentKrpUser.avatarPath, 3600);
+  window.currentKrpUser.avatarUrl = avatarData?.signedUrl || "";
+}
 window.dispatchEvent(new CustomEvent("krp-auth-ready", { detail: window.currentKrpUser }));
+const permissionStyle = document.createElement("style");
+permissionStyle.textContent = `${window.currentKrpUser.permissions.delete ? "" : '[onclick*="delete" i],.delete-btn,.btn-delete{display:none!important}'}
+${window.currentKrpUser.permissions.edit ? "" : '[onclick*="editRecord" i],[onclick*="openEdit" i],.edit-btn,.btn-edit,.btn-config,.records-action-btn.update{display:none!important}'}
+${window.currentKrpUser.permissions.create ? "" : '[onclick*="openForm" i],[onclick*="addCustomer" i],.btn-add{display:none!important}'}
+${window.currentKrpUser.permissions.settings ? "" : '#mainSettingsBtn,[onclick*="openHeaderSettingsHub"]{display:none!important}'}
+${Object.entries(window.currentKrpUser.permissions.sections).filter(([,allowed])=>!allowed).map(([section])=>`[data-tab="${section}"],[data-section="${section}"]{display:none!important}`).join('\n')}`;
+document.head.appendChild(permissionStyle);
+const guardedPageSection = {
+  "expense.html": "expense",
+  "transaction.html": "transaction",
+  "udhari.html": "udhari"
+}[location.pathname.split("/").pop()];
+if (guardedPageSection && session.user && access.role !== "admin" && window.currentKrpUser.permissions.sections[guardedPageSection] === false) {
+  location.replace(`${AUTH_OPTIONS.homePage}?error=section_denied`);
+  throw new Error("Section access denied");
+}
 if (window.currentKrpUser.accessExpiresAt) {
   setInterval(async () => {
     if (new Date(window.currentKrpUser.accessExpiresAt) <= new Date()) {
@@ -183,3 +216,4 @@ client.auth.onAuthStateChange((event, nextSession) => {
 });
 
 reveal();
+

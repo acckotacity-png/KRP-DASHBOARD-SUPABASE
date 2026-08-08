@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Daily Expense Tracker</title>
   <style id="auth-guard-style">html{visibility:hidden}</style>
-  <script type="module" src="auth-guard.js?v=10"></script>
+  <script type="module" src="auth-guard.js?v=13"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     *{box-sizing:border-box}body{margin:0;padding:12px;background:#f4f7fe;color:#2b3674;font-family:Inter,Arial,sans-serif}.app{max-width:1400px;margin:auto}
@@ -31,11 +31,11 @@
     </div>
   </header>
   <section class="summary">
-    <div class="card"><span>Month Expense</span><strong id="monthTotal">₹0</strong></div>
-    <div class="card"><span>Today Expense</span><strong id="todayTotal">₹0</strong></div>
-    <div class="card"><span>Essential</span><strong id="essentialTotal">₹0</strong></div>
-    <div class="card"><span>Optional</span><strong id="optionalTotal">₹0</strong></div>
-    <div class="card"><span>Highest Category</span><strong id="highestCategory">—</strong></div>
+    <div class="card"><span>Month Expense</span><strong id="monthTotal">â‚¹0</strong></div>
+    <div class="card"><span>Today Expense</span><strong id="todayTotal">â‚¹0</strong></div>
+    <div class="card"><span>Essential</span><strong id="essentialTotal">â‚¹0</strong></div>
+    <div class="card"><span>Optional</span><strong id="optionalTotal">â‚¹0</strong></div>
+    <div class="card"><span>Highest Category</span><strong id="highestCategory">â€”</strong></div>
   </section>
   <section class="tools">
     <div class="filter-row">
@@ -77,11 +77,11 @@
 </div></div>
 
 <script>
-const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense_cache_v2';
+const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense_cache_v2_'+(sessionStorage.getItem('krp_cache_user_uid')||'signed_out');
 const C={id:0,date:1,month:2,category:3,sub:4,desc:5,mode:6,paidTo:7,amount:8,ref:9,bill:10,type:11,priority:12,budget:13,spent:14,remaining:15,monthTotal:16,used:17,alert:18,remark:19,added:20,time:21};
 let records=[],budgets=[],preferredMonth='',preferredYear='';
 const MONTH_NAMES=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-const money=v=>'₹'+(Number(String(v||0).replace(/,/g,''))||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=v=>'â‚¹'+(Number(String(v||0).replace(/,/g,''))||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const num=v=>Number(String(v||0).replace(/,/g,''))||0;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isoDisplay=v=>{const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:v||''};
@@ -94,9 +94,9 @@ const recordYear=r=>{const iso=recordIso(r);return iso?iso.slice(0,4):(recordMon
 const recordMonthName=r=>{const key=recordMonth(r);return key.split('-')[0]||''};
 function status(t,e=false){const x=document.getElementById('status');x.textContent=t;x.style.color=e?'#c62828':'#008f68'}
 function cache(){localStorage.setItem(CACHE,JSON.stringify({records,budgets,savedAt:Date.now()}))}
-function restoreExpenseCache(){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(!Array.isArray(c?.records))return false;records=c.records;budgets=Array.isArray(c.budgets)?c.budgets:[];render();const age=Math.max(0,Math.floor((Date.now()-Number(c.savedAt||0))/60000));status(`Ready · ${records.length} cached records${age?' · '+age+'m old':''}`);return true}catch(e){return false}}
+function restoreExpenseCache(){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(!Array.isArray(c?.records))return false;records=c.records;budgets=Array.isArray(c.budgets)?c.budgets:[];render();const age=Math.max(0,Math.floor((Date.now()-Number(c.savedAt||0))/60000));status(`Ready Â· ${records.length} cached records${age?' Â· '+age+'m old':''}`);return true}catch(e){return false}}
 async function request(params){const q=new URLSearchParams({...params,t:Date.now()});const r=await fetch(API+'?'+q,{cache:'no-store'});return r.json()}
-async function load(force=false){let cached=false;if(!force){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(c?.records){records=c.records;budgets=c.budgets||[];cached=true;render();status(`Ready · ${records.length} cached records`)}}catch(e){}}try{const x=await request({action:'getExpenseData'});if(!x.success)throw Error(x.error||'Load failed');records=Array.isArray(x.data)?x.data:[];budgets=Array.isArray(x.budgets)?x.budgets:[];cache();render();status(`Sheet synced · ${records.length} records loaded`)}catch(e){status(cached?`Showing ${records.length} cached records · ${e.message}`:e.message,true)}}
+async function load(force=false){let cached=false;if(!force){try{const c=JSON.parse(localStorage.getItem(CACHE)||'null');if(c?.records){records=c.records;budgets=c.budgets||[];cached=true;render();status(`Ready Â· ${records.length} cached records`)}}catch(e){}}try{const x=await request({action:'getExpenseData'});if(!x.success)throw Error(x.error||'Load failed');records=Array.isArray(x.data)?x.data:[];budgets=Array.isArray(x.budgets)?x.budgets:[];cache();render();status(`Sheet synced Â· ${records.length} records loaded`)}catch(e){status(cached?`Showing ${records.length} cached records Â· ${e.message}`:e.message,true)}}
 function years(){const set=new Set(records.map(recordYear).filter(Boolean));set.add(todayIso().slice(0,4));return [...set].sort((a,b)=>Number(b)-Number(a))}
 function render(){
   const ySel=document.getElementById('yearFilter'),mSel=document.getElementById('monthFilter'),ys=years(),currentIso=todayIso();
@@ -108,8 +108,8 @@ function render(){
   const inPeriod=r=>(year==='ALL'||recordYear(r)===year)&&(month==='ALL'||recordMonthName(r)===month)&&(!dateExact||String(r[C.date]||'')===dateExact);
   const list=records.filter(r=>inPeriod(r)&&(!q||r.some(v=>String(v||'').toLowerCase().includes(q)))).sort((a,b)=>recordIso(b).localeCompare(recordIso(a)));
   const all=records.filter(inPeriod),today=isoDisplay(todayIso());document.getElementById('monthTotal').textContent=money(all.reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('todayTotal').textContent=money(all.filter(r=>r[C.date]===today).reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('essentialTotal').textContent=money(all.filter(r=>r[C.priority]==='ESSENTIAL').reduce((s,r)=>s+num(r[C.amount]),0));document.getElementById('optionalTotal').textContent=money(all.filter(r=>r[C.priority]==='OPTIONAL').reduce((s,r)=>s+num(r[C.amount]),0));
-  const cats={};all.forEach(r=>cats[r[C.category]]=(cats[r[C.category]]||0)+num(r[C.amount]));const sortedCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]);document.getElementById('highestCategory').textContent=sortedCats[0]?`${sortedCats[0][0]} · ${money(sortedCats[0][1])}`:'—';
-  document.getElementById('categoryGrid').innerHTML=sortedCats.length?sortedCats.map(([cat,total])=>{const latest=[...all].reverse().find(r=>r[C.category]===cat)||[],used=num(latest[C.used]),alert=String(latest[C.alert]||'NO BUDGET'),tone=used>=100?'over-card':used>=80?'warning-card':used>=60?'watch-card':'';return `<div class="category-card ${tone}"><div class="category-head"><b>${esc(cat)}</b><b>${money(total)}</b></div><div class="bar"><i class="${used>=100?'over':used>=80?'warn':used>=60?'watch':''}" style="width:${Math.min(100,used)}%"></i></div><div class="remark">${used?used.toFixed(1)+'% used · ':''}${esc(latest[C.remark]||'Budget set karein')}</div></div>`}).join(''):'<div class="card">Selected filter me koi expense nahi hai.</div>';
+  const cats={};all.forEach(r=>cats[r[C.category]]=(cats[r[C.category]]||0)+num(r[C.amount]));const sortedCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]);document.getElementById('highestCategory').textContent=sortedCats[0]?`${sortedCats[0][0]} Â· ${money(sortedCats[0][1])}`:'â€”';
+  document.getElementById('categoryGrid').innerHTML=sortedCats.length?sortedCats.map(([cat,total])=>{const latest=[...all].reverse().find(r=>r[C.category]===cat)||[],used=num(latest[C.used]),alert=String(latest[C.alert]||'NO BUDGET'),tone=used>=100?'over-card':used>=80?'warning-card':used>=60?'watch-card':'';return `<div class="category-card ${tone}"><div class="category-head"><b>${esc(cat)}</b><b>${money(total)}</b></div><div class="bar"><i class="${used>=100?'over':used>=80?'warn':used>=60?'watch':''}" style="width:${Math.min(100,used)}%"></i></div><div class="remark">${used?used.toFixed(1)+'% used Â· ':''}${esc(latest[C.remark]||'Budget set karein')}</div></div>`}).join(''):'<div class="card">Selected filter me koi expense nahi hai.</div>';
   document.getElementById('rows').innerHTML=list.length?list.map(r=>`<tr><td data-label="Date">${esc(r[C.date])}</td><td data-label="Category"><b>${esc(r[C.category])}</b></td><td data-label="Description">${esc(r[C.desc])}</td><td data-label="Paid To">${esc(r[C.paidTo])}</td><td data-label="Amount"><b>${money(r[C.amount])}</b></td><td data-label="Mode">${esc(r[C.mode])}</td><td data-label="Type">${esc(r[C.type])}</td><td data-label="Priority">${esc(r[C.priority])}</td><td data-label="Budget Used">${num(r[C.used]).toFixed(1)}%</td><td data-label="Alert"><span class="badge ${String(r[C.alert]).toLowerCase().replace(/ /g,'-')}">${esc(r[C.alert])}</span></td><td data-label="Smart Remarks">${esc(r[C.remark])}</td><td data-label="Actions"><div class="actions"><button class="outline" onclick="editExpense('${esc(r[C.id])}')"><i class="fas fa-pen"></i></button><button class="danger" onclick="deleteExpense('${esc(r[C.id])}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join(''):'<tr><td colspan="12">No expense found</td></tr>';
   document.getElementById('recordCount').textContent=list.length+' entries';
 }
@@ -127,3 +127,4 @@ window.addEventListener('load',()=>{load(false);setInterval(()=>load(false),1200
 </script>
 </body>
 </html>
+
