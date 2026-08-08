@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=8">
+    <link rel="stylesheet" href="theme.css?v=9">
     <script src="theme.js?v=1"></script>
 </head>
 <body class="form-view">
@@ -32,20 +32,20 @@
             <h1><img id="headerAvatar" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:7px"><i id="headerDefaultIcon" class="fas fa-chart-line"></i> <span id="headerProfileName">KRP User</span></h1>
             <p id="headerProfileMeta"></p>
         </div>
+        <div class="view-filter">
+            <button class="btn-settings" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i> My Profile</button>
+            <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
+            <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
+            <button id="themeToggleBtn" class="btn-settings" type="button" onclick="toggleKrpTheme()"><i class="fas fa-moon"></i> Dark Theme</button>
+        </div>
+        <div class="tracker-dashboard-only tracker-dashboard-controls header-month-filter">
+            <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
+        </div>
         <button type="button" class="mobile-nav-toggle unified-menu-toggle" onclick="toggleMobileNav()" aria-controls="unifiedDashboardMenu" aria-expanded="false">
             <span><i class="fas fa-bars"></i> Dashboard Menu</span>
             <i class="fas fa-chevron-down" id="mobileNavChevron"></i>
         </button>
         <div class="unified-dashboard-menu" id="unifiedDashboardMenu">
-          <div class="view-filter">
-            <button class="btn-settings" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i> My Profile</button>
-            <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
-            <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
-            <button id="themeToggleBtn" class="btn-settings" type="button" onclick="toggleKrpTheme()"><i class="fas fa-moon"></i> Dark Theme</button>
-            <div class="tracker-dashboard-only tracker-dashboard-controls">
-                <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
-            </div>
-          </div>
           <div class="nav-tabs" id="mainNavTabs">
             <button class="tab-btn active" data-tab="form" onclick="switchTab('form')"><i class="fas fa-pen"></i> Data Entry</button>
             <button class="tab-btn" data-tab="tracker" onclick="switchTab('tracker')"><i class="fas fa-list-ul"></i> Data Tracker</button>

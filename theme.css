@@ -181,3 +181,11 @@ html.krp-dark-theme input,html.krp-dark-theme select,html.krp-dark-theme textare
 html.krp-dark-theme table,html.krp-dark-theme th,html.krp-dark-theme td,html.krp-dark-theme .ledger-table-wrapper,html.krp-dark-theme .ledger-summary-item,html.krp-dark-theme .ledger-history-panel,html.krp-dark-theme .ledger-history-item{border-color:#203746!important}
 html.krp-dark-theme .modal-content,html.krp-dark-theme .modal-header,html.krp-dark-theme .ledger-modal{border-color:#243a49!important}
 html.krp-dark-theme .action-btn{box-shadow:none!important}
+
+/* Account actions stay visible; month filter and section dropdown stay separate. */
+.profile-header>.view-filter{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:min(100%,920px)!important;max-width:920px!important;margin:0!important}
+.header-month-filter{width:155px!important;justify-self:end!important;margin:0!important}.header-month-filter select{width:100%!important;min-height:36px!important;padding:5px 9px!important;border:1px solid #dbe3ea!important;border-radius:8px!important;background:#fff!important;color:#172033!important;font-size:11px!important}
+.profile-header>.unified-menu-toggle{margin-top:-51px!important;width:220px!important}
+.unified-dashboard-menu .nav-tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+html.krp-dark-theme .header-month-filter select{background:#0b1725!important;color:#f1f5f9!important;border-color:#294050!important}
+@media(max-width:720px){.profile-header>.view-filter{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}.header-month-filter{justify-self:start!important;width:130px!important}.profile-header>.unified-menu-toggle{margin-top:-46px!important;margin-left:auto!important;width:55%!important}.unified-dashboard-menu .nav-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
