@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,9 +6,9 @@
   <title>Daily Expense Tracker</title>
   <style id="auth-guard-style">html{visibility:hidden}</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=15"></script>
+  <script type="module" src="auth-guard.js?v=16"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="theme.css?v=1"><script src="theme.js?v=1"></script>
+  <link rel="stylesheet" href="theme.css?v=2"><script src="theme.js?v=1"></script>
   <style>
     *{box-sizing:border-box}body{margin:0;padding:12px;background:#f4f7fe;color:#2b3674;font-family:Inter,Arial,sans-serif}.app{max-width:1400px;margin:auto}
     .top,.tools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px;background:#fff;border:1px solid #e0e5f2;border-radius:14px;margin-bottom:12px}
@@ -33,10 +33,10 @@
     </div>
   </header>
   <section class="summary">
-    <div class="card"><span>Month Expense</span><strong id="monthTotal">₹0</strong></div>
-    <div class="card"><span>Today Expense</span><strong id="todayTotal">₹0</strong></div>
-    <div class="card"><span>Essential</span><strong id="essentialTotal">₹0</strong></div>
-    <div class="card"><span>Optional</span><strong id="optionalTotal">₹0</strong></div>
+    <div class="card"><span>Month Expense</span><strong id="monthTotal">?0</strong></div>
+    <div class="card"><span>Today Expense</span><strong id="todayTotal">?0</strong></div>
+    <div class="card"><span>Essential</span><strong id="essentialTotal">?0</strong></div>
+    <div class="card"><span>Optional</span><strong id="optionalTotal">?0</strong></div>
     <div class="card"><span>Highest Category</span><strong id="highestCategory">—</strong></div>
   </section>
   <section class="tools">
@@ -83,7 +83,7 @@ const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense
 const C={id:0,date:1,month:2,category:3,sub:4,desc:5,mode:6,paidTo:7,amount:8,ref:9,bill:10,type:11,priority:12,budget:13,spent:14,remaining:15,monthTotal:16,used:17,alert:18,remark:19,added:20,time:21};
 let records=[],budgets=[],preferredMonth='',preferredYear='';
 const MONTH_NAMES=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-const money=v=>'₹'+(Number(String(v||0).replace(/,/g,''))||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=v=>'?'+(Number(String(v||0).replace(/,/g,''))||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const num=v=>Number(String(v||0).replace(/,/g,''))||0;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isoDisplay=v=>{const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:v||''};
@@ -129,4 +129,5 @@ window.addEventListener('load',()=>{load(false);setInterval(()=>load(false),1200
 </script>
 </body>
 </html>
+
 

@@ -4,7 +4,7 @@ const s = value => String(value ?? "");
 const parseJson = value => { try { return typeof value === "object" ? value : JSON.parse(value || "{}"); } catch { return {}; } };
 const round = value => Math.round((n(value) + Number.EPSILON) * 100) / 100;
 
-const MAIN_HEADERS = ["Timestamp","INVOICE NO.","DATE","CONTACT NO. OR NAME","CUSTOMER NAME","BANK OWNER NAME","STATE","PURPOSE","SERVICE CHARGE REMARKS","LOGIN ID","DEALING AMOUNT","AMOUNT DENO","RECEIVED AMOUNT","ID ACTIVATION AMOUNT","UPLOADING OR SETUP AMOUNT","UTR / TRN NO.","PAYMENT STATUS","REMARKS","CREATED BY"];
+const MAIN_HEADERS = ["Timestamp","INVOICE NO.","DATE","CONTACT NO. OR NAME","CUSTOMER NAME","BANK OWNER NAME","STATE","PURPOSE","SERVICE CHARGE REMARKS","LOGIN ID","DEALING AMOUNT","AMOUNT DENO","RECEIVED AMOUNT","ID ACTIVATION AMOUNT","UPLOADING OR SETUP AMOUNT","UTR / TRN NO.","PAYMENT STATUS","REMARKS","CREATED BY","ACTIVATION REQUIRED"];
 const MONTH_HEADERS = ["DATE","MONTH","TOTAL ID","WORKING AMT","TRANSFER AMT","MONTHLY AMT","SETUP AMOUNT","REMARKS","CREATED BY","TIMESTAMP"];
 const NOTE_HEADERS = ["Task Date","Contact No","State","Name","ID","Password","Task Description","Task Status","Payment Date","Dealing Amount","Received Amount","Remaining Amount","Payment Status","Reminder Date","CREATED BY","TIMESTAMP"];
 const UDHARI_HEADERS = ["ENTRY ID","DATE","CUSTOMER NAME","MOBILE NO.","ADDRESS / STATE","TRANSACTION TYPE","DESCRIPTION","UDHAR DIYA AMT","PAYMENT MILA AMT","RUNNING BALANCE","DUE DATE","PAYMENT MODE","UTR / REFERENCE NO.","STATUS","REMINDER DATE","REMARKS","CREATED BY","TIMESTAMP","INTEREST RATE (%)","INTEREST TYPE","INTEREST START DATE","INTEREST CALCULATED TILL","INTEREST AMOUNT","TOTAL PAYABLE"];
@@ -32,14 +32,15 @@ function mainContactKey(value) { const phone=mobile(value); return phone||s(valu
 async function all(client, table) { const {data,error}=await client.from(table).select("*").order("sequence_no"); if(error) throw error; return data||[]; }
 async function idAt(client, table, index) { const rows=await all(client,table); const row=rows[n(index)]; if(!row) throw Error("Record not found"); return row.id; }
 
-function mainRow(r) { const status=s(r.login_id).trim()?r.payment_status:"PENDING";return [r.created_at,r.invoice_no,r.entry_date,r.contact_name,r.customer_name,r.bank_owner,r.state,r.purpose,r.service_remarks,r.login_id,n(r.dealing_amount),s(r.amount_deno),n(r.received_amount),n(r.id_activation_amount),n(r.uploading_amount),s(r.utr_no),status,r.remarks,r.created_by_name||'']; }
+function mainRow(r) { const required=r.activation_required!==false,status=(!required||s(r.login_id).trim())?r.payment_status:"PENDING";return [r.created_at,r.invoice_no,r.entry_date,r.contact_name,r.customer_name,r.bank_owner,r.state,r.purpose,r.service_remarks,r.login_id,n(r.dealing_amount),s(r.amount_deno),n(r.received_amount),n(r.id_activation_amount),n(r.uploading_amount),s(r.utr_no),status,r.remarks,r.created_by_name||'',required]; }
 function mainPayload(p) {
   const receivedAmount=n(p.receivedAmount), idActivationAmount=n(p.idActivationAmount);
   const loginId=s(p.loginId).trim();
-  const paymentStatus=loginId?s(p.paymentStatus||p.status||"PENDING").toUpperCase():"PENDING";
+  const activationRequired=!/^(false|0|no)$/i.test(s(p.activationRequired));
+  const paymentStatus=(!activationRequired||loginId)?s(p.paymentStatus||p.status||"PENDING").toUpperCase():"PENDING";
   // Setup is a customer-ledger balance movement: payment adds credit and ID activation consumes it.
   const setupBalanceChange=paymentStatus==="REFUND"?0:round(receivedAmount-idActivationAmount);
-  return {invoice_no:s(p.invoiceNo||p.invoice),entry_date:s(p.date),contact_name:s(p.contactName||p.contact),customer_name:s(p.customerName),bank_owner:s(p.bankOwner),state:s(p.state),purpose:s(p.purpose),service_remarks:s(p.serviceRemarks),login_id:loginId,dealing_amount:n(p.dealingAmount),amount_deno:s(p.amountDeno),received_amount:receivedAmount,id_activation_amount:idActivationAmount,uploading_amount:setupBalanceChange,utr_no:s(p.utrNo||p.utr),payment_status:paymentStatus,remarks:s(p.remarks)};
+  return {invoice_no:s(p.invoiceNo||p.invoice),entry_date:s(p.date),contact_name:s(p.contactName||p.contact),customer_name:s(p.customerName),bank_owner:s(p.bankOwner),state:s(p.state),purpose:s(p.purpose),service_remarks:s(p.serviceRemarks),login_id:loginId,dealing_amount:n(p.dealingAmount),amount_deno:s(p.amountDeno),received_amount:receivedAmount,id_activation_amount:idActivationAmount,uploading_amount:setupBalanceChange,utr_no:s(p.utrNo||p.utr),payment_status:paymentStatus,remarks:s(p.remarks),activation_required:activationRequired};
 }
 function monthRow(r) { return [r.entry_date,r.month,n(r.total_id),n(r.working_amount),n(r.transfer_amount),n(r.monthly_amount),n(r.setup_amount),r.remarks,r.created_by_name||'',stampText(r.created_at)]; }
 function noteRow(r) { const remaining=Math.max(0,n(r.dealing_amount)-n(r.received_amount)); const status=remaining<=0&&n(r.dealing_amount)>0?"PAID":n(r.received_amount)>0?"PARTIAL":"PENDING"; return [r.task_date,r.contact_no,r.state,r.customer_name,r.login_id,r.password_text,r.task_description,r.task_status,r.payment_date,n(r.dealing_amount),n(r.received_amount),remaining,status,r.reminder_date,r.created_by_name||'',stampText(r.created_at)]; }
@@ -81,7 +82,7 @@ async function route(client,user,p){
     if(nextId>availableBeforeId)throw Error("ID Activation Amount recharge balance se zyada nahi ho sakta");
     const projectedBalance=Math.max(0,availableBeforeId-nextId);
     let nextStatus=s(p.status||"PENDING").toUpperCase();
-    if(!s(current.login_id).trim()||openingBalance<=0||projectedBalance<=0)nextStatus="PENDING";
+    if((current.activation_required!==false&&!s(current.login_id).trim())||openingBalance<=0||projectedBalance<=0)nextStatus="PENDING";
     const nextSetup=nextStatus==="REFUND"?0:round(n(current.received_amount)-nextId);
     const {data,error}=await client.from("main_records").update({payment_status:nextStatus,utr_no:s(p.utr),id_activation_amount:nextId,uploading_amount:nextSetup}).eq("id",current.id).select("*").single();
     if(error)throw error;
@@ -108,7 +109,7 @@ async function route(client,user,p){
   if(action==="deleteNotepad"){const id=await idAt(client,"notepad_tasks",p.row);const {error}=await client.from("notepad_tasks").delete().eq("id",id);if(error)throw error;return {success:true};}
   if(action==="getMainStatusSummary"){
     const rows=await all(client,"main_records"),summary={PENDING:{ids:0,amount:0},SUCCESS:{ids:0,amount:0},REFUND:{ids:0,amount:0}};
-    rows.forEach(r=>{const login=s(r.login_id).trim(),raw=s(r.payment_status||"PENDING").toUpperCase(),status=!login?"PENDING":raw==="REFUND"?"REFUND":raw==="SUCCESS"?"SUCCESS":"PENDING";const ids=login?Math.max(1,login.split(/[,&\n]+/).map(x=>x.trim()).filter(Boolean).length):0;const amount=status==="PENDING"?Math.max(0,n(r.dealing_amount)-n(r.received_amount)):n(r.received_amount);summary[status].ids+=ids;summary[status].amount=round(summary[status].amount+amount);});
+    rows.forEach(r=>{const login=s(r.login_id).trim(),raw=s(r.payment_status||"PENDING").toUpperCase(),required=r.activation_required!==false,status=(required&&!login)?"PENDING":raw==="REFUND"?"REFUND":raw==="SUCCESS"?"SUCCESS":"PENDING";const ids=login?Math.max(1,login.split(/[,&\n]+/).map(x=>x.trim()).filter(Boolean).length):0;const amount=status==="PENDING"?Math.max(0,n(r.dealing_amount)-n(r.received_amount)):n(r.received_amount);summary[status].ids+=ids;summary[status].amount=round(summary[status].amount+amount);});
     return {status:"success",summary};
   }
   if(action==="getRecords"){return {status:"success",data:recalcTransactions(await all(client,"transactions"))};}

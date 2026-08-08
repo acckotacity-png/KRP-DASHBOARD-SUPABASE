@@ -1802,7 +1802,9 @@
         document.getElementById('uploadingAmount').value = (r - i).toFixed(2);
         
         const statusEl = document.getElementById('paymentStatus');
-        if (r > 0) {
+        const paymentOnly = document.getElementById('paymentOnlyNoLogin')?.checked;
+        const hasLogin = Boolean(document.getElementById('loginId')?.value.trim());
+        if (r > 0 && (paymentOnly || hasLogin)) {
             statusEl.disabled = false;
         } else {
             statusEl.value = 'PENDING';
@@ -1816,12 +1818,24 @@
         document.getElementById('edit_uploadingAmount').value = (r - i).toFixed(2);
         
         const statusEl = document.getElementById('edit_paymentStatus');
-        if (r > 0) {
+        const paymentOnly = document.getElementById('edit_paymentOnlyNoLogin')?.checked;
+        const hasLogin = Boolean(document.getElementById('edit_loginId')?.value.trim());
+        if (r > 0 && (paymentOnly || hasLogin)) {
             statusEl.disabled = false;
         } else {
             statusEl.value = 'PENDING';
             statusEl.disabled = true;
         }
+    }
+    function togglePaymentOnlyMode(prefix = '') {
+        const checked = Boolean(document.getElementById(prefix + 'paymentOnlyNoLogin')?.checked);
+        const received = parseFloat(document.getElementById(prefix + 'receivedAmount')?.value) || 0;
+        const statusEl = document.getElementById(prefix + 'paymentStatus');
+        if (checked && received > 0 && statusEl) {
+            statusEl.disabled = false;
+            if (statusEl.value === 'PENDING') statusEl.value = 'SUCCESS';
+        }
+        if (prefix) calcEditAmt(); else calcNewAmt();
     }
 
     // ─── MULTI-SELECT ─────────────────────────────────────────────
@@ -3432,6 +3446,7 @@
         formData.append('uploadingAmount',   document.getElementById('uploadingAmount').value);
         formData.append('utrNo',             normalizeUtrValue(document.getElementById('utrNo').value));
         formData.append('paymentStatus',     document.getElementById('paymentStatus').value);
+        formData.append('activationRequired',document.getElementById('paymentOnlyNoLogin').checked ? 'false' : 'true');
         formData.append('remarks',           document.getElementById('remarks').value);
 
         try {
@@ -3466,6 +3481,8 @@
         setMultiSelectState('edit_purpose',        record[getColIndex('PURPOSE')] || '');
         setMultiSelectState('edit_serviceRemarks', record[getColIndex('SERVICE CHARGE REMARKS')] || '');
         document.getElementById('edit_loginId').value           = record[getColIndex('LOGIN ID')] || '';
+        const activationRequiredIdx = getColIndex('ACTIVATION REQUIRED');
+        document.getElementById('edit_paymentOnlyNoLogin').checked = activationRequiredIdx !== -1 && /^(false|0|no)$/i.test(String(record[activationRequiredIdx]));
         document.getElementById('edit_dealingAmount').value     = record[getColIndex('DEALING AMOUNT')] || '';
         document.getElementById('edit_amountDeno').value        = record[getColIndex('AMOUNT DENO')] || '';
         document.getElementById('edit_receivedAmount').value    = record[getColIndex('RECEIVED AMOUNT')] || '';
@@ -3475,8 +3492,7 @@
         const rAmt = parseFloat(record[getColIndex('RECEIVED AMOUNT')]) || 0;
         const statusEl = document.getElementById('edit_paymentStatus');
         statusEl.value = record[getColIndex('PAYMENT STATUS')] || 'PENDING';
-        statusEl.disabled = (rAmt <= 0);
-        if (rAmt <= 0) statusEl.value = 'PENDING';
+        togglePaymentOnlyMode('edit_');
 
         document.getElementById('edit_remarks').value           = record[getColIndex('REMARKS')] || '';
         document.getElementById('fullEditModal').classList.add('active');
@@ -3506,6 +3522,7 @@
             uploadingAmount: document.getElementById('edit_uploadingAmount').value.trim(),
             utrNo: normalizeUtrValue(document.getElementById('edit_utrNo').value),
             paymentStatus: document.getElementById('edit_paymentStatus').value.trim(),
+            activationRequired: !document.getElementById('edit_paymentOnlyNoLogin').checked,
             remarks: document.getElementById('edit_remarks').value.trim()
         };
         const btn = document.getElementById('editForm').querySelector('.btn-submit');
@@ -3532,6 +3549,7 @@
         formData.append('uploadingAmount',   document.getElementById('edit_uploadingAmount').value);
         formData.append('utrNo',             normalizeUtrValue(document.getElementById('edit_utrNo').value));
         formData.append('paymentStatus',     document.getElementById('edit_paymentStatus').value);
+        formData.append('activationRequired',document.getElementById('edit_paymentOnlyNoLogin').checked ? 'false' : 'true');
         formData.append('remarks',           document.getElementById('edit_remarks').value);
 
         try {

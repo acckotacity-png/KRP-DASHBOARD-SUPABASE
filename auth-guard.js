@@ -1,6 +1,6 @@
 ﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
-import { installSupabaseApiAdapter } from "./supabase-api.js?v=12";
+import { installSupabaseApiAdapter } from "./supabase-api.js?v=13";
 
 const guardStyle = document.getElementById("auth-guard-style");
 const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
@@ -105,6 +105,7 @@ window.currentKrpUser = {
     }
   }
 };
+document.documentElement.classList.add(window.currentKrpUser.role === "admin" ? "krp-role-admin" : "krp-role-user");
 if (window.currentKrpUser.avatarPath) {
   const { data: avatarData } = await client.storage.from("krp-avatars").createSignedUrl(window.currentKrpUser.avatarPath, 3600);
   window.currentKrpUser.avatarUrl = avatarData?.signedUrl || "";

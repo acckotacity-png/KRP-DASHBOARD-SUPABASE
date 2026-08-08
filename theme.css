@@ -15,3 +15,10 @@ html.krp-dark-theme .tab-btn.active{background:#174b36!important;color:#d1fae5!i
 html.krp-dark-theme .mobile-nav-toggle{background:#1f2937;color:#e5e7eb;border-color:#46556d}
 html.krp-dark-theme .modal-overlay{background:rgba(3,7,18,.72)!important}
 html.krp-dark-theme .badge,html.krp-dark-theme .pill{filter:saturate(.85) brightness(.92)}
+html.krp-dark-theme .table-container,html.krp-dark-theme .table-wrapper,html.krp-dark-theme .table-wrap,html.krp-dark-theme .dashboard,html.krp-dark-theme .dash-card,html.krp-dark-theme .data-entry-panel,html.krp-dark-theme .ledger-tools,html.krp-dark-theme .ledger-summary,html.krp-dark-theme .ledger-history,html.krp-dark-theme .customer-card,html.krp-dark-theme .customer-info,html.krp-dark-theme .m-card,html.krp-dark-theme .record-card,html.krp-dark-theme .records-card,html.krp-dark-theme .notepad-card,html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr,html.krp-dark-theme .overlap-ledger-modal .modal-content{background:#1f2937!important;color:#f8fafc!important;border-color:#475569!important;box-shadow:none!important}
+html.krp-dark-theme .tracker-container td,html.krp-dark-theme .ledger-dialog td,html.krp-dark-theme .customer-card *,html.krp-dark-theme .m-card *,html.krp-dark-theme .record-card *,html.krp-dark-theme .records-card *,html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr *{color:#f8fafc}
+html.krp-dark-theme .field-label,html.krp-dark-theme .card-label,html.krp-dark-theme .record-label,html.krp-dark-theme .meta,html.krp-dark-theme .subtext,html.krp-dark-theme .hint{color:#cbd5e1!important}
+html.krp-dark-theme a,html.krp-dark-theme .link,html.krp-dark-theme .contact-link{color:#93c5fd!important}
+html.krp-dark-theme .success,html.krp-dark-theme .status-success,html.krp-dark-theme [data-status="SUCCESS"]{color:#86efac!important}
+html.krp-dark-theme .pending,html.krp-dark-theme .status-pending,html.krp-dark-theme [data-status="PENDING"]{color:#fcd34d!important}
+html.krp-dark-theme .refund,html.krp-dark-theme .danger,html.krp-dark-theme .status-refund,html.krp-dark-theme [data-status="REFUND"]{color:#fca5a5!important}

@@ -39,11 +39,12 @@ create table if not exists public.main_records (
   bank_owner text default '', state text default '', purpose text default '', service_remarks text default '', login_id text default '',
   dealing_amount numeric(14,2) not null default 0, amount_deno text not null default '',
   received_amount numeric(14,2) not null default 0, id_activation_amount numeric(14,2) not null default 0,
-  uploading_amount numeric(14,2) not null default 0, utr_no text default '', payment_status text not null default 'PENDING', remarks text default '',
+  uploading_amount numeric(14,2) not null default 0, utr_no text default '', payment_status text not null default 'PENDING', activation_required boolean not null default true, remarks text default '',
   created_by uuid not null default auth.uid() references auth.users(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
 alter table public.main_records add column if not exists customer_name text not null default '';
+alter table public.main_records add column if not exists activation_required boolean not null default true;
 
 create table if not exists public.business_settings (
   id smallint primary key default 1 check (id = 1), business_name text default '', contact_number text default '', email_address text default '',
