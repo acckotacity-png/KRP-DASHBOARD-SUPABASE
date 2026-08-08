@@ -166,3 +166,18 @@ html.krp-dark-theme .unified-menu-toggle{background:#0b1725!important;color:#f1f
 html.krp-dark-theme .unified-dashboard-menu{background:#0b1725;border-color:#26384b;box-shadow:0 18px 45px rgba(0,0,0,.38)}
 html.krp-dark-theme .unified-dashboard-menu .nav-tabs{background:#0b1725!important}
 @media(max-width:720px){.unified-menu-toggle{width:100%!important}.unified-dashboard-menu{padding:7px}.unified-dashboard-menu .view-filter{grid-template-columns:repeat(2,minmax(0,1fr))!important}.unified-dashboard-menu .nav-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* Final dark-mode border pass: quiet separation, never bright white outlines. */
+html.krp-dark-theme .profile-header,html.krp-dark-theme .nav-tabs,html.krp-dark-theme .unified-dashboard-menu,html.krp-dark-theme body.tracker-view #trackerTab .tracker-container,html.krp-dark-theme .tracker-container,html.krp-dark-theme .transaction-frame-wrap{border-color:#1d3040!important}
+html.krp-dark-theme .view-filter>button,html.krp-dark-theme .view-filter .tracker-dashboard-controls select,html.krp-dark-theme .unified-menu-toggle,html.krp-dark-theme .nav-tabs .tab-btn{border-color:#263b4b!important}
+html.krp-dark-theme .view-filter>button:hover,html.krp-dark-theme .nav-tabs .tab-btn:hover{border-color:#355064!important}
+html.krp-dark-theme #statsArea .stat-pair-card{border-color:#1f3443!important}
+html.krp-dark-theme #statsArea .stat-pair-item+.stat-pair-item{border-color:#314656!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){border-color:#1c3241!important;box-shadow:0 7px 18px rgba(0,0,0,.2)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td{border-color:#203746!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item{border-color:#203746!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{border-color:#1c3241!important}
+html.krp-dark-theme input,html.krp-dark-theme select,html.krp-dark-theme textarea,html.krp-dark-theme .search-box,html.krp-dark-theme .filter-select{border-color:#294050!important}
+html.krp-dark-theme table,html.krp-dark-theme th,html.krp-dark-theme td,html.krp-dark-theme .ledger-table-wrapper,html.krp-dark-theme .ledger-summary-item,html.krp-dark-theme .ledger-history-panel,html.krp-dark-theme .ledger-history-item{border-color:#203746!important}
+html.krp-dark-theme .modal-content,html.krp-dark-theme .modal-header,html.krp-dark-theme .ledger-modal{border-color:#243a49!important}
+html.krp-dark-theme .action-btn{box-shadow:none!important}
