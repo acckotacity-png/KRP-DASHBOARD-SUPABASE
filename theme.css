@@ -57,3 +57,23 @@ html.krp-dark-theme .ledger-summary-item strong,html.krp-dark-theme .ledger-hist
 html.krp-dark-theme .ledger-summary-item.balance strong,html.krp-dark-theme .ledger-due.positive{color:#fca5a5!important}
 html.krp-dark-theme .ledger-table th{background:#172033!important;color:#dbeafe!important}
 html.krp-dark-theme .ledger-table td{background:#222d3f!important;color:#f8fafc!important;border-color:#475569!important}
+
+/* Dashboard totals: high contrast like the analytics cards, without neon text. */
+html.krp-dark-theme #statsArea .stat-pair-card{background:linear-gradient(145deg,#1e293b,#202c40)!important;border-color:#34435a!important;box-shadow:0 4px 12px rgba(2,6,23,.18)!important}
+html.krp-dark-theme #statsArea .stat-pair-item+ .stat-pair-item{border-color:#45546a!important}
+html.krp-dark-theme #statsArea .stat-pair-item h4{color:#f8fafc!important}
+html.krp-dark-theme #statsArea .stat-pair-item .stat-count{color:#7dd3fc!important;font-weight:800!important}
+html.krp-dark-theme #statsArea .stat-pair-item .stat-amount{color:#a7f3d0!important;font-weight:800!important}
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:first-child .stat-count,html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:first-child .stat-amount{color:#fca5a5!important}
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:last-child .stat-count,html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:last-child .stat-amount{color:#c4b5fd!important}
+
+/* Ledger heading must follow the active theme too. */
+html.krp-dark-theme #contactLedgerModal .modal-header,html.krp-dark-theme #contactLedgerModal .modal-header span,html.krp-dark-theme #contactLedgerModal .modal-header i,html.krp-dark-theme #ledgerContactTitle{color:#f8fafc!important}
+html.krp-dark-theme #contactLedgerModal #ledgerCustomerName{color:#cbd5e1!important}
+html.krp-dark-theme #contactLedgerModal .close-modal{color:#fb7185!important}
+
+/* Quiet separators: remove the bright white boxed-grid appearance. */
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){border-color:#34435a!important;box-shadow:0 5px 14px rgba(2,6,23,.18)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td{border-color:#303d50!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item{border-color:#34435a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{border-color:#34435a!important}
