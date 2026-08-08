@@ -22,3 +22,38 @@ html.krp-dark-theme a,html.krp-dark-theme .link,html.krp-dark-theme .contact-lin
 html.krp-dark-theme .success,html.krp-dark-theme .status-success,html.krp-dark-theme [data-status="SUCCESS"]{color:#86efac!important}
 html.krp-dark-theme .pending,html.krp-dark-theme .status-pending,html.krp-dark-theme [data-status="PENDING"]{color:#fcd34d!important}
 html.krp-dark-theme .refund,html.krp-dark-theme .danger,html.krp-dark-theme .status-refund,html.krp-dark-theme [data-status="REFUND"]{color:#fca5a5!important}
+
+/* Complete KRP Ledger dark palette: surfaces and content switch together. */
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){background:#172033!important;border-color:#3b82f6!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td{background:#222d3f!important;color:#f8fafc!important;border-color:#40506a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"]{background:#1c2939!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"],html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Status"]{background:#20352f!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="UTR"]{background:#19343a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{background:#172033!important;border-color:#40506a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-card-head{background:linear-gradient(100deg,#18352d 0%,#202d3d 60%,#1c2939 100%)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item{background:transparent!important;border-color:#40506a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td::before,html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-label{color:#a9b9d0!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-value,html.krp-dark-theme #tableContainer.mobile-card-view strong,html.krp-dark-theme #tableContainer.mobile-card-view .tracker-contact-stack,html.krp-dark-theme #tableContainer.mobile-card-view .entry-owner,html.krp-dark-theme #tableContainer.mobile-card-view .utr-value{color:#f8fafc!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-login-subline,html.krp-dark-theme #tableContainer.mobile-card-view .entry-owner{color:#bac7d9!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .contact-ledger-link{color:#93c5fd!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label{background:#174b36!important;color:#bbf7d0!important;border-color:#2f7d5a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-invoice::before{background:#059669!important;color:#fff!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .badge-success{background:#14532d!important;color:#bbf7d0!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .badge-pending,html.krp-dark-theme #tableContainer.mobile-card-view .badge-partial{background:#713f12!important;color:#fde68a!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .badge-refund,html.krp-dark-theme #tableContainer.mobile-card-view .badge-failed{background:#7f1d1d!important;color:#fecaca!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .badge-advance{background:#312e81!important;color:#c7d2fe!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn{filter:none!important;opacity:1!important;color:#fff!important;border-color:transparent!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn i,html.krp-dark-theme #tableContainer.mobile-card-view .action-btn .action-text{color:inherit!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-print,html.krp-dark-theme #tableContainer.mobile-card-view .btn-edit{background:#1d4ed8!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-config{background:#b45309!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-delete{background:#b91c1c!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-whatsapp,html.krp-dark-theme #tableContainer.mobile-card-view .btn-wa-direct,html.krp-dark-theme #tableContainer.mobile-card-view .btn-activation-done{background:#047857!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-bell,html.krp-dark-theme #tableContainer.mobile-card-view .btn-sms{background:#7c3aed!important}
+
+/* Contact ledger modal and update-history surfaces. */
+html.krp-dark-theme .ledger-modal,html.krp-dark-theme .ledger-summary-item,html.krp-dark-theme .ledger-table-wrapper,html.krp-dark-theme .ledger-history-panel,html.krp-dark-theme .ledger-history-header,html.krp-dark-theme .ledger-history-body,html.krp-dark-theme .ledger-history-item{background:#1f2937!important;color:#f8fafc!important;border-color:#475569!important}
+html.krp-dark-theme .ledger-summary-item span,html.krp-dark-theme .ledger-history-header span,html.krp-dark-theme .ledger-history-top span,html.krp-dark-theme .ledger-history-change span,html.krp-dark-theme .ledger-history-empty{color:#b9c6d8!important}
+html.krp-dark-theme .ledger-summary-item strong,html.krp-dark-theme .ledger-history-top strong,html.krp-dark-theme .ledger-history-meta,html.krp-dark-theme .ledger-history-change strong{color:#f8fafc!important}
+html.krp-dark-theme .ledger-summary-item.balance strong,html.krp-dark-theme .ledger-due.positive{color:#fca5a5!important}
+html.krp-dark-theme .ledger-table th{background:#172033!important;color:#dbeafe!important}
+html.krp-dark-theme .ledger-table td{background:#222d3f!important;color:#f8fafc!important;border-color:#475569!important}
