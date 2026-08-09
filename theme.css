@@ -319,3 +319,18 @@ html.krp-dark-theme #tableContainer.mobile-card-view .contact-ledger-link{color:
 html.krp-dark-theme #tableContainer.mobile-card-view .tracker-login-subline,html.krp-dark-theme #tableContainer.mobile-card-view small{color:#8295a5!important}
 html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label{background:#174d3c!important;color:#a8dbc4!important;box-shadow:none!important}
 html.krp-dark-theme #tableContainer.mobile-card-view .badge{filter:saturate(.72) brightness(.88)!important;text-shadow:none!important}
+
+/* Balanced section icon colours in both themes. */
+.section-icon-line .tab-btn{--nav-accent:#168b58;--nav-soft:#edf9f2;color:var(--nav-accent)!important;background:#f8fafc!important;border-color:#e3e9ef!important;box-shadow:0 2px 5px rgba(15,23,42,.035)!important}
+.section-icon-line .tab-btn:nth-child(1){--nav-accent:#0b9b6d;--nav-soft:#eafaf4}.section-icon-line .tab-btn:nth-child(2){--nav-accent:#118a62;--nav-soft:#eaf8f2}.section-icon-line .tab-btn:nth-child(3){--nav-accent:#0789a8;--nav-soft:#e9f8fb}.section-icon-line .tab-btn:nth-child(4){--nav-accent:#008fa1;--nav-soft:#e9f8fa}.section-icon-line .tab-btn:nth-child(5){--nav-accent:#7157d9;--nav-soft:#f1effd}.section-icon-line .tab-btn:nth-child(6){--nav-accent:#d18a08;--nav-soft:#fff7e5}.section-icon-line .tab-btn:nth-child(7){--nav-accent:#2769c7;--nav-soft:#edf4ff}
+.section-icon-line .tab-btn:hover{background:var(--nav-soft)!important;color:var(--nav-accent)!important;border-color:color-mix(in srgb,var(--nav-accent) 28%,#dfe7ed)!important;box-shadow:0 4px 9px color-mix(in srgb,var(--nav-accent) 10%,transparent)!important;transform:translateY(-1px)!important}
+.section-icon-line .tab-btn.active,.section-icon-line .tab-btn.active:hover{background:var(--nav-accent)!important;color:#fff!important;border-color:var(--nav-accent)!important;box-shadow:0 5px 11px color-mix(in srgb,var(--nav-accent) 22%,transparent)!important}
+html.krp-dark-theme .section-icon-line .tab-btn{background:#0b1a26!important;color:color-mix(in srgb,var(--nav-accent) 78%,#9fb0bd)!important;border-color:rgba(137,160,178,.10)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.012)!important}
+html.krp-dark-theme .section-icon-line .tab-btn:hover{background:color-mix(in srgb,var(--nav-accent) 13%,#0b1a26)!important;color:color-mix(in srgb,var(--nav-accent) 68%,#d5e0e8)!important;border-color:color-mix(in srgb,var(--nav-accent) 30%,#1c3140)!important;box-shadow:none!important}
+html.krp-dark-theme .section-icon-line .tab-btn.active,html.krp-dark-theme .section-icon-line .tab-btn.active:hover{background:color-mix(in srgb,var(--nav-accent) 58%,#0b2530)!important;color:#e5eee9!important;border-color:color-mix(in srgb,var(--nav-accent) 46%,#27404e)!important;box-shadow:0 4px 9px rgba(0,0,0,.2)!important}
+
+/* Strong visual separation between consecutive invoice cards. */
+#tableContainer.mobile-card-view #tableBody{gap:15px!important}
+#tableContainer.mobile-card-view #tableBody tr:not(.empty-row){margin:0!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){box-shadow:0 10px 22px rgba(0,0,0,.32),inset 0 1px 0 rgba(117,148,169,.035)!important}
+@media(max-width:720px){#tableContainer.mobile-card-view #tableBody{gap:11px!important}}
