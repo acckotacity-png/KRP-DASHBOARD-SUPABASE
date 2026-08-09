@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=14">
+    <link rel="stylesheet" href="theme.css?v=15">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -41,9 +41,6 @@
           </div>
         </div>
         <div class="header-compact-row">
-          <div class="tracker-dashboard-only tracker-dashboard-controls header-month-filter">
-              <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
-          </div>
           <div class="unified-dashboard-menu section-icon-line" id="unifiedDashboardMenu" aria-label="Dashboard sections">
             <div class="nav-tabs" id="mainNavTabs">
               <button class="tab-btn active" data-tab="form" onclick="switchTab('form')" title="Data Entry" aria-label="Data Entry"><i class="fas fa-pen"></i><span>Data Entry</span></button>
@@ -263,7 +260,12 @@
 
     <div id="trackerTab" class="tab-content">
         <div class="tracker-container">
-            <div class="section-title"><i class="fas fa-book-open"></i> KRP Ledger</div>
+            <div class="ledger-title-row">
+              <div class="section-title"><i class="fas fa-book-open"></i> KRP Ledger</div>
+              <div class="tracker-dashboard-controls header-month-filter ledger-month-filter">
+                <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter KRP Ledger by month" aria-label="Filter KRP Ledger by month"><option value="all">All Months</option></select>
+              </div>
+            </div>
             <div class="stats-grid tracker-dashboard-only ledger-mini-dashboard" id="statsArea"></div>
             <div class="toolbar">
                 <div class="notepad-search-wrap"><input type="text" id="searchInput" class="search-box" placeholder="Search Invoice / Contact / UTR" autocomplete="off" oninput="loadTrackerData(false)"><button type="button" class="notepad-search-clear" onclick="clearTrackerSearch()" title="Clear search" aria-label="Clear search"><i class="fas fa-times"></i></button></div>
