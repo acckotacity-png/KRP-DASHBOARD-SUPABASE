@@ -198,3 +198,41 @@ html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-ro
 html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td,html.krp-dark-theme .tracker-head-item,html.krp-dark-theme table,html.krp-dark-theme th,html.krp-dark-theme td,html.krp-dark-theme .ledger-table-wrapper,html.krp-dark-theme .ledger-summary-item,html.krp-dark-theme .ledger-history-panel,html.krp-dark-theme .ledger-history-item{border-color:rgba(148,163,184,.09)!important}
 html.krp-dark-theme input,html.krp-dark-theme select,html.krp-dark-theme textarea,html.krp-dark-theme button,html.krp-dark-theme .search-box,html.krp-dark-theme .filter-select{border-color:rgba(148,163,184,.14)!important}
 html.krp-dark-theme .stat-pair-item+.stat-pair-item{border-color:rgba(148,163,184,.14)!important}
+
+/* Stable header formatting: no overlap, all four account actions remain visible. */
+.header-compact-row{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;width:100%!important}
+.header-compact-row .header-month-filter{width:145px!important;justify-self:auto!important}
+.profile-header>.header-compact-row>.unified-menu-toggle{width:220px!important;margin:0!important}
+@media(max-width:720px){.header-compact-row{justify-content:space-between!important}.header-compact-row .header-month-filter{width:38%!important}.profile-header>.header-compact-row>.unified-menu-toggle{width:60%!important;margin:0!important}}
+
+/* Main dashboard analytics and Notepad: readable text and no light surfaces. */
+html.krp-dark-theme .analytics-panel,html.krp-dark-theme .notepad-dashboard-panel,html.krp-dark-theme .mini-kpi,html.krp-dark-theme #notepadTab .toolbar,html.krp-dark-theme #notepadTable tbody tr,html.krp-dark-theme #notepadTable td{background:linear-gradient(90deg,#091722,#0d1d29)!important;color:#eef5fb!important;border-color:rgba(148,163,184,.10)!important;box-shadow:none!important}
+html.krp-dark-theme .analytics-title,html.krp-dark-theme .mini-kpi span,html.krp-dark-theme .chart-row,html.krp-dark-theme .chart-value,html.krp-dark-theme .legend-item,html.krp-dark-theme .legend-item strong,html.krp-dark-theme #notepadTable td::before{color:#aebed0!important;opacity:1!important}
+html.krp-dark-theme .mini-kpi strong,html.krp-dark-theme .donut-center,html.krp-dark-theme #notepadTable td,html.krp-dark-theme #notepadTable td strong{color:#f8fafc!important}
+html.krp-dark-theme .donut-chart::after{background:#0b1924!important}
+html.krp-dark-theme .donut-center span{color:#9fb1c5!important}
+html.krp-dark-theme .chart-track{background:#233646!important}
+html.krp-dark-theme #notepadTab .toolbar input,html.krp-dark-theme #notepadTab .toolbar select{background:#0a1722!important;color:#f8fafc!important;border-color:rgba(148,163,184,.14)!important}
+
+/* Transaction iframe exact overrides (its inline CSS loads after the theme file). */
+html.krp-dark-theme .app-container{background:linear-gradient(90deg,#081621,#0d1d29)!important;color:#f8fafc!important;border:1px solid rgba(148,163,184,.08)!important;box-shadow:none!important}
+html.krp-dark-theme .crm-header{border-color:rgba(148,163,184,.10)!important}
+html.krp-dark-theme .crm-header h1,html.krp-dark-theme .crm-header h1 i{color:#f8fafc!important}
+html.krp-dark-theme .crm-header .header-actions button{background:#0c1b27!important;color:#f8fafc!important;border-color:rgba(148,163,184,.14)!important}
+html.krp-dark-theme .crm-header .header-actions .btn-success{background:#15803d!important;color:#fff!important}html.krp-dark-theme .crm-header .header-actions .btn-primary{background:#2563eb!important;color:#fff!important}
+html.krp-dark-theme .dashboard{background:linear-gradient(90deg,#071520,#0b1b27)!important;border-color:rgba(148,163,184,.08)!important}
+html.krp-dark-theme .dashboard .dash-card,html.krp-dark-theme .modal-summary-grid .m-card{background:#0c1d29!important;border-color:rgba(148,163,184,.09)!important;box-shadow:none!important}
+html.krp-dark-theme .dashboard .dash-label,html.krp-dark-theme .modal-summary-grid .m-label{color:#9fb2c7!important}
+html.krp-dark-theme .dashboard .dash-value,html.krp-dark-theme .modal-summary-grid .m-value{color:#eaf2f8!important}
+html.krp-dark-theme .data-entry-panel,html.krp-dark-theme .ledger-tools,html.krp-dark-theme .table-wrapper,html.krp-dark-theme .overlap-ledger-modal .modal-content{background:linear-gradient(90deg,#081621,#0d1d29)!important;color:#f8fafc!important;border-color:rgba(148,163,184,.10)!important}
+html.krp-dark-theme .ledger-tools span,html.krp-dark-theme .ledger-tools i{color:#dbe7f2!important}
+
+/* Udhari and Expense iframe text/surface corrections. */
+html.krp-dark-theme .app .top,html.krp-dark-theme .app .tools,html.krp-dark-theme .app .card,html.krp-dark-theme .app .customer-card,html.krp-dark-theme .app .customer-info,html.krp-dark-theme .app .category-card,html.krp-dark-theme .app .table-wrap,html.krp-dark-theme .app .dialog{background:linear-gradient(90deg,#091722,#0d1d29)!important;color:#f8fafc!important;border-color:rgba(148,163,184,.10)!important;box-shadow:none!important}
+html.krp-dark-theme .app .top h1,html.krp-dark-theme .app .dialog-head h2,html.krp-dark-theme .app .customer-name,html.krp-dark-theme .app .customer-info b,html.krp-dark-theme .app .card strong,html.krp-dark-theme .app td{color:#f8fafc!important}
+html.krp-dark-theme .app .card span,html.krp-dark-theme .app .customer-mobile,html.krp-dark-theme .app .customer-info span,html.krp-dark-theme .app label,html.krp-dark-theme .app th,html.krp-dark-theme .app .remark{color:#aebed0!important}
+html.krp-dark-theme .app .outline{background:#102131!important;color:#eaf2f8!important;border-color:rgba(148,163,184,.14)!important}
+html.krp-dark-theme .app .search input,html.krp-dark-theme .app .search-wrap input,html.krp-dark-theme .app .filter-row input,html.krp-dark-theme .app .filter-row select{background:#081621!important;color:#f8fafc!important;border-color:rgba(148,163,184,.14)!important}
+html.krp-dark-theme .app .ledger-dialog tr{background:#0b1b27!important;border-color:rgba(148,163,184,.09)!important}
+html.krp-dark-theme .btn-outline,html.krp-dark-theme .btn-toggle-view,html.krp-dark-theme .toolbar .btn-outline{background:#102131!important;color:#eaf2f8!important;border-color:rgba(148,163,184,.14)!important;box-shadow:none!important}
+html.krp-dark-theme .btn-outline i,html.krp-dark-theme .toolbar .btn-outline i{color:#7dd3fc!important}

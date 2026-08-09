@@ -8,7 +8,7 @@
   <script src="api-gate.js?v=1"></script>
   <script type="module" src="auth-guard.js?v=17"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="theme.css?v=10"><script src="theme.js?v=1"></script>
+  <link rel="stylesheet" href="theme.css?v=11"><script src="theme.js?v=1"></script>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; padding: 12px; background: #f4f7fe; color: #2b3674; font-family: Inter, Arial, sans-serif; }
@@ -109,11 +109,11 @@
 
   <section class="cards">
     <div class="card"><span>Customers</span><strong id="customerCount">0</strong></div>
-    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">?0</strong></div>
-    <div class="card"><span>Payment Mila</span><strong id="totalPayment">?0</strong></div>
-    <div class="card"><span>Current Balance</span><strong id="totalBalance">?0</strong></div>
-    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">?0</strong></div>
-    <div class="card"><span>Total Payable</span><strong id="totalPayable">?0</strong></div>
+    <div class="card"><span>Total Udhari</span><strong id="totalUdhari">₹0</strong></div>
+    <div class="card"><span>Payment Mila</span><strong id="totalPayment">₹0</strong></div>
+    <div class="card"><span>Current Balance</span><strong id="totalBalance">₹0</strong></div>
+    <div class="card"><span>Remaining Interest</span><strong id="totalInterest">₹0</strong></div>
+    <div class="card"><span>Total Payable</span><strong id="totalPayable">₹0</strong></div>
   </section>
 
   <div class="tools">
@@ -186,7 +186,7 @@
   let activeLedgerKey = '';
   let returnToLedgerKey = '';
 
-  const money = value => '?' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const money = value => '₹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const num = value => Number(String(value || 0).replace(/,/g,'')) || 0;
   const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const isoToDisplay = value => { const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:value||''; };
@@ -409,16 +409,16 @@
     const mobile=normalizeMobile(customer.mobile||latest[COL.mobile]);
     if(mobile.length!==10)return alert('Customer ka sahi 10-digit mobile number nahi mila');
     const dueEntry=[...customer.entries].reverse().find(r=>r[COL.due]);
-    const dueDate=dueEntry?.[COL.due]||'???? ?? ????';
+    const dueDate=dueEntry?.[COL.due]||'Date available nahi hai';
     const message=[
-      `?????? ${customer.name||'??'},`,
+      `Namaste ${customer.name||'Customer'},`,
       '',
-      '?? ???? ????? ?????? ?? reminder ???',
-      `????? ????: ${money(latest[COL.balance])}`,
-      `????? ???? ??? ???: ${money(latest[COL.total])}`,
+      'Yeh aapke udhari payment ka reminder hai.',
+      `Baki amount: ${money(latest[COL.balance])}`,
+      `Total payable: ${money(latest[COL.total])}`,
       `Due Date: ${dueDate}`,
       '',
-      '????? ?????? ???? ??????? ???? ????? ????????'
+      'Kripya payment karke confirmation share karein. Dhanyavaad.'
     ].join('\n');
     window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
   }
