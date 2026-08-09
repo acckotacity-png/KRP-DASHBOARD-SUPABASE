@@ -302,3 +302,20 @@ html.krp-dark-theme .ledger-title-row .ledger-month-filter select{background:#0c
 #tableContainer.mobile-card-view #dataTable td,#tableContainer.mobile-card-view .tracker-head-item{background:linear-gradient(145deg,#f8fafc,#eef3f7)!important;box-shadow:inset 0 0 0 1px rgba(100,116,139,.04)!important}
 html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){background:linear-gradient(135deg,#071520,#0c1d29)!important;border:0!important;box-shadow:0 8px 20px rgba(0,0,0,.27)!important}html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td,html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item,html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{background:linear-gradient(145deg,#0d1e2a,#0a1823)!important;border:0!important;outline:0!important;box-shadow:inset 0 0 0 1px rgba(148,163,184,.025)!important}html.krp-dark-theme #tableContainer.mobile-card-view .tracker-card-head{border:0!important;outline:0!important}
 @media(max-width:720px){.ledger-title-row{gap:8px!important}.ledger-title-row .ledger-month-filter{width:115px!important;flex-basis:115px!important}.ledger-title-row .ledger-month-filter select{min-height:32px!important;font-size:10px!important}.profile-header>.header-compact-row{width:100%!important}}
+
+/* Muted blue-slate ledger card palette: separate layers without white glare. */
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){background:linear-gradient(135deg,#102634 0%,#0d202d 48%,#0a1b27 100%)!important;padding:7px!important;border-radius:13px!important;box-shadow:0 8px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(117,148,169,.035)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td{background:linear-gradient(145deg,#102431,#0c1d29)!important;color:#c8d3dc!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(118,148,168,.028)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Invoice"]{background:linear-gradient(100deg,#102b34,#0c202c 58%,#0b1c28)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-card-head{background:transparent!important;color:#cbd6df!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item{background:rgba(8,25,36,.34)!important;color:#cbd6df!important;border:0!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Contact"]{background:linear-gradient(145deg,#102a31,#0c2029)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Status"]{background:linear-gradient(145deg,#10282d,#0c2028)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="UTR"]{background:linear-gradient(145deg,#0d2830,#0b2029)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{background:#091925!important;border:0!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td::before,html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-label{color:#7890a3!important;opacity:1!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-value,html.krp-dark-theme #tableContainer.mobile-card-view strong,html.krp-dark-theme #tableContainer.mobile-card-view .utr-value{color:#cbd6df!important;text-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .contact-ledger-link{color:#71add0!important;text-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-login-subline,html.krp-dark-theme #tableContainer.mobile-card-view small{color:#8295a5!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label{background:#174d3c!important;color:#a8dbc4!important;box-shadow:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .badge{filter:saturate(.72) brightness(.88)!important;text-shadow:none!important}
