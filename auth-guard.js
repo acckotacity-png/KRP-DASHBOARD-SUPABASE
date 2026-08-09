@@ -1,5 +1,5 @@
 ﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js?v=2";
 import { installSupabaseApiAdapter } from "./supabase-api.js?v=13";
 
 const guardStyle = document.getElementById("auth-guard-style");

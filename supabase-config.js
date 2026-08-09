@@ -5,7 +5,7 @@ export const SUPABASE_URL = "https://vicamcowuppzjexhxkgq.supabase.co";
 export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_55bcE9Nr63NHjjsq16fRcg_xztB3QBS";
 
 export const AUTH_OPTIONS = {
-  idleLogoutMinutes: 5,
+  idleLogoutMinutes: 30,
   loginPage: "login.html",
   homePage: "index.html"
 };
