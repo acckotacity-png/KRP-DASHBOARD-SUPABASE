@@ -256,3 +256,18 @@ html.krp-dark-theme .overlap-ledger-modal .modal-header{background:#0c2944!impor
 html.krp-dark-theme .overlap-ledger-modal .modal-body{background:#081621!important;color:#f8fafc!important}
 html.krp-dark-theme .overlap-ledger-modal table{background:#0d1a28!important}
 html.krp-dark-theme .show-more-btn{background:#102131!important;color:#7dd3fc!important;border-color:rgba(125,211,252,.28)!important}
+
+/* Compact identity header: icon-only account controls beside the user name. */
+.profile-identity-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;width:100%!important;padding-right:38px!important}
+.profile-identity-row .profile-info{min-width:0!important;flex:1 1 auto!important}
+.profile-identity-row .profile-info h1{margin-bottom:4px!important}
+.profile-identity-row .profile-info p{margin-top:0!important;margin-bottom:0!important}
+.profile-identity-row>.account-icon-line{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;width:auto!important;max-width:none!important;margin:0!important;flex:0 0 auto!important}
+.account-icon-line .icon-action{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;padding:0!important;border-radius:12px!important;font-size:17px!important;line-height:1!important;background:#f8fafc!important;color:#334155!important;border:1px solid #e2e8f0!important;box-shadow:none!important}
+.account-icon-line .icon-action:hover{transform:translateY(-1px)!important;background:#ecfdf5!important;color:#07883f!important;border-color:#86efac!important}
+.account-icon-line .profile-action{color:#07883f!important}.account-icon-line .access-action{color:#08966b!important}.account-icon-line .settings-action{color:#d88a00!important}.account-icon-line .theme-action{color:#2563eb!important}
+html.krp-dark-theme .profile-identity-row>.account-icon-line .icon-action{background:#0b1a26!important;border-color:rgba(148,163,184,.14)!important;color:#dce8f2!important}
+html.krp-dark-theme .profile-identity-row>.account-icon-line .icon-action:hover{background:#112838!important;border-color:rgba(52,211,153,.45)!important;color:#34d399!important}
+html.krp-dark-theme .profile-identity-row>.account-icon-line .profile-action{color:#46d993!important}html.krp-dark-theme .profile-identity-row>.account-icon-line .access-action{color:#22d3a7!important}html.krp-dark-theme .profile-identity-row>.account-icon-line .settings-action{color:#fbbf24!important}html.krp-dark-theme .profile-identity-row>.account-icon-line .theme-action{color:#7dd3fc!important}
+@media(max-width:720px){.profile-identity-row{gap:9px!important;padding-right:24px!important}.profile-identity-row>.account-icon-line{gap:5px!important}.account-icon-line .icon-action{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;border-radius:9px!important;font-size:14px!important}.profile-identity-row .profile-info h1{font-size:18px!important}.profile-identity-row .profile-info p{margin-left:60px!important;max-width:210px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}}
+@media(max-width:420px){.profile-identity-row{align-items:flex-start!important;gap:6px!important}.profile-identity-row>.account-icon-line{padding-top:4px!important}.account-icon-line .icon-action{width:31px!important;height:31px!important;min-width:31px!important;min-height:31px!important;font-size:13px!important}.profile-identity-row .profile-info h1{font-size:17px!important}}

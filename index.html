@@ -21,22 +21,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=12">
-    <script src="theme.js?v=1"></script>
+    <link rel="stylesheet" href="theme.css?v=13">
+    <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
 <div class="container">
 
     <div class="profile-header">
-        <div class="profile-info">
-            <h1><img id="headerAvatar" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:7px"><i id="headerDefaultIcon" class="fas fa-chart-line"></i> <span id="headerProfileName">KRP User</span></h1>
-            <p id="headerProfileMeta"></p>
-        </div>
-        <div class="view-filter">
-            <button class="btn-settings" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i> My Profile</button>
-            <button id="adminAccessBtn" class="btn-settings" style="display:none" onclick="location.href='admin.html'"><i class="fas fa-user-shield"></i> Access Control</button>
-            <button id="mainSettingsBtn" class="btn-settings" onclick="openHeaderSettingsHub()"><i class="fas fa-sliders-h"></i> Settings Menu</button>
-            <button id="themeToggleBtn" class="btn-settings" type="button" onclick="toggleKrpTheme()"><i class="fas fa-moon"></i> Dark Theme</button>
+        <div class="profile-identity-row">
+          <div class="profile-info">
+              <h1><img id="headerAvatar" alt="" style="display:none;width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:7px"><i id="headerDefaultIcon" class="fas fa-chart-line"></i> <span id="headerProfileName">KRP User</span></h1>
+              <p id="headerProfileMeta"></p>
+          </div>
+          <div class="view-filter account-icon-line" aria-label="Account controls">
+              <button class="btn-settings icon-action profile-action" onclick="location.href='profile.html'" title="My Profile" aria-label="My Profile"><i class="fas fa-user-circle"></i></button>
+              <button id="adminAccessBtn" class="btn-settings icon-action access-action" style="display:none" onclick="location.href='admin.html'" title="Access Control" aria-label="Access Control"><i class="fas fa-user-shield"></i></button>
+              <button id="mainSettingsBtn" class="btn-settings icon-action settings-action" onclick="openHeaderSettingsHub()" title="Settings Menu" aria-label="Settings Menu"><i class="fas fa-sliders-h"></i></button>
+              <button id="themeToggleBtn" class="btn-settings icon-action theme-action" type="button" onclick="toggleKrpTheme()" title="Switch to dark theme" aria-label="Switch to dark theme"><i class="fas fa-moon"></i></button>
+          </div>
         </div>
         <div class="header-compact-row">
           <div class="tracker-dashboard-only tracker-dashboard-controls header-month-filter">
