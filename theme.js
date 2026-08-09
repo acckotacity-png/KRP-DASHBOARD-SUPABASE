@@ -10,8 +10,8 @@
     if (button) {
       const dark = isDark();
       button.innerHTML = `<i class="fas ${dark ? "fa-sun" : "fa-moon"}"></i>`;
-      button.title = dark ? "Switch to light theme" : "Switch to dark theme";
-      button.setAttribute("aria-label", button.title);
+      button.removeAttribute("title");
+      button.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
     }
   }
 
