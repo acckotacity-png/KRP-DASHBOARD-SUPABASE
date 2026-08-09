@@ -334,3 +334,11 @@ html.krp-dark-theme .section-icon-line .tab-btn.active,html.krp-dark-theme .sect
 #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){margin:0!important}
 html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){box-shadow:0 10px 22px rgba(0,0,0,.32),inset 0 1px 0 rgba(117,148,169,.035)!important}
 @media(max-width:720px){#tableContainer.mobile-card-view #tableBody{gap:11px!important}}
+
+/* Invoice boundary: breathing room belongs below the action buttons. */
+#tableContainer.mobile-card-view #tableBody{gap:0!important}
+#tableContainer.mobile-card-view #tableBody tr:not(.empty-row){margin:0 0 16px!important;overflow:hidden!important}
+#tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{padding-top:7px!important;padding-bottom:11px!important;margin-bottom:0!important}
+#tableContainer.mobile-card-view #tableBody tr:not(.empty-row):last-child{margin-bottom:0!important}
+html.krp-dark-theme #tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{background:linear-gradient(180deg,#091925,#081620)!important;box-shadow:inset 0 -1px 0 rgba(117,148,169,.025)!important}
+@media(max-width:720px){#tableContainer.mobile-card-view #tableBody tr:not(.empty-row){margin-bottom:12px!important}#tableContainer.mobile-card-view #dataTable td[data-label="Actions"]{padding-bottom:9px!important}}
