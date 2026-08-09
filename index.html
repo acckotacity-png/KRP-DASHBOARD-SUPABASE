@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=13">
+    <link rel="stylesheet" href="theme.css?v=14">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -44,26 +44,21 @@
           <div class="tracker-dashboard-only tracker-dashboard-controls header-month-filter">
               <select id="mainMonthFilter" onchange="handleMainMonthFilterChange()" title="Filter by month"><option value="all">All Months</option></select>
           </div>
-          <button type="button" class="mobile-nav-toggle unified-menu-toggle" onclick="toggleMobileNav()" aria-controls="unifiedDashboardMenu" aria-expanded="false">
-              <span><i class="fas fa-bars"></i> Dashboard Menu</span>
-              <i class="fas fa-chevron-down" id="mobileNavChevron"></i>
-          </button>
-        </div>
-        <div class="unified-dashboard-menu" id="unifiedDashboardMenu">
-          <div class="nav-tabs" id="mainNavTabs">
-            <button class="tab-btn active" data-tab="form" onclick="switchTab('form')"><i class="fas fa-pen"></i> Data Entry</button>
-            <button class="tab-btn" data-tab="tracker" onclick="switchTab('tracker')"><i class="fas fa-list-ul"></i> Data Tracker</button>
-            <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</button>
-            <button class="tab-btn" data-tab="expense" onclick="switchTab('expense')"><i class="fas fa-receipt"></i> Expenses</button>
-            <button class="tab-btn" data-tab="udhari" onclick="switchTab('udhari')"><i class="fas fa-book-open"></i> Udhari Khata</button>
-            <button class="tab-btn" data-tab="notepad" onclick="switchTab('notepad')"><i class="fas fa-note-sticky"></i> Notepad</button>
-            <button class="tab-btn" data-tab="transaction" onclick="switchTab('transaction')"><i class="fas fa-money-bill-transfer"></i> Transaction</button>
+          <div class="unified-dashboard-menu section-icon-line" id="unifiedDashboardMenu" aria-label="Dashboard sections">
+            <div class="nav-tabs" id="mainNavTabs">
+              <button class="tab-btn active" data-tab="form" onclick="switchTab('form')" title="Data Entry" aria-label="Data Entry"><i class="fas fa-pen"></i><span>Data Entry</span></button>
+              <button class="tab-btn" data-tab="tracker" onclick="switchTab('tracker')" title="Data Tracker" aria-label="Data Tracker"><i class="fas fa-list-ul"></i><span>Data Tracker</span></button>
+              <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')" title="Dashboard" aria-label="Dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
+              <button class="tab-btn" data-tab="expense" onclick="switchTab('expense')" title="Expenses" aria-label="Expenses"><i class="fas fa-receipt"></i><span>Expenses</span></button>
+              <button class="tab-btn" data-tab="udhari" onclick="switchTab('udhari')" title="Udhari Khata" aria-label="Udhari Khata"><i class="fas fa-book-open"></i><span>Udhari Khata</span></button>
+              <button class="tab-btn" data-tab="notepad" onclick="switchTab('notepad')" title="Notepad" aria-label="Notepad"><i class="fas fa-note-sticky"></i><span>Notepad</span></button>
+              <button class="tab-btn" data-tab="transaction" onclick="switchTab('transaction')" title="Transaction" aria-label="Transaction"><i class="fas fa-money-bill-transfer"></i><span>Transaction</span></button>
+            </div>
           </div>
         </div>
         <button class="btn-settings btn-logout-corner" onclick="logoutKrpDashboard()" title="Logout" aria-label="Logout"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></button>
     </div>
 
-    <div class="stats-grid tracker-dashboard-only" id="statsArea"></div>
     <div class="stats-grid notepad-summary-only" id="notepadStatsArea"></div>
 
     <div id="expenseTab" class="tab-content">
@@ -269,6 +264,7 @@
     <div id="trackerTab" class="tab-content">
         <div class="tracker-container">
             <div class="section-title"><i class="fas fa-book-open"></i> KRP Ledger</div>
+            <div class="stats-grid tracker-dashboard-only ledger-mini-dashboard" id="statsArea"></div>
             <div class="toolbar">
                 <div class="notepad-search-wrap"><input type="text" id="searchInput" class="search-box" placeholder="Search Invoice / Contact / UTR" autocomplete="off" oninput="loadTrackerData(false)"><button type="button" class="notepad-search-clear" onclick="clearTrackerSearch()" title="Clear search" aria-label="Clear search"><i class="fas fa-times"></i></button></div>
                 <select id="statusFilter" class="filter-select" onchange="loadTrackerData(false)">
