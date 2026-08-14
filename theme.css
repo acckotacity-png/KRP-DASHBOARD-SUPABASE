@@ -593,6 +593,17 @@ html.krp-dark-theme #contactLedgerModal .ledger-action-menu>summary{background:#
 html.krp-dark-theme #contactLedgerModal .ledger-action-dropdown{background:#112631!important;border-color:#294652!important;box-shadow:0 14px 30px rgba(0,0,0,.44)!important}
 html.krp-dark-theme #contactLedgerModal .ledger-action-dropdown button{color:#cbd7d1!important}html.krp-dark-theme #contactLedgerModal .ledger-action-dropdown button:hover{background:#1a3541!important}
 
+/* Floating ledger actions stay outside the horizontally scrolling table. */
+#contactLedgerModal .ledger-actions-trigger{display:flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:30px!important;margin:auto!important;padding:0!important;border:0!important;border-radius:7px!important;background:#d0ded5!important;color:#176c48!important;box-shadow:none!important;cursor:pointer!important}
+#contactLedgerModal .ledger-actions-trigger i{font-size:14px!important;pointer-events:none!important}
+.ledger-actions-popup{position:fixed!important;z-index:100000!important;display:flex!important;flex-direction:column!important;gap:3px!important;width:168px!important;padding:6px!important;box-sizing:border-box!important;border:1px solid rgba(36,52,48,.16)!important;border-radius:9px!important;background:#f4f6f3!important;box-shadow:0 14px 32px rgba(25,42,35,.28)!important}
+.ledger-actions-popup button{position:static!important;display:flex!important;align-items:center!important;flex:0 0 32px!important;width:100%!important;height:32px!important;min-height:32px!important;margin:0!important;padding:6px 8px!important;box-sizing:border-box!important;border:0!important;border-radius:6px!important;background:transparent!important;color:#25322d!important;font-size:10px!important;font-weight:700!important;line-height:1!important;text-align:left!important;white-space:nowrap!important;transform:none!important;cursor:pointer!important}
+.ledger-actions-popup button i{width:23px!important;text-align:center!important;pointer-events:none!important}.ledger-actions-popup button span{pointer-events:none!important}
+.ledger-actions-popup button:hover{background:#dfe8e2!important}.ledger-actions-popup .payment i{color:#078a58!important}.ledger-actions-popup .edit i{color:#246dde!important}.ledger-actions-popup .quick i{color:#d27a00!important}.ledger-actions-popup .sms i{color:#6945d8!important}.ledger-actions-popup .delete,.ledger-actions-popup .delete i{color:#d43d3d!important}
+html.krp-dark-theme #contactLedgerModal .ledger-actions-trigger{background:#193d36!important;color:#59d69c!important}
+html.krp-dark-theme .ledger-actions-popup{background:#112631!important;border-color:#294652!important;box-shadow:0 16px 34px rgba(0,0,0,.48)!important}
+html.krp-dark-theme .ledger-actions-popup button{color:#cbd7d1!important}html.krp-dark-theme .ledger-actions-popup button:hover{background:#1a3541!important}
+
 @media(max-width:850px){
   #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1440px!important}
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}

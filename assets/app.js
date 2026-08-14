@@ -1553,11 +1553,39 @@
             else renderContactLedger(activeLedgerKey, activeLedgerTitle);
         }
     }
-    function closeOtherLedgerActionMenus(clickedSummary) {
-        const currentMenu = clickedSummary?.closest('details.ledger-action-menu');
-        document.querySelectorAll('#contactLedgerModal details.ledger-action-menu[open]').forEach(menu => {
-            if (menu !== currentMenu) menu.removeAttribute('open');
-        });
+    let activeLedgerActionsPopup = null;
+
+    function closeLedgerActionPopup() {
+        activeLedgerActionsPopup?.remove();
+        activeLedgerActionsPopup = null;
+    }
+
+    function openLedgerActionPopup(event, rowIndex, canSendReminder) {
+        event.preventDefault();
+        event.stopPropagation();
+        const trigger = event.currentTarget;
+        const existingRow = activeLedgerActionsPopup?.dataset?.rowIndex;
+        closeLedgerActionPopup();
+        if (existingRow === String(rowIndex)) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'ledger-actions-popup';
+        popup.dataset.rowIndex = String(rowIndex);
+        popup.innerHTML = `
+            <button type="button" class="payment" onclick="closeLedgerActionPopup();openLedgerPaymentModal(${rowIndex})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
+            <button type="button" class="edit" onclick="closeLedgerActionPopup();editLedgerRecord(${rowIndex})"><i class="fas fa-edit"></i><span>Full Edit</span></button>
+            <button type="button" class="quick" onclick="closeLedgerActionPopup();quickUpdateLedgerRecord(${rowIndex})"><i class="fas fa-sliders-h"></i><span>Quick Update</span></button>
+            ${canSendReminder ? `<button type="button" class="sms" onclick="closeLedgerActionPopup();sendSmsReminder(${rowIndex})"><i class="fas fa-sms"></i><span>SMS Reminder</span></button>` : ''}
+            <button type="button" class="delete" onclick="closeLedgerActionPopup();deleteLedgerRecord(${rowIndex})"><i class="fas fa-trash-alt"></i><span>Delete</span></button>`;
+        document.body.appendChild(popup);
+        activeLedgerActionsPopup = popup;
+
+        const rect = trigger.getBoundingClientRect();
+        const popupWidth = 168;
+        const left = Math.max(8, Math.min(rect.right - popupWidth, window.innerWidth - popupWidth - 8));
+        popup.style.left = `${left}px`;
+        popup.style.top = `${rect.bottom + 5}px`;
+        setTimeout(() => document.addEventListener('click', closeLedgerActionPopup, { once: true }), 0);
     }
 
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
@@ -1659,16 +1687,7 @@
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Actions" class="ledger-actions">
-                    <details class="ledger-action-menu">
-                        <summary title="Open actions" aria-label="Open actions" onclick="closeOtherLedgerActionMenus(this)"><i class="fas fa-ellipsis-v"></i><span>Actions</span></summary>
-                        <div class="ledger-action-dropdown">
-                            <button type="button" class="payment" onclick="openLedgerPaymentModal(${item.index})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
-                            <button type="button" class="edit" onclick="editLedgerRecord(${item.index})"><i class="fas fa-edit"></i><span>Full Edit</span></button>
-                            <button type="button" class="quick" onclick="quickUpdateLedgerRecord(${item.index})"><i class="fas fa-sliders-h"></i><span>Quick Update</span></button>
-                            ${canSendReminder ? `<button type="button" class="sms" onclick="sendSmsReminder(${item.index})"><i class="fas fa-sms"></i><span>SMS Reminder</span></button>` : ''}
-                            <button type="button" class="delete" onclick="deleteLedgerRecord(${item.index})"><i class="fas fa-trash-alt"></i><span>Delete</span></button>
-                        </div>
-                    </details>
+                    <button type="button" class="ledger-actions-trigger" onclick="openLedgerActionPopup(event,${item.index},${canSendReminder})" title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i></button>
                 </td>
             </tr>`;
         }).join('');
