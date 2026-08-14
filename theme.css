@@ -510,3 +510,74 @@ html:not(.krp-dark-theme) body.form-view #formTab .form-group,html:not(.krp-dark
 html:not(.krp-dark-theme) body.form-view #formTab .form-group input,html:not(.krp-dark-theme) body.form-view #formTab .form-group select,html:not(.krp-dark-theme) body.form-view #formTab .form-group textarea,html:not(.krp-dark-theme) #fullEditModal #editForm input:not([type="checkbox"]),html:not(.krp-dark-theme) #fullEditModal #editForm select,html:not(.krp-dark-theme) #fullEditModal #editForm textarea{background:#f3f5f2!important;color:var(--krp-light-text)!important;border-color:var(--krp-light-line)!important}
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){background:linear-gradient(145deg,#e9eeea,#dce5df)!important;box-shadow:0 8px 18px rgba(47,62,56,.12)!important}html:not(.krp-dark-theme) #tableContainer.mobile-card-view #dataTable td,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item{background:linear-gradient(145deg,#f0f3f0,#e2e9e4)!important;color:var(--krp-light-text)!important;box-shadow:inset 0 0 0 1px rgba(36,52,48,.035)!important}
 html:not(.krp-dark-theme) .account-icon-line .icon-action,html:not(.krp-dark-theme) .account-icon-line .icon-action:hover,html:not(.krp-dark-theme) .section-icon-line .tab-btn:not(.active),html:not(.krp-dark-theme) .section-icon-line .tab-btn:not(.active):hover{background:linear-gradient(145deg,#edf2ee,#d6e0da)!important;border-color:rgba(36,52,48,.11)!important;box-shadow:5px 6px 11px rgba(51,66,60,.13),-3px -3px 8px rgba(255,255,255,.50),inset 1px 1px 0 rgba(255,255,255,.54)!important}
+
+/* Customer ledger: Excel-style grid with persistent headings and right actions. */
+#contactLedgerModal .ledger-table-wrapper.main-ledger-fit{
+  width:100%!important;max-width:100%!important;max-height:55vh!important;padding:0!important;
+  overflow-x:auto!important;overflow-y:auto!important;border-radius:10px!important;
+  overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;
+  scrollbar-gutter:stable!important;background:#edf1ed!important;
+}
+#contactLedgerModal .main-ledger-fit .ledger-table,
+#contactLedgerModal .main-ledger-fit .ledger-table thead,
+#contactLedgerModal .main-ledger-fit .ledger-table tbody{display:table!important}
+#contactLedgerModal .main-ledger-fit .ledger-table{
+  width:max-content!important;min-width:1580px!important;table-layout:auto!important;
+  border-collapse:separate!important;border-spacing:0!important;background:#edf1ed!important;
+}
+#contactLedgerModal .main-ledger-fit .ledger-table thead{display:table-header-group!important}
+#contactLedgerModal .main-ledger-fit .ledger-table tbody{display:table-row-group!important}
+#contactLedgerModal .main-ledger-fit .ledger-table tr{display:table-row!important;box-shadow:none!important}
+#contactLedgerModal .main-ledger-fit .ledger-table th,
+#contactLedgerModal .main-ledger-fit .ledger-table td{
+  display:table-cell!important;width:auto!important;min-width:92px!important;padding:9px 10px!important;
+  border-right:1px solid rgba(36,52,48,.12)!important;border-bottom:1px solid rgba(36,52,48,.12)!important;
+  border-radius:0!important;white-space:nowrap!important;overflow-wrap:normal!important;
+  font-size:11px!important;line-height:1.35!important;text-align:left!important;vertical-align:middle!important;
+}
+#contactLedgerModal .main-ledger-fit .ledger-table th{
+  position:sticky!important;top:0!important;z-index:8!important;min-height:38px!important;
+  background:#cbd8d0!important;color:#17231f!important;font-weight:800!important;text-transform:uppercase!important;
+  letter-spacing:.025em!important;border-top:1px solid rgba(36,52,48,.15)!important;
+}
+#contactLedgerModal .main-ledger-fit .ledger-table tbody td{background:#f3f5f2!important;color:#1d2925!important}
+#contactLedgerModal .main-ledger-fit .ledger-table tbody tr:nth-child(even) td{background:#e7ece8!important}
+#contactLedgerModal .main-ledger-fit .ledger-table th:first-child,
+#contactLedgerModal .main-ledger-fit .ledger-table td:first-child{border-left:1px solid rgba(36,52,48,.12)!important}
+#contactLedgerModal .main-ledger-fit .ledger-table th:nth-child(3),
+#contactLedgerModal .main-ledger-fit .ledger-table td:nth-child(3){min-width:145px!important}
+#contactLedgerModal .main-ledger-fit .ledger-table th:nth-child(4),
+#contactLedgerModal .main-ledger-fit .ledger-table td:nth-child(4),
+#contactLedgerModal .main-ledger-fit .ledger-table th:nth-child(5),
+#contactLedgerModal .main-ledger-fit .ledger-table td:nth-child(5),
+#contactLedgerModal .main-ledger-fit .ledger-table th:nth-child(13),
+#contactLedgerModal .main-ledger-fit .ledger-table td:nth-child(13){min-width:150px!important;white-space:normal!important}
+#contactLedgerModal .main-ledger-fit .ledger-table th:last-child,
+#contactLedgerModal .main-ledger-fit .ledger-table td:last-child{
+  position:sticky!important;right:0!important;z-index:7!important;min-width:190px!important;
+  border-left:2px solid #81998c!important;box-shadow:-7px 0 12px rgba(28,45,38,.10)!important;
+}
+#contactLedgerModal .main-ledger-fit .ledger-table th:last-child{z-index:12!important;background:#b9ccbf!important;text-align:center!important}
+#contactLedgerModal .main-ledger-fit .ledger-table tbody td:last-child{background:#e1e9e3!important}
+#contactLedgerModal .main-ledger-fit .ledger-table tbody tr:nth-child(even) td:last-child{background:#d8e3dc!important}
+#contactLedgerModal .main-ledger-fit .ledger-table td::before{display:none!important;content:none!important}
+#contactLedgerModal .main-ledger-fit .ledger-actions .action-icons{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:5px!important}
+#contactLedgerModal .main-ledger-fit .ledger-payment-btn{white-space:nowrap!important}
+
+html.krp-dark-theme #contactLedgerModal .ledger-table-wrapper.main-ledger-fit,
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table{background:#071721!important}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table th{
+  background:#17303d!important;color:#d6e3dc!important;border-color:#294452!important;
+}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table tbody td{
+  background:#0d202b!important;color:#cbd7d1!important;border-color:#243c48!important;
+}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table tbody tr:nth-child(even) td{background:#102631!important}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table th:last-child{background:#1b3946!important;border-left-color:#376070!important}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table tbody td:last-child{background:#132d38!important;border-left-color:#376070!important;box-shadow:-7px 0 13px rgba(0,0,0,.28)!important}
+html.krp-dark-theme #contactLedgerModal .main-ledger-fit .ledger-table tbody tr:nth-child(even) td:last-child{background:#17333e!important}
+
+@media(max-width:850px){
+  #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1580px!important}
+  #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}
+}
