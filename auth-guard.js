@@ -136,7 +136,12 @@ if (window.currentKrpUser.accessExpiresAt) {
   }, 30000);
 }
 
-const sessionTokenKey = `krp_active_session_${session.user.id}`;
+const deviceType = (() => {
+  const ua = navigator.userAgent || "";
+  const ipadDesktopMode = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || ipadDesktopMode ? "mobile" : "desktop";
+})();
+const sessionTokenKey = `krp_active_session_${session.user.id}_${deviceType}`;
 const storedSessionToken = sessionStorage.getItem(sessionTokenKey);
 const activeSessionToken = storedSessionToken || crypto.randomUUID();
 sessionStorage.setItem(sessionTokenKey, activeSessionToken);
@@ -150,18 +155,19 @@ const deviceLabel = (() => {
 let singleSessionEnabled = false;
 let displacedSession = null;
 try {
-  const { data: existing, error: readSessionError } = await client.from("active_sessions").select("session_token,device_label").eq("user_id", session.user.id).maybeSingle();
+  const { data: existing, error: readSessionError } = await client.from("active_sessions").select("session_token,device_label,device_type").eq("user_id", session.user.id).eq("device_type", deviceType).maybeSingle();
   if (readSessionError) throw readSessionError;
   if (storedSessionToken && existing?.session_token && existing.session_token !== activeSessionToken) {
     displacedSession = existing;
   } else {
     const { error: claimError } = await client.from("active_sessions").upsert({
       user_id: session.user.id,
+      device_type: deviceType,
       session_token: activeSessionToken,
       device_label: deviceLabel,
       signed_in_at: new Date().toISOString(),
       last_seen: new Date().toISOString()
-    }, { onConflict: "user_id" });
+    }, { onConflict: "user_id,device_type" });
     if (claimError) throw claimError;
   }
   singleSessionEnabled = true;
@@ -187,7 +193,7 @@ window.logoutKrpDashboard = async function logoutKrpDashboard(reason = "manual",
     showRemoteLoginPopup(remoteDevice);
     await new Promise(resolve => setTimeout(resolve, 2600));
   } else if (singleSessionEnabled) {
-    await client.from("active_sessions").delete().eq("user_id", session.user.id).eq("session_token", activeSessionToken);
+    await client.from("active_sessions").delete().eq("user_id", session.user.id).eq("device_type", deviceType).eq("session_token", activeSessionToken);
   }
   sessionStorage.removeItem(sessionTokenKey);
   await client.auth.signOut({ scope: "local" });
@@ -202,13 +208,13 @@ if (displacedSession) {
 
 async function verifySingleSession() {
   if (!singleSessionEnabled || logoutInProgress || document.visibilityState === "hidden") return;
-  const { data, error } = await client.from("active_sessions").select("session_token,device_label").eq("user_id", session.user.id).maybeSingle();
+  const { data, error } = await client.from("active_sessions").select("session_token,device_label,device_type").eq("user_id", session.user.id).eq("device_type", deviceType).maybeSingle();
   if (error || !data) return;
   if (data.session_token !== activeSessionToken) {
     await window.logoutKrpDashboard("remote_login", data.device_label || "another system");
     return;
   }
-  await client.from("active_sessions").update({ last_seen: new Date().toISOString() }).eq("user_id", session.user.id).eq("session_token", activeSessionToken);
+  await client.from("active_sessions").update({ last_seen: new Date().toISOString() }).eq("user_id", session.user.id).eq("device_type", deviceType).eq("session_token", activeSessionToken);
 }
 
 if (singleSessionEnabled) {
@@ -219,7 +225,7 @@ if (singleSessionEnabled) {
   client.channel(`krp-session-${session.user.id}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "active_sessions", filter: `user_id=eq.${session.user.id}` }, payload => {
       const next = payload.new;
-      if (next?.session_token && next.session_token !== activeSessionToken) {
+      if (next?.device_type === deviceType && next?.session_token && next.session_token !== activeSessionToken) {
         window.logoutKrpDashboard("remote_login", next.device_label || "another system");
       }
     }).subscribe();
