@@ -1553,6 +1553,13 @@
             else renderContactLedger(activeLedgerKey, activeLedgerTitle);
         }
     }
+    function closeOtherLedgerActionMenus(clickedSummary) {
+        const currentMenu = clickedSummary?.closest('details.ledger-action-menu');
+        document.querySelectorAll('#contactLedgerModal details.ledger-action-menu[open]').forEach(menu => {
+            if (menu !== currentMenu) menu.removeAttribute('open');
+        });
+    }
+
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
         document.querySelector('#contactLedgerModal .ledger-table-wrapper')?.classList.add('main-ledger-fit');
@@ -1653,7 +1660,7 @@
                 <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Actions" class="ledger-actions">
                     <details class="ledger-action-menu">
-                        <summary title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i><span>Actions</span></summary>
+                        <summary title="Open actions" aria-label="Open actions" onclick="closeOtherLedgerActionMenus(this)"><i class="fas fa-ellipsis-v"></i><span>Actions</span></summary>
                         <div class="ledger-action-dropdown">
                             <button type="button" class="payment" onclick="openLedgerPaymentModal(${item.index})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
                             <button type="button" class="edit" onclick="editLedgerRecord(${item.index})"><i class="fas fa-edit"></i><span>Full Edit</span></button>
