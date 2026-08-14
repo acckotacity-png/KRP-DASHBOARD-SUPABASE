@@ -959,7 +959,7 @@
             document.querySelector('[data-tab="expense"]').classList.add('active');
             const expenseFrame = document.getElementById('expenseFrame');
             if (expenseFrame && !expenseFrame.getAttribute('src')) {
-                expenseFrame.src = `expense.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                expenseFrame.src = `expense.html?v=20260810-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'udhari') {
             document.body.classList.remove('form-view');
@@ -967,7 +967,7 @@
             document.querySelector('[data-tab="udhari"]').classList.add('active');
             const udhariFrame = document.getElementById('udhariFrame');
             if (udhariFrame && !udhariFrame.getAttribute('src')) {
-                udhariFrame.src = `udhari.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                udhariFrame.src = `udhari.html?v=20260810-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'transaction') {
             document.body.classList.remove('form-view');
@@ -975,7 +975,7 @@
             document.querySelector('[data-tab="transaction"]').classList.add('active');
             const transactionFrame = document.getElementById('transactionFrame');
             if (transactionFrame && !transactionFrame.getAttribute('src')) {
-                transactionFrame.src = `transaction.html?v=20260809-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                transactionFrame.src = `transaction.html?v=20260810-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else {
             document.body.classList.remove('form-view');
@@ -1559,7 +1559,7 @@
         const historyPanel = document.querySelector('#contactLedgerModal .ledger-history-panel');
         if (historyPanel) historyPanel.style.display = '';
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
-        if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Due</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Status</th><th>Actions</th>';
+        if (header) header.innerHTML = '<th>ID Serial</th><th>Date</th><th>Invoice</th><th>Purpose</th><th>Service Remarks</th><th>Login ID</th><th>Deal</th><th>Received</th><th>Remaining Pending</th><th>Setup +/-</th><th>Setup Balance</th><th>UTR</th><th>Remarks</th><th>Status</th><th>Actions</th>';
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         const idxCustomerName = getColIndex('CUSTOMER NAME');
         if (idxContact === -1 || !contactKey) return;
@@ -1582,6 +1582,25 @@
             .map((row, index) => ({ row, index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contactKey);
 
+        // Running customer balance: PAYMENT AGAINST rows reduce pending dues.
+        const runningPendingByIndex = new Map();
+        let runningPending = 0;
+        [...ledgerRows].sort((a, b) => a.index - b.index).forEach(item => {
+            const row = item.row;
+            const status = (row[idxStatus]?.toString().toUpperCase() || 'PENDING');
+            const purpose = showSheetText(row[idxPurpose]).trim().toUpperCase();
+            const deal = parseFloat(row[idxDeal] || 0) || 0;
+            const received = parseFloat(row[idxRecv] || 0) || 0;
+            if (status === 'PENDING' || status === 'PARTIAL') {
+                runningPending += Math.max(deal - received, 0);
+            } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
+                runningPending = Math.max(runningPending - received, 0);
+            } else if (status === 'REFUND') {
+                runningPending += received;
+            }
+            runningPendingByIndex.set(item.index, Math.max(runningPending, 0));
+        });
+
         const ledgerCustomerName = (idxCustomerName === -1 ? '' : ledgerRows
             .map(item => showSheetText(item.row[idxCustomerName]).trim())
             .filter(Boolean)
@@ -1603,7 +1622,7 @@
             const setupChange = idxSetup !== -1 ? (parseFloat(row[idxSetup] || 0) || 0) : 0;
             setupBalance += setupChange;
             const purposeText = showSheetText(row[idxPurpose]).trim().toUpperCase();
-            const balance = statusVal === 'REFUND' ? 0 : Math.max(deal - received, 0);
+            const remainingPending = runningPendingByIndex.get(item.index) || 0;
             totalDeal += deal;
             if (statusVal === 'REFUND') {
                 totalRefund += received;
@@ -1626,7 +1645,7 @@
                 <td data-label="Login ID" class="ledger-remarks">${escapeHtml(row[idxLogin] || '-')}</td>
                 <td data-label="Deal">${formatLedgerMoney(deal)}</td>
                 <td data-label="Received" style="${statusVal === 'REFUND' ? 'color:#ee5d50;font-weight:700;' : ''}">${statusVal === 'REFUND' ? '- ' : ''}${formatLedgerMoney(received)}</td>
-                <td data-label="Due" class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
+                <td data-label="Remaining Pending" class="ledger-due ${remainingPending > 0 ? 'positive' : ''}">${formatLedgerMoney(remainingPending)}</td>
                 <td data-label="Setup +/-" style="color:${setupChange < 0 ? '#ee5d50' : '#05a660'};font-weight:700;">${setupChange > 0 ? '+' : ''}${formatLedgerMoney(setupChange)}</td>
                 <td data-label="Setup Balance" style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
@@ -1654,7 +1673,7 @@
             <div class="ledger-summary-item"><span>Total Received</span><strong>${formatLedgerMoney(totalReceived)}</strong></div>
             <div class="ledger-summary-item"><span>Total Refund</span><strong style="color:#ee5d50;">${formatLedgerMoney(totalRefund)}</strong></div>
             <div class="ledger-summary-item"><span>Setup Balance</span><strong style="color:#05a660;">${formatLedgerMoney(Math.max(setupBalance, 0))}</strong></div>
-            <div class="ledger-summary-item balance"><span>Balance</span><strong>${formatLedgerMoney(totalBalance)}</strong></div>
+            <div class="ledger-summary-item balance"><span>Remaining Pending</span><strong>${formatLedgerMoney(totalBalance)}</strong></div>
         `;
         document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="15" style="text-align:center; padding:20px;">No records found</td></tr>';
         renderLedgerHistory(contactKey, ledgerRows);
