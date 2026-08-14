@@ -604,6 +604,32 @@ html.krp-dark-theme #contactLedgerModal .ledger-actions-trigger{background:#193d
 html.krp-dark-theme .ledger-actions-popup{background:#112631!important;border-color:#294652!important;box-shadow:0 16px 34px rgba(0,0,0,.48)!important}
 html.krp-dark-theme .ledger-actions-popup button{color:#cbd7d1!important}html.krp-dark-theme .ledger-actions-popup button:hover{background:#1a3541!important}
 
+/* Readable header icon buttons for the sage light theme. */
+html:not(.krp-dark-theme) .account-icon-line .icon-action,
+html:not(.krp-dark-theme) .account-icon-line .icon-action:hover,
+html:not(.krp-dark-theme) .account-icon-line .icon-action:focus-visible{
+  background:#d4dfd8!important;border:1px solid rgba(41,65,55,.14)!important;
+  box-shadow:2px 3px 7px rgba(44,64,56,.10)!important;transform:none!important;filter:none!important;
+}
+html:not(.krp-dark-theme) .account-icon-line .icon-action i{color:inherit!important;opacity:1!important;filter:none!important}
+html:not(.krp-dark-theme) .account-icon-line .profile-action{color:#24765a!important}
+html:not(.krp-dark-theme) .account-icon-line .access-action{color:#078958!important}
+html:not(.krp-dark-theme) .account-icon-line .settings-action{color:#b87508!important}
+html:not(.krp-dark-theme) .account-icon-line .theme-action{color:#315f9f!important}
+html:not(.krp-dark-theme) .section-icon-line .tab-btn,
+html:not(.krp-dark-theme) .section-icon-line .tab-btn:not(.active):hover{
+  background:#d6e1da!important;border:1px solid rgba(41,65,55,.12)!important;
+  color:var(--nav-accent)!important;box-shadow:2px 3px 7px rgba(44,64,56,.09)!important;
+  transform:none!important;filter:none!important;
+}
+html:not(.krp-dark-theme) .section-icon-line .tab-btn i{color:inherit!important;opacity:1!important;filter:none!important}
+html:not(.krp-dark-theme) .section-icon-line .tab-btn.active,
+html:not(.krp-dark-theme) .section-icon-line .tab-btn.active:hover{
+  background:#a9cbb8!important;color:#126846!important;border-color:#7caf91!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),2px 3px 7px rgba(44,64,56,.11)!important;
+  transform:none!important;filter:none!important;
+}
+
 @media(max-width:850px){
   #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1440px!important}
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}
