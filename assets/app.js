@@ -1652,13 +1652,16 @@
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
                 <td data-label="Actions" class="ledger-actions">
-                    <div class="action-icons">
-                        <button type="button" class="ledger-payment-btn" onclick="openLedgerPaymentModal(${item.index})" title="Add Payment or Refund Entry"><i class="fas fa-money-bill-wave"></i> Payment</button>
-                        <button type="button" class="action-btn btn-edit" onclick="editLedgerRecord(${item.index})" title="Full Edit"><i class="fas fa-edit"></i></button>
-                        <button type="button" class="action-btn btn-config" onclick="quickUpdateLedgerRecord(${item.index})" title="Quick Update"><i class="fas fa-sliders-h"></i></button>
-                        ${canSendReminder ? `<button type="button" class="action-btn btn-sms" onclick="sendSmsReminder(${item.index})" title="Send SMS Reminder"><i class="fas fa-sms"></i></button>` : ''}
-                        <button type="button" class="action-btn btn-delete" onclick="deleteLedgerRecord(${item.index})" title="Delete"><i class="fas fa-trash-alt"></i></button>
-                    </div>
+                    <details class="ledger-action-menu">
+                        <summary title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i><span>Actions</span></summary>
+                        <div class="ledger-action-dropdown">
+                            <button type="button" class="payment" onclick="openLedgerPaymentModal(${item.index})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
+                            <button type="button" class="edit" onclick="editLedgerRecord(${item.index})"><i class="fas fa-edit"></i><span>Full Edit</span></button>
+                            <button type="button" class="quick" onclick="quickUpdateLedgerRecord(${item.index})"><i class="fas fa-sliders-h"></i><span>Quick Update</span></button>
+                            ${canSendReminder ? `<button type="button" class="sms" onclick="sendSmsReminder(${item.index})"><i class="fas fa-sms"></i><span>SMS Reminder</span></button>` : ''}
+                            <button type="button" class="delete" onclick="deleteLedgerRecord(${item.index})"><i class="fas fa-trash-alt"></i><span>Delete</span></button>
+                        </div>
+                    </details>
                 </td>
             </tr>`;
         }).join('');
