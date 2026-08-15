@@ -1603,11 +1603,15 @@
             const purpose = showSheetText(item.row[idxPurpose]).trim().toUpperCase();
             const deal = parseFloat(item.row[idxDeal] || 0) || 0;
             const received = parseFloat(item.row[idxRecv] || 0) || 0;
+            const isPaymentAdjustment = purpose.startsWith('PAYMENT AGAINST');
             if (status === 'REFUND') {
                 state.balance += received;
-            } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
+            } else if (isPaymentAdjustment) {
+                // Payment rows sometimes come back from the backend as PENDING
+                // when no activation/login is attached. Their purpose is the
+                // reliable marker that they reduce this invoice's due amount.
                 state.balance -= received;
-            } else if (!purpose.startsWith('PAYMENT AGAINST') && status !== 'FAILED') {
+            } else if (status !== 'FAILED') {
                 // The amount is authoritative. A row can be marked SUCCESS even
                 // when only part of its deal has been received; that remainder
                 // must still stay pending for this invoice.
@@ -1676,7 +1680,8 @@
             const purposeText = showSheetText(row[idxPurpose]).trim().toUpperCase();
             const invoiceNo = showSheetText(row[idxInv]).trim();
             const remainingPending = invoicePendingState.get(invoiceNo)?.runningByIndex.get(item.index) || 0;
-            totalDeal += deal;
+            const isPaymentAdjustment = purposeText.startsWith('PAYMENT AGAINST');
+            if (!isPaymentAdjustment && statusVal !== 'REFUND') totalDeal += deal;
             if (statusVal === 'REFUND') {
                 totalRefund += received;
             } else {
@@ -1685,7 +1690,7 @@
             if (statusVal === 'PENDING' || statusVal === 'PARTIAL') {
                 pendingDeal += deal;
                 paymentApplied += received;
-            } else if (statusVal === 'SUCCESS' && purposeText.startsWith('PAYMENT AGAINST')) {
+            } else if (isPaymentAdjustment) {
                 paymentApplied += received;
             }
 
@@ -1840,6 +1845,7 @@
         formData.append('uploadingAmount', isPaidEntry ? String(amount) : '0');
         formData.append('utrNo', utr);
         formData.append('paymentStatus', entryType === 'REFUND' ? 'REFUND' : isPendingEntry ? 'PENDING' : 'SUCCESS');
+        formData.append('activationRequired', 'false');
         formData.append('remarks', remarks || `${entryLabel} entry against ${invoiceNo || 'ledger'}`);
 
         const button = document.getElementById('saveLedgerPaymentBtn');
