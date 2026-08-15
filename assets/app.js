@@ -1598,12 +1598,13 @@
         [...ledgerRows].sort((a, b) => a.index - b.index).forEach(item => {
             const invoice = showSheetText(item.row[idxInv]).trim();
             if (!invoice) return;
-            const state = stateByInvoice.get(invoice) || { balance: 0, firstIndex: item.index, sourceIndex: item.index, runningByIndex: new Map() };
+            const state = stateByInvoice.get(invoice) || { balance: 0, firstIndex: item.index, sourceIndex: item.index, mainIndex: null, runningByIndex: new Map() };
             const status = showSheetText(item.row[idxStatus]).trim().toUpperCase() || 'PENDING';
             const purpose = showSheetText(item.row[idxPurpose]).trim().toUpperCase();
             const deal = parseFloat(item.row[idxDeal] || 0) || 0;
             const received = parseFloat(item.row[idxRecv] || 0) || 0;
             const isPaymentAdjustment = purpose.startsWith('PAYMENT AGAINST');
+            if (!isPaymentAdjustment && status !== 'REFUND' && state.mainIndex === null) state.mainIndex = item.index;
             if (status === 'REFUND') {
                 state.balance += received;
             } else if (isPaymentAdjustment) {
@@ -1667,19 +1668,19 @@
             const row = item.row;
             const ledgerIdSerial = getIdActivationSerialNo(item.index);
             const statusVal = (row[idxStatus]?.toString().toUpperCase() || 'PENDING');
-            const canSendReminder = statusVal === 'PENDING' || statusVal === 'PARTIAL';
-            const badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
-                               statusVal === 'FAILED'  ? 'badge-failed'  :
-                               statusVal === 'REFUND'  ? 'badge-refund'  :
-                               statusVal === 'ADVANCE' ? 'badge-advance' :
-                               statusVal === 'PARTIAL' ? 'badge-partial' : 'badge-pending';
             const deal = parseFloat(row[idxDeal] || 0) || 0;
             const received = parseFloat(row[idxRecv] || 0) || 0;
             const setupChange = idxSetup !== -1 ? (parseFloat(row[idxSetup] || 0) || 0) : 0;
             setupBalance += setupChange;
             const purposeText = showSheetText(row[idxPurpose]).trim().toUpperCase();
             const invoiceNo = showSheetText(row[idxInv]).trim();
-            const remainingPending = invoicePendingState.get(invoiceNo)?.runningByIndex.get(item.index) || 0;
+            const invoiceState = invoicePendingState.get(invoiceNo);
+            const remainingPending = invoiceState?.runningByIndex.get(item.index) || 0;
+            const isMainInvoiceRow = invoiceState?.mainIndex === item.index;
+            const invoiceStatus = (invoiceState?.balance || 0) > 0 ? 'PENDING' : 'SUCCESS';
+            const displayStatus = isMainInvoiceRow ? invoiceStatus : '';
+            const canSendReminder = isMainInvoiceRow && invoiceStatus === 'PENDING';
+            const badgeClass = invoiceStatus === 'SUCCESS' ? 'badge-success' : 'badge-pending';
             const isPaymentAdjustment = purposeText.startsWith('PAYMENT AGAINST');
             if (!isPaymentAdjustment && statusVal !== 'REFUND') totalDeal += deal;
             if (statusVal === 'REFUND') {
@@ -1708,7 +1709,7 @@
                 <td data-label="Setup Balance" style="font-weight:800;">${formatLedgerMoney(Math.max(setupBalance, 0))}</td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${escapeHtml(statusVal)}</span></td>
+                <td data-label="Status">${displayStatus ? `<span class="badge ${badgeClass}">${displayStatus}</span>` : '<span aria-label="Supporting payment entry">—</span>'}</td>
                 <td data-label="Actions" class="ledger-actions">
                     <button type="button" class="ledger-actions-trigger" onclick="openLedgerActionPopup(event,${item.index},${canSendReminder})" title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i></button>
                 </td>
