@@ -1607,7 +1607,10 @@
                 state.balance += received;
             } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
                 state.balance -= received;
-            } else if (status === 'PENDING' || status === 'PARTIAL') {
+            } else if (!purpose.startsWith('PAYMENT AGAINST') && status !== 'FAILED') {
+                // The amount is authoritative. A row can be marked SUCCESS even
+                // when only part of its deal has been received; that remainder
+                // must still stay pending for this invoice.
                 state.balance += Math.max(deal - received, 0);
             }
             state.balance = Math.max(state.balance, 0);
