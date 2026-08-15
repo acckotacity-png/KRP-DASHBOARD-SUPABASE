@@ -19,6 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
     <link rel="stylesheet" href="theme.css?v=35">
@@ -519,7 +520,7 @@
     <div class="modal-content large-modal ledger-modal">
         <div class="modal-header">
             <span><i class="fas fa-book"></i> Ledger: <span id="ledgerContactTitle">-</span><small id="ledgerCustomerName" style="display:block;margin:4px 0 0 25px;font-size:11px;font-weight:600;opacity:.82;"></small></span>
-            <button type="button" class="btn-submit ledger-misc-payment-btn" onclick="openMiscellaneousPaymentEntry()"><i class="fas fa-money-check-dollar"></i> Miscellaneous Payment Entry</button>
+            <div class="ledger-header-actions"><button type="button" class="btn-submit ledger-excel-btn" onclick="exportActiveContactLedgerExcel()"><i class="fas fa-file-excel"></i> Excel</button><button type="button" class="btn-submit ledger-misc-payment-btn" onclick="openMiscellaneousPaymentEntry()"><i class="fas fa-money-check-dollar"></i> Miscellaneous Payment Entry</button></div>
             <i class="fas fa-times close-modal" onclick="closeContactLedger()"></i>
         </div>
         <div id="ledgerSummary" class="ledger-summary-grid"></div>

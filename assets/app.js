@@ -1761,6 +1761,45 @@
         if (!host) return;
         host.scrollTo({ top: direction === 'up' ? 0 : host.scrollHeight, behavior:'smooth' });
     }
+    function exportActiveContactLedgerExcel() {
+        if (!activeLedgerKey || activeLedgerSource !== 'main') return showMessage('Customer ledger open karein', 'error');
+        if (!window.XLSX) return showMessage('Excel library load नहीं हुई; internet check करके retry करें', 'error');
+        const col = name => getColIndex(name);
+        const idxContact = col('CONTACT NO. OR NAME'), idxInv = col('INVOICE NO.'), idxDate = col('DATE');
+        const idxPurpose = col('PURPOSE'), idxService = col('SERVICE CHARGE REMARKS'), idxLogin = col('LOGIN ID');
+        const idxDeal = col('DEALING AMOUNT'), idxRecv = col('RECEIVED AMOUNT'), idxSetup = col('UPLOADING OR SETUP AMOUNT');
+        const idxUtr = col('UTR / TRN NO.'), idxRemarks = col('REMARKS'), idxStatus = col('PAYMENT STATUS');
+        const ledgerRows = currentData.map((row,index) => ({ row,index }))
+            .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === activeLedgerKey);
+        const invoiceState = buildInvoicePendingState(ledgerRows);
+        let totalDeal = 0, totalReceived = 0, totalRefund = 0, setupBalance = 0;
+        const exportRows = ledgerRows.map(item => {
+            const row = item.row, invoice = showSheetText(row[idxInv]).trim();
+            const purpose = showSheetText(row[idxPurpose]).trim(), rawStatus = showSheetText(row[idxStatus]).trim().toUpperCase();
+            const deal = parseFloat(row[idxDeal] || 0) || 0, received = parseFloat(row[idxRecv] || 0) || 0;
+            const setup = parseFloat(row[idxSetup] || 0) || 0, state = invoiceState.get(invoice);
+            const supporting = purpose.toUpperCase().startsWith('PAYMENT AGAINST');
+            if (!supporting && rawStatus !== 'REFUND') totalDeal += deal;
+            if (rawStatus === 'REFUND') totalRefund += received; else totalReceived += received;
+            setupBalance += setup;
+            return {'ID Serial':getIdActivationSerialNo(item.index)||'','Date':formatDisplayDate(row[idxDate])||'',Invoice:invoice,
+                Purpose:purpose,'Service Remarks':showSheetText(row[idxService]),'Login ID':showSheetText(row[idxLogin]),Deal:deal,
+                Received:rawStatus==='REFUND'?-received:received,'Remaining Pending':state?.runningByIndex.get(item.index)||0,
+                'Setup +/-':setup,'Setup Balance':setupBalance,'UTR / TRN No.':showSheetText(row[idxUtr]),Remarks:showSheetText(row[idxRemarks]),
+                Status:state?.mainIndex===item.index?(state.balance>0?'PENDING':'SUCCESS'):'SUPPORTING'};
+        });
+        const totalPending = [...invoiceState.values()].reduce((sum,state) => sum + state.balance, 0);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+            ['KRP Customer Ledger'],['Customer / Contact',activeLedgerTitle],['Exported At',new Date().toLocaleString('en-IN')],[],
+            ['Total Entries','Total Deal','Total Received','Total Refund','Setup Balance','Remaining Pending'],
+            [ledgerRows.length,totalDeal,totalReceived,totalRefund,setupBalance,totalPending]
+        ]), 'Summary');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportRows), 'Ledger');
+        const safeName = (activeLedgerTitle || 'Customer').replace(/[^a-z0-9_-]+/gi,'_').slice(0,50);
+        XLSX.writeFile(wb, `KRP_Ledger_${safeName}_${getLocalISODate(new Date())}.xlsx`);
+        showMessage('Customer ledger Excel download हो गया', 'success');
+    }
     function closeContactLedger() {
         document.getElementById('contactLedgerModal').classList.remove('active');
         activeLedgerKey = '';
@@ -2797,13 +2836,12 @@
             const deal = idxDeal !== -1 ? (parseFloat(row[idxDeal]) || 0) : 0;
             const received = idxRecv !== -1 ? (parseFloat(row[idxRecv]) || 0) : 0;
 
-            if (status === 'PENDING' || status === 'PARTIAL') {
-                group.pendingDeal += deal;
-                group.paid += received;
-            } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
+            if (purpose.startsWith('PAYMENT AGAINST')) {
                 group.paid += received;
             } else if (status === 'REFUND' && purpose.startsWith('REFUND AGAINST')) {
                 group.refunded += received;
+            } else if (status !== 'FAILED' && status !== 'REFUND') {
+                group.pendingDeal += Math.max(deal - received, 0);
             }
             groups.set(key, group);
         });
