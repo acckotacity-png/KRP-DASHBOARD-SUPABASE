@@ -1710,9 +1710,10 @@
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td data-label="Status">${displayStatus ? `<span class="badge ${badgeClass}">${displayStatus}</span>` : '<span aria-label="Supporting payment entry">—</span>'}</td>
-                <td data-label="Actions" class="ledger-actions">
+                <td data-label="Actions" class="ledger-actions"><div class="action-icons">
+                    ${isMainInvoiceRow ? `<button type="button" class="ledger-duplicate-trigger" onclick="duplicateLedgerActivation(${item.index})" title="Create another activation from this entry" aria-label="Duplicate activation entry"><i class="fas fa-plus"></i></button>` : ''}
                     <button type="button" class="ledger-actions-trigger" onclick="openLedgerActionPopup(event,${item.index},${canSendReminder})" title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i></button>
-                </td>
+                </div></td>
             </tr>`;
         }).join('');
 
@@ -1742,6 +1743,44 @@
     }
     function editLedgerRecord(rowIndex) {
         openFullEditModal(rowIndex);
+    }
+    function duplicateLedgerActivation(rowIndex) {
+        const source = currentData[rowIndex];
+        if (!source) return showMessage('Source ledger entry नहीं मिली', 'error');
+        const purpose = showSheetText(source[getColIndex('PURPOSE')]).trim();
+        const serviceRemarks = showSheetText(source[getColIndex('SERVICE CHARGE REMARKS')]).trim();
+        const state = showSheetText(source[getColIndex('STATE')]).trim();
+        const bank = showSheetText(source[getColIndex('BANK OWNER NAME')]).trim();
+        const contact = showSheetText(source[getColIndex('CONTACT NO. OR NAME')]).trim();
+        const customer = showSheetText(source[getColIndex('CUSTOMER NAME')]).trim();
+        const remarks = showSheetText(source[getColIndex('REMARKS')]).trim();
+
+        closeContactLedger();
+        clearNewEntryFormAfterNo();
+        switchTab('form');
+        if (!document.getElementById('formTab')?.classList.contains('active')) {
+            return showMessage('Data Entry section का access उपलब्ध नहीं है', 'error');
+        }
+
+        // Vendor context is copied; identity/payment fields belong to the new ID.
+        document.getElementById('contactName').value = contact;
+        document.getElementById('customerName').value = customer;
+        setManagedBankValue('bankOwner', bank);
+        setManagedStateValue('state', state);
+        setMultiSelectState('purpose', purpose);
+        setMultiSelectState('serviceRemarks', serviceRemarks);
+        document.getElementById('remarks').value = remarks;
+        ['loginId','dealingAmount','amountDeno','receivedAmount','idActivationAmount','uploadingAmount','utrNo'].forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.value = '';
+        });
+        document.getElementById('paymentOnlyNoLogin').checked = false;
+        document.getElementById('paymentStatus').value = 'PENDING';
+        document.getElementById('paymentStatus').disabled = true;
+        generateInvoiceNo();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => document.getElementById('loginId')?.focus(), 100);
+        showMessage('New invoice ready · Vendor mobile/name copied; Login ID और amounts भरें', 'success');
     }
     function quickUpdateLedgerRecord(rowIndex) {
         openPaymentModal(rowIndex);
