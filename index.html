@@ -305,7 +305,7 @@
 
     <div id="formTab" class="tab-content active">
         <div class="tracker-container">
-            <div class="section-title"><i class="fas fa-plus-circle"></i> Create New Entry</div>
+            <div class="section-title entry-title-row"><span><i class="fas fa-plus-circle"></i> Create New Entry</span><button type="button" class="entry-back-btn" onclick="backFromNewEntry()"><i class="fas fa-arrow-left"></i> Back</button></div>
             <form id="entryForm" onsubmit="submitNewEntry(event)">
                 <div class="form-grid">
                     <div class="form-group"><label class="required">Invoice (Auto)</label><input type="text" id="invoiceNo" required readonly placeholder="Generating..."></div>
@@ -539,6 +539,10 @@
         <div class="ledger-history-panel">
             <div class="ledger-history-header"><span><i class="fas fa-clock-rotate-left"></i> Update History</span><span>Saved with date and time</span></div>
             <div id="ledgerHistoryBody" class="ledger-history-body"><div class="ledger-history-empty">Open a ledger to see its update history.</div></div>
+        </div>
+        <div class="ledger-scroll-controls" id="ledgerScrollControls" aria-label="Ledger scroll controls">
+            <button type="button" id="ledgerScrollUp" onclick="scrollContactLedger('up')" title="Ledger top" aria-label="Scroll ledger to top"><i class="fas fa-arrow-up"></i></button>
+            <button type="button" id="ledgerScrollDown" onclick="scrollContactLedger('down')" title="Ledger bottom" aria-label="Scroll ledger to bottom"><i class="fas fa-arrow-down"></i></button>
         </div>
     </div>
 </div>

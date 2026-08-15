@@ -1554,6 +1554,7 @@
         }
     }
     let activeLedgerActionsPopup = null;
+    let newEntryLedgerReturn = null;
 
     function closeLedgerActionPopup() {
         activeLedgerActionsPopup?.remove();
@@ -1732,6 +1733,33 @@
         document.getElementById('ledgerTableBody').innerHTML = rowsHtml || '<tr><td colspan="15" style="text-align:center; padding:20px;">No records found</td></tr>';
         renderLedgerHistory(contactKey, ledgerRows);
         document.getElementById('contactLedgerModal').classList.add('active');
+        setupContactLedgerScrollControls();
+    }
+    function getContactLedgerScrollHost() {
+        return document.querySelector('#contactLedgerModal .ledger-modal');
+    }
+    function updateContactLedgerScrollControls() {
+        const host = getContactLedgerScrollHost();
+        const controls = document.getElementById('ledgerScrollControls');
+        if (!host || !controls) return;
+        const canScroll = host.scrollHeight > host.clientHeight + 12;
+        controls.classList.toggle('visible', canScroll && host.scrollTop > 24);
+        document.getElementById('ledgerScrollUp').disabled = host.scrollTop <= 2;
+        document.getElementById('ledgerScrollDown').disabled = host.scrollTop + host.clientHeight >= host.scrollHeight - 2;
+    }
+    function setupContactLedgerScrollControls() {
+        const host = getContactLedgerScrollHost();
+        if (!host) return;
+        if (host.dataset.scrollControlsReady !== '1') {
+            host.addEventListener('scroll', updateContactLedgerScrollControls, { passive:true });
+            host.dataset.scrollControlsReady = '1';
+        }
+        requestAnimationFrame(updateContactLedgerScrollControls);
+    }
+    function scrollContactLedger(direction) {
+        const host = getContactLedgerScrollHost();
+        if (!host) return;
+        host.scrollTo({ top: direction === 'up' ? 0 : host.scrollHeight, behavior:'smooth' });
     }
     function closeContactLedger() {
         document.getElementById('contactLedgerModal').classList.remove('active');
@@ -1755,6 +1783,7 @@
         const customer = showSheetText(source[getColIndex('CUSTOMER NAME')]).trim();
         const remarks = showSheetText(source[getColIndex('REMARKS')]).trim();
 
+        newEntryLedgerReturn = { key: activeLedgerKey, title: activeLedgerTitle };
         closeContactLedger();
         clearNewEntryFormAfterNo();
         switchTab('form');
@@ -1781,6 +1810,17 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => document.getElementById('loginId')?.focus(), 100);
         showMessage('New invoice ready · Vendor mobile/name copied; Login ID और amounts भरें', 'success');
+    }
+    function backFromNewEntry() {
+        const ledgerReturn = newEntryLedgerReturn;
+        newEntryLedgerReturn = null;
+        switchTab('tracker');
+        if (ledgerReturn?.key) {
+            activeLedgerKey = ledgerReturn.key;
+            activeLedgerTitle = ledgerReturn.title;
+            activeLedgerSource = 'main';
+            setTimeout(() => renderContactLedger(ledgerReturn.key, ledgerReturn.title), 80);
+        }
     }
     function quickUpdateLedgerRecord(rowIndex) {
         openPaymentModal(rowIndex);
