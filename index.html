@@ -305,7 +305,7 @@
 
     <div id="formTab" class="tab-content active">
         <div class="tracker-container">
-            <div class="section-title entry-title-row"><span><i class="fas fa-plus-circle"></i> Create New Entry</span><button type="button" class="entry-back-btn" onclick="backFromNewEntry()"><i class="fas fa-arrow-left"></i> Back</button></div>
+            <div class="section-title entry-title-row"><span><i class="fas fa-plus-circle"></i> Create New Entry</span><div class="entry-title-actions"><button type="button" class="entry-reset-btn" onclick="resetNewEntryPage()"><i class="fas fa-rotate-left"></i> Reset</button><button type="button" class="entry-back-btn" onclick="backFromNewEntry()"><i class="fas fa-arrow-left"></i> Back</button></div></div>
             <form id="entryForm" onsubmit="submitNewEntry(event)">
                 <div class="form-grid">
                     <div class="form-group"><label class="required">Invoice (Auto)</label><input type="text" id="invoiceNo" required readonly placeholder="Generating..."></div>

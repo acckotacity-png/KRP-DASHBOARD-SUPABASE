@@ -1822,6 +1822,20 @@
             setTimeout(() => renderContactLedger(ledgerReturn.key, ledgerReturn.title), 80);
         }
     }
+    function resetNewEntryPage() {
+        const form = document.getElementById('entryForm');
+        if (!form) return;
+        const hasEnteredData = Array.from(form.querySelectorAll('input:not([type="hidden"]), textarea, select'))
+            .some(field => !['invoiceNo','date','paymentStatus'].includes(field.id) && (field.type === 'checkbox' ? field.checked : String(field.value || '').trim()));
+        if (hasEnteredData && !window.confirm('इस page पर भरा हुआ पूरा data साफ करना है?')) return;
+        clearNewEntryFormAfterNo();
+        dismissedDefaulterLookupKey = '';
+        activeDefaulterMatch = null;
+        closeDefaulterWarningModal();
+        window.scrollTo({ top:0, behavior:'smooth' });
+        setTimeout(() => document.getElementById('contactName')?.focus(), 100);
+        showMessage('New Entry form reset हो गया', 'success');
+    }
     function quickUpdateLedgerRecord(rowIndex) {
         openPaymentModal(rowIndex);
     }
