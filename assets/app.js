@@ -1766,9 +1766,12 @@
         if (!window.XLSX) return showMessage('Excel library load नहीं हुई; internet check करके retry करें', 'error');
         const col = name => getColIndex(name);
         const idxContact = col('CONTACT NO. OR NAME'), idxInv = col('INVOICE NO.'), idxDate = col('DATE');
+        const idxCustomer = col('CUSTOMER NAME'), idxBank = col('BANK OWNER NAME'), idxState = col('STATE');
         const idxPurpose = col('PURPOSE'), idxService = col('SERVICE CHARGE REMARKS'), idxLogin = col('LOGIN ID');
-        const idxDeal = col('DEALING AMOUNT'), idxRecv = col('RECEIVED AMOUNT'), idxSetup = col('UPLOADING OR SETUP AMOUNT');
+        const idxDeal = col('DEALING AMOUNT'), idxDeno = col('AMOUNT DENO'), idxRecv = col('RECEIVED AMOUNT');
+        const idxIdActivation = col('ID ACTIVATION AMOUNT'), idxSetup = col('UPLOADING OR SETUP AMOUNT');
         const idxUtr = col('UTR / TRN NO.'), idxRemarks = col('REMARKS'), idxStatus = col('PAYMENT STATUS');
+        const idxCreatedBy = col('CREATED BY'), idxTimestamp = col('Timestamp');
         const ledgerRows = currentData.map((row,index) => ({ row,index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === activeLedgerKey);
         const invoiceState = buildInvoicePendingState(ledgerRows);
@@ -1782,11 +1785,31 @@
             if (!supporting && rawStatus !== 'REFUND') totalDeal += deal;
             if (rawStatus === 'REFUND') totalRefund += received; else totalReceived += received;
             setupBalance += setup;
-            return {'ID Serial':getIdActivationSerialNo(item.index)||'','Date':formatDisplayDate(row[idxDate])||'',Invoice:invoice,
-                Purpose:purpose,'Service Remarks':showSheetText(row[idxService]),'Login ID':showSheetText(row[idxLogin]),Deal:deal,
-                Received:rawStatus==='REFUND'?-received:received,'Remaining Pending':state?.runningByIndex.get(item.index)||0,
-                'Setup +/-':setup,'Setup Balance':setupBalance,'UTR / TRN No.':showSheetText(row[idxUtr]),Remarks:showSheetText(row[idxRemarks]),
-                Status:state?.mainIndex===item.index?(state.balance>0?'PENDING':'SUCCESS'):'SUPPORTING'};
+            return {
+                'ID Serial':getIdActivationSerialNo(item.index)||'',
+                'Invoice No.':invoice,
+                'Date':formatDisplayDate(row[idxDate])||'',
+                'Contact No. or Name':showSheetText(row[idxContact]),
+                'Customer Name':showSheetText(row[idxCustomer]),
+                'Bank Owner Name':showSheetText(row[idxBank]),
+                'State':showSheetText(row[idxState]),
+                'Purpose':purpose,
+                'Service Charge Remarks':showSheetText(row[idxService]),
+                'Login ID':showSheetText(row[idxLogin]),
+                'Dealing Amount':deal,
+                'Amount Denomination':showSheetText(row[idxDeno]),
+                'Received Amount':rawStatus==='REFUND'?-received:received,
+                'ID Activation Amount':parseFloat(row[idxIdActivation]||0)||0,
+                'Uploading or Setup Amount':setup,
+                'Remaining Pending':state?.runningByIndex.get(item.index)||0,
+                'Running Setup Balance':setupBalance,
+                'UTR / TRN No.':showSheetText(row[idxUtr]),
+                'Entry Payment Status':rawStatus,
+                'Ledger Status':state?.mainIndex===item.index?(state.balance>0?'PENDING':'SUCCESS'):'SUPPORTING',
+                'Remarks':showSheetText(row[idxRemarks]),
+                'Created By':showSheetText(row[idxCreatedBy]),
+                'Created At':formatEntryDateTime(idxTimestamp!==-1?row[idxTimestamp]:'')
+            };
         });
         const totalPending = [...invoiceState.values()].reduce((sum,state) => sum + state.balance, 0);
         const wb = XLSX.utils.book_new();
