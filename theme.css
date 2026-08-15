@@ -69,6 +69,7 @@ html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:last-
 
 /* Ledger heading must follow the active theme too. */
 html.krp-dark-theme #contactLedgerModal .modal-header,html.krp-dark-theme #contactLedgerModal .modal-header span,html.krp-dark-theme #contactLedgerModal .modal-header i,html.krp-dark-theme #ledgerContactTitle{color:#f8fafc!important}
+.ledger-misc-payment-btn{width:auto!important;margin:0 8px 0 auto!important;padding:8px 12px!important;border-radius:9px!important;font-size:11px!important;white-space:nowrap!important}.ledger-misc-payment-btn i{margin-right:5px!important}html.krp-dark-theme .ledger-misc-payment-btn{color:#fff!important}@media(max-width:720px){#contactLedgerModal .modal-header{flex-wrap:wrap!important}.ledger-misc-payment-btn{order:3;width:100%!important;margin:0 0 8px!important;padding:8px!important}}
 html.krp-dark-theme #contactLedgerModal #ledgerCustomerName{color:#cbd5e1!important}
 html.krp-dark-theme #contactLedgerModal .close-modal{color:#fb7185!important}
 

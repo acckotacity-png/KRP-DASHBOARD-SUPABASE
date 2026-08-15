@@ -519,6 +519,7 @@
     <div class="modal-content large-modal ledger-modal">
         <div class="modal-header">
             <span><i class="fas fa-book"></i> Ledger: <span id="ledgerContactTitle">-</span><small id="ledgerCustomerName" style="display:block;margin:4px 0 0 25px;font-size:11px;font-weight:600;opacity:.82;"></small></span>
+            <button type="button" class="btn-submit ledger-misc-payment-btn" onclick="openMiscellaneousPaymentEntry()"><i class="fas fa-money-check-dollar"></i> Miscellaneous Payment Entry</button>
             <i class="fas fa-times close-modal" onclick="closeContactLedger()"></i>
         </div>
         <div id="ledgerSummary" class="ledger-summary-grid"></div>
@@ -550,7 +551,7 @@
         </div>
         <input type="hidden" id="ledgerPaymentRowIndex">
         <div class="form-grid">
-            <div class="form-group"><label>Invoice</label><input type="text" id="ledgerPaymentInvoice" readonly></div>
+            <div class="form-group"><label class="required">Apply Against Invoice</label><select id="ledgerPaymentInvoice" required></select></div>
             <div class="form-group"><label>Customer</label><input type="text" id="ledgerPaymentCustomer" readonly></div>
             <div class="form-group"><label class="required">Entry Type</label><select id="ledgerPaymentType"><option value="PAYMENT">Payment Received</option><option value="PENDING">Pending / New Due</option><option value="REFUND">Refund Paid</option></select></div>
             <div class="form-group"><label class="required">Date</label><input type="date" id="ledgerPaymentDate" required></div>

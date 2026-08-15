@@ -1588,6 +1588,35 @@
         setTimeout(() => document.addEventListener('click', closeLedgerActionPopup, { once: true }), 0);
     }
 
+    function buildInvoicePendingState(ledgerRows) {
+        const idxInv = getColIndex('INVOICE NO.');
+        const idxStatus = getColIndex('PAYMENT STATUS');
+        const idxPurpose = getColIndex('PURPOSE');
+        const idxDeal = getColIndex('DEALING AMOUNT');
+        const idxRecv = getColIndex('RECEIVED AMOUNT');
+        const stateByInvoice = new Map();
+        [...ledgerRows].sort((a, b) => a.index - b.index).forEach(item => {
+            const invoice = showSheetText(item.row[idxInv]).trim();
+            if (!invoice) return;
+            const state = stateByInvoice.get(invoice) || { balance: 0, firstIndex: item.index, sourceIndex: item.index, runningByIndex: new Map() };
+            const status = showSheetText(item.row[idxStatus]).trim().toUpperCase() || 'PENDING';
+            const purpose = showSheetText(item.row[idxPurpose]).trim().toUpperCase();
+            const deal = parseFloat(item.row[idxDeal] || 0) || 0;
+            const received = parseFloat(item.row[idxRecv] || 0) || 0;
+            if (status === 'REFUND') {
+                state.balance += received;
+            } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
+                state.balance -= received;
+            } else if (status === 'PENDING' || status === 'PARTIAL') {
+                state.balance += Math.max(deal - received, 0);
+            }
+            state.balance = Math.max(state.balance, 0);
+            state.runningByIndex.set(item.index, state.balance);
+            stateByInvoice.set(invoice, state);
+        });
+        return stateByInvoice;
+    }
+
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
         document.querySelector('#contactLedgerModal .ledger-table-wrapper')?.classList.add('main-ledger-fit');
@@ -1617,24 +1646,9 @@
             .map((row, index) => ({ row, index }))
             .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contactKey);
 
-        // Running customer balance: PAYMENT AGAINST rows reduce pending dues.
-        const runningPendingByIndex = new Map();
-        let runningPending = 0;
-        [...ledgerRows].sort((a, b) => a.index - b.index).forEach(item => {
-            const row = item.row;
-            const status = (row[idxStatus]?.toString().toUpperCase() || 'PENDING');
-            const purpose = showSheetText(row[idxPurpose]).trim().toUpperCase();
-            const deal = parseFloat(row[idxDeal] || 0) || 0;
-            const received = parseFloat(row[idxRecv] || 0) || 0;
-            if (status === 'PENDING' || status === 'PARTIAL') {
-                runningPending += Math.max(deal - received, 0);
-            } else if (status === 'SUCCESS' && purpose.startsWith('PAYMENT AGAINST')) {
-                runningPending = Math.max(runningPending - received, 0);
-            } else if (status === 'REFUND') {
-                runningPending += received;
-            }
-            runningPendingByIndex.set(item.index, Math.max(runningPending, 0));
-        });
+        // Every invoice owns its balance. A payment/refund can only change the
+        // invoice number it was saved against, never another customer invoice.
+        const invoicePendingState = buildInvoicePendingState(ledgerRows);
 
         const ledgerCustomerName = (idxCustomerName === -1 ? '' : ledgerRows
             .map(item => showSheetText(item.row[idxCustomerName]).trim())
@@ -1657,7 +1671,8 @@
             const setupChange = idxSetup !== -1 ? (parseFloat(row[idxSetup] || 0) || 0) : 0;
             setupBalance += setupChange;
             const purposeText = showSheetText(row[idxPurpose]).trim().toUpperCase();
-            const remainingPending = runningPendingByIndex.get(item.index) || 0;
+            const invoiceNo = showSheetText(row[idxInv]).trim();
+            const remainingPending = invoicePendingState.get(invoiceNo)?.runningByIndex.get(item.index) || 0;
             totalDeal += deal;
             if (statusVal === 'REFUND') {
                 totalRefund += received;
@@ -1692,7 +1707,7 @@
             </tr>`;
         }).join('');
 
-        const totalBalance = Math.max(pendingDeal - paymentApplied + totalRefund, 0);
+        const totalBalance = [...invoicePendingState.values()].reduce((sum, state) => sum + state.balance, 0);
         document.getElementById('ledgerContactTitle').textContent = contactText;
         const ledgerCustomerNameEl = document.getElementById('ledgerCustomerName');
         if (ledgerCustomerNameEl) ledgerCustomerNameEl.textContent = ledgerCustomerName ? `Name: ${ledgerCustomerName}` : 'Name: -';
@@ -1726,8 +1741,43 @@
         const record = currentData[rowIndex];
         if (!record) return showMessage('Ledger record not found', 'error');
         document.getElementById('ledgerPaymentRowIndex').value = rowIndex;
-        document.getElementById('ledgerPaymentInvoice').value = showSheetText(record[getColIndex('INVOICE NO.')]).trim();
+        const invoiceNo = showSheetText(record[getColIndex('INVOICE NO.')]).trim();
+        const invoiceSelect = document.getElementById('ledgerPaymentInvoice');
+        invoiceSelect.innerHTML = `<option value="${escapeHtml(invoiceNo)}">${escapeHtml(invoiceNo || 'No Invoice')}</option>`;
+        invoiceSelect.value = invoiceNo;
+        invoiceSelect.disabled = true;
         document.getElementById('ledgerPaymentCustomer').value = showSheetText(record[getColIndex('CONTACT NO. OR NAME')]).trim();
+        document.getElementById('ledgerPaymentType').value = 'PAYMENT';
+        document.getElementById('ledgerPaymentDate').value = getLocalISODate(new Date());
+        document.getElementById('ledgerPaymentAmount').value = '';
+        document.getElementById('ledgerPaymentUtr').value = '';
+        document.getElementById('ledgerPaymentRemarks').value = '';
+        document.getElementById('ledgerPaymentModal').classList.add('active');
+        setTimeout(() => document.getElementById('ledgerPaymentAmount')?.focus(), 50);
+    }
+    function openMiscellaneousPaymentEntry() {
+        if (!activeLedgerKey || activeLedgerSource !== 'main') return showMessage('Customer ledger open karein', 'error');
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxInvoice = getColIndex('INVOICE NO.');
+        const ledgerRows = currentData.map((row, index) => ({ row, index }))
+            .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === activeLedgerKey);
+        const invoiceState = buildInvoicePendingState(ledgerRows);
+        const invoices = [...invoiceState.entries()]
+            .filter(([invoice, state]) => invoice && state.balance > 0)
+            .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
+        if (!invoices.length) return showMessage('Is customer ki koi pending invoice nahi hai', 'error');
+
+        const invoiceSelect = document.getElementById('ledgerPaymentInvoice');
+        invoiceSelect.disabled = false;
+        invoiceSelect.innerHTML = invoices.map(([invoice, state]) =>
+            `<option value="${escapeHtml(invoice)}">${escapeHtml(invoice)} · Pending ${formatLedgerMoney(state.balance)}</option>`
+        ).join('');
+        document.getElementById('ledgerPaymentRowIndex').value = invoices[0][1].sourceIndex;
+        invoiceSelect.onchange = () => {
+            const selected = invoiceState.get(invoiceSelect.value);
+            if (selected) document.getElementById('ledgerPaymentRowIndex').value = selected.sourceIndex;
+        };
+        document.getElementById('ledgerPaymentCustomer').value = activeLedgerTitle;
         document.getElementById('ledgerPaymentType').value = 'PAYMENT';
         document.getElementById('ledgerPaymentDate').value = getLocalISODate(new Date());
         document.getElementById('ledgerPaymentAmount').value = '';
@@ -1738,6 +1788,8 @@
     }
     function closeLedgerPaymentModal() {
         document.getElementById('ledgerPaymentModal')?.classList.remove('active');
+        const invoiceSelect = document.getElementById('ledgerPaymentInvoice');
+        if (invoiceSelect) invoiceSelect.onchange = null;
     }
     async function saveLedgerPaymentEntry() {
         const rowIndex = Number(document.getElementById('ledgerPaymentRowIndex').value);
@@ -1755,7 +1807,15 @@
         if (!entryDate) return showMessage('Date select karein', 'error');
         if (amount <= 0) return showMessage('Valid amount enter karein', 'error');
 
-        const invoiceNo = showSheetText(sourceRecord[getColIndex('INVOICE NO.')]).trim();
+        const invoiceNo = document.getElementById('ledgerPaymentInvoice').value.trim();
+        if (!invoiceNo) return showMessage('Invoice select karein', 'error');
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const customerLedgerRows = currentData.map((row, index) => ({ row, index }))
+            .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === normalizeContactLedgerKey(sourceRecord[idxContact]));
+        const invoicePending = buildInvoicePendingState(customerLedgerRows).get(invoiceNo)?.balance || 0;
+        if (isPaidEntry && amount > invoicePending) {
+            return showMessage(`Payment invoice pending ${formatLedgerMoney(invoicePending)} se zyada nahi ho sakta`, 'error');
+        }
         const sourcePurpose = showSheetText(sourceRecord[getColIndex('PURPOSE')]).trim();
         const formData = new FormData();
         formData.append('action', 'add');
