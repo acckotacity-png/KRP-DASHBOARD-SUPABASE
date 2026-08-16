@@ -2853,7 +2853,7 @@
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Contact / Login ID">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
-                <td data-label="Status"><div class="tracker-status-with-amount">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
+                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
                 <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
