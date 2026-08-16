@@ -1232,8 +1232,6 @@
         return '+' + digits;
     }
     function getSelectedWhatsAppPhone() {
-        const customSelected = document.getElementById('waTargetCustom')?.checked;
-        if (customSelected) return normalizeWhatsAppPhone(document.getElementById('waCustomPhone').value);
         return normalizeWhatsAppPhone(currentQRPayload?.contactPhone || '');
     }
     function toggleWhatsAppTargetInput() {
@@ -4150,16 +4148,8 @@
               `<strong>UPI ID:</strong> ${escapeHtml(upiId)}<br>` +
               `<strong>Purpose:</strong> ${escapeHtml(purpose)}`;
 
-        const contactRadio = document.getElementById('waTargetContact');
-        const customRadio = document.getElementById('waTargetCustom');
         const contactText = document.getElementById('waTargetContactText');
-        const customInput = document.getElementById('waCustomPhone');
         contactText.textContent = contactPhone ? `Saved contact (${formatWhatsAppPhone(contactPhone)})` : 'Saved contact number not found';
-        contactRadio.disabled = !contactPhone;
-        contactRadio.checked = !!contactPhone;
-        customRadio.checked = !contactPhone;
-        customInput.value = '';
-        toggleWhatsAppTargetInput();
 
         document.getElementById('whatsappRemarks').value = recordRemarks;
 
@@ -4230,6 +4220,11 @@
     function shareQRWithWhatsApp() {
         if (!currentQRPayload) return;
         const p = currentQRPayload;
+        const selectedPhone = getSelectedWhatsAppPhone();
+        if (!selectedPhone) {
+            showMessage('Entry में valid customer mobile number नहीं मिला', 'error');
+            return;
+        }
 
         const userRemarks  = document.getElementById('whatsappRemarks').value.trim();
         const remarksText  = userRemarks ? `\n📝 Remarks: ${userRemarks}` : '';
@@ -4245,8 +4240,6 @@
             `📞 Arjun Malviya | 9521867142`;
 
         const shareMessageText = buildCurrentWhatsAppShareMessage() || buildQRWhatsAppMessage(p, messageText);
-        const selectedPhone = getSelectedWhatsAppPhone();
-
         let dataUrl = '';
         const img = document.querySelector('#qrCodeContainer img');
         if (img && img.src && img.src.startsWith('data:')) {
@@ -4275,30 +4268,6 @@
         const qrFileKey = p.shareMode === 'reminder' ? 'Pending_Payment' : p.invoice;
         const file = new File([blob], `QR_${qrFileKey}.png`, { type: 'image/png' });
 
-        let canShareFiles = false;
-        try {
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                canShareFiles = true;
-            }
-        } catch (e) {
-            console.warn('canShare check failed:', e);
-        }
-
-        if (canShareFiles && navigator.share) {
-            navigator.share({ title: p.shareMode === 'reminder' ? 'Payment Reminder' : 'Payment Request', text: shareMessageText, files: [file] })
-                .then(() => {
-                    showMessage('QR + Link shared successfully!', 'success');
-                    closeQRModal();
-                })
-                .catch(err => {
-                    if (err.name !== 'AbortError') {
-                        console.warn('Native share failed, using fallback:', err);
-                        desktopFallback(blob, shareMessageText, qrFileKey);
-                    }
-                });
-            return;
-        }
-
         desktopFallback(blob, shareMessageText, qrFileKey);
     }
 
@@ -4310,8 +4279,8 @@
             link.click();
             URL.revokeObjectURL(link.href);
 
-            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText + '\n\n📸 QR image downloaded — please attach it to this chat.')}`;
             const phone = getSelectedWhatsAppPhone();
+            if (!phone) throw new Error('Customer WhatsApp number not found');
             const phoneParam = phone ? `phone=${encodeURIComponent(phone)}&` : '';
             const waUrlWithPhone = `https://api.whatsapp.com/send?${phoneParam}text=${encodeURIComponent(messageText + '\n\nQR image downloaded - please attach it to this chat.')}`;
             window.open(waUrlWithPhone, '_blank');

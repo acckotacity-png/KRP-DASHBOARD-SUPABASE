@@ -582,19 +582,15 @@
                 <textarea id="whatsappRemarks" rows="2" placeholder="Add any special note, purpose, or instruction for customer..."></textarea>
             </div>
             <div class="wa-target-box">
-                <label><i class="fab fa-whatsapp"></i> Send WhatsApp To</label>
-                <div class="wa-target-options">
-                    <label onclick="if(!document.getElementById('waTargetContact').disabled){ document.getElementById('waTargetContact').checked = true; handleWhatsAppTargetChange(); openSavedContactWhatsApp(); }"><input type="radio" name="waTargetType" id="waTargetContact" value="contact" onchange="handleWhatsAppTargetChange()"> <span id="waTargetContactText">Saved contact</span></label>
-                    <label><input type="radio" name="waTargetType" id="waTargetCustom" value="custom" onchange="handleWhatsAppTargetChange()"> Other number</label>
-                </div>
-                <input type="tel" id="waCustomPhone" placeholder="Enter WhatsApp number">
+                <label><i class="fab fa-whatsapp"></i> WhatsApp सीधे इस customer को जाएगा</label>
+                <div class="wa-target-options"><span id="waTargetContactText">Saved contact</span></div>
             </div>
             <button class="btn-copy-link" id="copyLinkBtn"><i class="fas fa-link"></i> Copy Payment Link</button>
         </div>
         <button class="btn-share-wa" id="whatsappShareBtn"><i class="fab fa-whatsapp"></i> Share QR + Link on WhatsApp</button>
         <p style="font-size: 11px; margin-top: 14px; color: #777;">
             ? Customer can scan QR or click link to pay instantly.<br>
-            ?? Mobile: QR image auto-attached. Desktop: image downloads, attach manually.
+            QR image download होगी; खुली हुई customer chat में इसे attach करें।
         </p>
     </div>
 </div>
@@ -795,7 +791,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260815-3" defer></script>
+<script src="assets/app.js?v=20260817-1" defer></script>
 </body>
 </html>
 
