@@ -3669,8 +3669,6 @@
             else totAmt += rAmt;
         });
 
-        pAmt = calculatePendingDueFromEntries(data);
-
         document.getElementById('statsArea').innerHTML = `
             <div class="stat-pair-card">
                 <div class="stat-pair-item"><h4 style="color:#ee5d50;">Pending / Partial</h4><div class="stat-count" style="color:#ee5d50;">${pCount + partialCount}</div><div class="stat-amount" style="color:#ee5d50;">₹${pAmt.toLocaleString('en-IN')}</div></div>
