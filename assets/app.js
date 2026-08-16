@@ -2847,56 +2847,33 @@
         const idxPurpose = getColIndex('PURPOSE');
         const idxDeal = getColIndex('DEALING AMOUNT');
         const idxRecv = getColIndex('RECEIVED AMOUNT');
-        const groups = new Map();
-        const targetKeys = new Set();
-        const getPendingGroupKey = (row, fallbackIndex) => {
-            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
+        const targets = new Map();
+        let legacyPending = 0;
+        rows.forEach(row => {
+            const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
+            const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
+            if ((status !== 'PENDING' && status !== 'PARTIAL') || purpose.startsWith('PAYMENT AGAINST')) return;
+            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim() : '';
             const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
-            if (invoice) return `${contact}|${invoice}`;
-            // Filtered arrays keep the original row object, so resolve its
-            // stable index from the complete balance source for legacy rows
-            // that do not have an invoice number.
-            const sourceIndex = balanceSourceRows.indexOf(row);
-            return `row:${sourceIndex >= 0 ? sourceIndex : fallbackIndex}`;
-        };
-
-        // The visible/filter rows decide which pending invoices belong in this
-        // KPI. Their balance must still use every supporting payment row, even
-        // when that PAYMENT AGAINST row is hidden by the active status filter.
-        rows.forEach((row, rowIndex) => {
-            const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
-            const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
-            if ((status === 'PENDING' || status === 'PARTIAL') && !purpose.startsWith('PAYMENT AGAINST')) {
-                targetKeys.add(getPendingGroupKey(row, rowIndex));
+            if (!invoice || !contact) {
+                legacyPending += Math.max((parseFloat(row[idxDeal])||0) - (parseFloat(row[idxRecv])||0), 0);
+                return;
             }
+            targets.set(`${contact}|${invoice.toUpperCase()}`, { contact, invoice });
         });
-
-        balanceSourceRows.forEach((row, rowIndex) => {
-            const key = getPendingGroupKey(row, rowIndex);
-            const group = groups.get(key) || { balance: 0 };
-            const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
-            const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
-            const deal = idxDeal !== -1 ? (parseFloat(row[idxDeal]) || 0) : 0;
-            const received = idxRecv !== -1 ? (parseFloat(row[idxRecv]) || 0) : 0;
-
-            if (purpose.startsWith('PAYMENT AGAINST')) {
-                group.balance -= received;
-            } else if (status === 'REFUND' && purpose.startsWith('REFUND AGAINST')) {
-                group.balance += received;
-            } else if (status !== 'FAILED' && status !== 'REFUND') {
-                group.balance += Math.max(deal - received, 0);
+        const stateCache = new Map();
+        let total = legacyPending;
+        targets.forEach(({ contact, invoice }) => {
+            if (!stateCache.has(contact)) {
+                const contactRows = balanceSourceRows.map((row,index) => ({ row,index }))
+                    .filter(item => normalizeContactLedgerKey(item.row[idxContact]) === contact);
+                stateCache.set(contact, buildInvoicePendingState(contactRows));
             }
-            // Match the customer-ledger running calculation exactly. A payment
-            // row must never create a negative due that cancels another entry
-            // encountered later in the source order.
-            group.balance = Math.max(group.balance, 0);
-            groups.set(key, group);
+            const states = stateCache.get(contact);
+            const matched = [...states.entries()].find(([key]) => key.toUpperCase() === invoice.toUpperCase());
+            total += matched ? matched[1].balance : 0;
         });
-
-        return Array.from(groups.entries()).reduce(
-            (sum, [key, group]) => sum + (targetKeys.has(key) ? group.balance : 0),
-            0
-        );
+        return total;
     }
 
     function renderBarRows(items, maxValue, className = '') {
