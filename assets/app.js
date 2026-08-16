@@ -2849,24 +2849,30 @@
         const idxRecv = getColIndex('RECEIVED AMOUNT');
         const groups = new Map();
         const targetKeys = new Set();
+        const getPendingGroupKey = (row, fallbackIndex) => {
+            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
+            const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
+            if (invoice) return `${contact}|${invoice}`;
+            // Filtered arrays keep the original row object, so resolve its
+            // stable index from the complete balance source for legacy rows
+            // that do not have an invoice number.
+            const sourceIndex = balanceSourceRows.indexOf(row);
+            return `row:${sourceIndex >= 0 ? sourceIndex : fallbackIndex}`;
+        };
 
         // The visible/filter rows decide which pending invoices belong in this
         // KPI. Their balance must still use every supporting payment row, even
         // when that PAYMENT AGAINST row is hidden by the active status filter.
         rows.forEach((row, rowIndex) => {
-            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
-            const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
             const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
             const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
             if ((status === 'PENDING' || status === 'PARTIAL') && !purpose.startsWith('PAYMENT AGAINST')) {
-                targetKeys.add(invoice ? `${contact}|${invoice}` : `row:${rowIndex}`);
+                targetKeys.add(getPendingGroupKey(row, rowIndex));
             }
         });
 
         balanceSourceRows.forEach((row, rowIndex) => {
-            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
-            const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
-            const key = invoice ? `${contact}|${invoice}` : `row:${rowIndex}`;
+            const key = getPendingGroupKey(row, rowIndex);
             const group = groups.get(key) || { pendingDeal: 0, paid: 0, refunded: 0 };
             const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
             const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
