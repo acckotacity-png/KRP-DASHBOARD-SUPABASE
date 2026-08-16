@@ -2823,7 +2823,7 @@
 
             // Reminder Bell button visibility conditions
             let reminderButtonHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL') ? 
-                `<button type="button" class="action-btn btn-bell" onclick="sendWhatsAppReminder(${originalIdx})" title="Send WhatsApp Payment Reminder"><i class="fas fa-bell"></i><span class="action-text">Reminder</span></button>` : '';
+                `<button type="button" class="action-btn btn-bell" onclick="sendWhatsAppReminder(${originalIdx})" title="Send WhatsApp Payment Reminder"><i class="fas fa-triangle-exclamation"></i><span class="action-text">Reminder</span></button>` : '';
             let smsReminderButtonHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL') ?
                 `<button type="button" class="action-btn btn-sms" onclick="sendSmsReminder(${originalIdx})" title="Send SMS Payment Reminder"><i class="fas fa-sms"></i><span class="action-text">SMS</span></button>` : '';
             const idActivationSerialNo = getIdActivationSerialNo(originalIdx);
@@ -2858,7 +2858,7 @@
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
                     <div class="action-icons">
-                        <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i><span class="action-text">WhatsApp</span></button>
+                        <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share QR on WhatsApp"><i class="fas fa-qrcode"></i><span class="action-text">QR Share</span></button>
                         ${idActivationButtonHtml}
                         ${activationDoneButtonHtml}
                         ${reminderButtonHtml}
@@ -4130,7 +4130,7 @@
 
         const qrContainer = document.getElementById('qrCodeContainer');
         qrContainer.innerHTML = '';
-        const qrSize = shareMode === 'reminder' ? 160 : 200;
+        const qrSize = 160;
         new QRCode(qrContainer, { text: upiLink, width: qrSize, height: qrSize, correctLevel: QRCode.CorrectLevel.H });
         renderBrandedQrCard(qrContainer, currentQRPayload);
 
@@ -4177,15 +4177,16 @@
         const userRemarks = document.getElementById('whatsappRemarks').value.trim();
         const remarksText = userRemarks ? `\nRemarks: ${userRemarks}` : '';
         const bizName = localStorage.getItem('biz_name') || 'KRP ID Activation';
+        const oneLine = value => String(value || '').replace(/\s+/g, ' ').trim();
         return `*PENDING PAYMENT REMINDER*\n\n` +
-            `*${bizName.toUpperCase()}*\n` +
-            `Mobile No: ${payload.mobileNo}\n` +
-            `Name: ${payload.contactName}\n` +
-            `Work: ${payload.purpose}\n` +
+            `*${oneLine(bizName).toUpperCase()}*\n` +
+            `Mobile No: ${oneLine(payload.mobileNo)}\n` +
+            `Name: ${oneLine(payload.contactName)}\n` +
+            `Work: ${oneLine(payload.purpose)}\n\n` +
             `Total Amount: Rs. ${payload.totalDeal.toLocaleString('en-IN')}\n` +
             `Paid Amount: Rs. ${payload.receivedAmt.toLocaleString('en-IN')}\n` +
-            `*DUE AMOUNT: Rs. ${payload.dueAmt.toLocaleString('en-IN')}*\n` +
-            `UPI ID: ${payload.upiId}` +
+            `*DUE AMOUNT: Rs. ${payload.dueAmt.toLocaleString('en-IN')}*\n\n` +
+            `UPI ID: ${oneLine(payload.upiId)}` +
             `${remarksText}\n\n` +
             `Instant Payment Link:\n${payload.upiLink}\n\n` +
             `Please clear the pending payment by clicking the link or scanning the QR code.\n\n` +
@@ -4194,13 +4195,16 @@
     function buildCurrentWhatsAppShareMessage() {
         if (!currentQRPayload) return '';
         const p = currentQRPayload;
+        const oneLine = value => String(value || '').replace(/\s+/g, ' ').trim();
         const userRemarks = document.getElementById('whatsappRemarks').value.trim();
         const remarksText = userRemarks ? `\nRemarks: ${userRemarks}` : '';
         const messageText =
             `*PAYMENT REQUEST*\n\n` +
             `*KRP ID ACTIVATION*\n` +
-            `Customer: ${p.contactName}\n` +
-            `Amount: Rs. ${parseFloat(p.dealingAmt).toLocaleString('en-IN')}\n` +
+            `Mobile No: ${oneLine(p.mobileNo)}\n` +
+            `Name: ${oneLine(p.contactName)}\n` +
+            `Work: ${oneLine(p.purpose)}\n\n` +
+            `Total Amount: Rs. ${parseFloat(p.dealingAmt).toLocaleString('en-IN')}\n\n` +
             `UPI ID: ${p.upiId}` +
             `${remarksText}\n\n` +
             `Direct Payment Link:\n${p.upiLink}\n\n` +
