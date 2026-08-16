@@ -1626,6 +1626,24 @@
         return stateByInvoice;
     }
 
+    function buildTrackerInvoicePendingMap() {
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const contacts = new Map();
+        currentData.forEach((row,index) => {
+            const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
+            if (!contact) return;
+            if (!contacts.has(contact)) contacts.set(contact, []);
+            contacts.get(contact).push({ row,index });
+        });
+        const pendingByMainIndex = new Map();
+        contacts.forEach(items => {
+            buildInvoicePendingState(items).forEach(state => {
+                if (state.mainIndex !== null) pendingByMainIndex.set(state.mainIndex, state.balance);
+            });
+        });
+        return pendingByMainIndex;
+    }
+
     function renderContactLedger(contactKey, contactText = activeLedgerTitle) {
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
         document.querySelector('#contactLedgerModal .ledger-table-wrapper')?.classList.add('main-ledger-fit');
@@ -2759,7 +2777,8 @@
 
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
 
-        updateStats(filtered);
+        const invoicePendingByIndex = buildTrackerInvoicePendingMap();
+        updateStats(filtered, invoicePendingByIndex);
 
         if (!filtered.length) {
             document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">📭 No records found</td></tr>';
@@ -2776,12 +2795,20 @@
             const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
             const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
             let statusVal  = row[idxStatus]?.toString().toUpperCase() || 'PENDING';
+            const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
+            const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
+            if (isSupportingPayment) {
+                statusVal = 'SUPPORTING';
+            } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(statusVal)) {
+                statusVal = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
+            }
             let badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
                              statusVal === 'FAILED'  ? 'badge-failed'  :
                              statusVal === 'REFUND'  ? 'badge-refund'  :
-                             statusVal === 'ADVANCE' ? 'badge-advance' : 
+                             (statusVal === 'ADVANCE' || statusVal === 'SUPPORTING') ? 'badge-advance' : 
                              statusVal === 'PARTIAL' ? 'badge-partial' : 'badge-pending';
-            const displayedPendingAmount = getTrackerDisplayedPendingAmount(row);
+            const displayedPendingAmount = statusVal === 'PENDING' || statusVal === 'PARTIAL'
+                ? (finalInvoicePending !== undefined ? finalInvoicePending : getTrackerDisplayedPendingAmount(row)) : 0;
             const pendingAmountHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL')
                 ? `<small class="tracker-pending-amount">Amt Pending: ₹${displayedPendingAmount.toLocaleString('en-IN')}</small>` : '';
             let dateDisplay = formatDisplayDate(row[idxDate]);
@@ -3637,7 +3664,7 @@
         showMessage('New record added to Records Tracker', 'success');
     }
 
-    function updateStats(data) {
+    function updateStats(data, invoicePendingByIndex = buildTrackerInvoicePendingMap()) {
         const idxStatus  = getColIndex('PAYMENT STATUS');
         const idxRecv    = getColIndex('RECEIVED AMOUNT');
         const idxDealing = getColIndex('DEALING AMOUNT');
@@ -3650,6 +3677,14 @@
         let totCount=data.length,totAmt=0,setupCount=0,setupAmt=0,idCount=0,idActAmt=0, totalDueAmt=0;
         data.forEach(row => {
             let status  = row[idxStatus]?.toString().toUpperCase() || '';
+            const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
+            const originalIdx = currentData.indexOf(row);
+            const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
+            if (isSupportingPayment) {
+                status = 'SUPPORTING';
+            } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(status)) {
+                status = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
+            }
             let rAmt    = parseFloat(row[idxRecv])    || 0;
             let dAmt    = parseFloat(row[idxDealing]) || 0;
             let supAmt  = parseFloat(row[idxSetup])   || 0;
@@ -3672,7 +3707,8 @@
                 }
             }
 
-            const remainingDue = getTrackerDisplayedPendingAmount(row);
+            const remainingDue = (status === 'PENDING' || status === 'PARTIAL')
+                ? (finalInvoicePending !== undefined ? finalInvoicePending : getTrackerDisplayedPendingAmount(row)) : 0;
             if      (status === 'PENDING') { pCount++;   pAmt += remainingDue; totAmt += dAmt; }
             else if (status === 'PARTIAL') { partialCount++; pAmt += remainingDue; sAmt += rAmt; totAmt += rAmt; }
             else if (status === 'SUCCESS') { sCount++;   sAmt   += rAmt; totAmt += rAmt; }
