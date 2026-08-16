@@ -2840,7 +2840,7 @@
         return 'Rs. ' + (parseFloat(value) || 0).toLocaleString('en-IN');
     }
 
-    function calculatePendingDueFromEntries(rows) {
+    function calculatePendingDueFromEntries(rows, balanceSourceRows = currentData) {
         const idxInv = getColIndex('INVOICE NO.');
         const idxContact = getColIndex('CONTACT NO. OR NAME');
         const idxStatus = getColIndex('PAYMENT STATUS');
@@ -2848,8 +2848,22 @@
         const idxDeal = getColIndex('DEALING AMOUNT');
         const idxRecv = getColIndex('RECEIVED AMOUNT');
         const groups = new Map();
+        const targetKeys = new Set();
 
+        // The visible/filter rows decide which pending invoices belong in this
+        // KPI. Their balance must still use every supporting payment row, even
+        // when that PAYMENT AGAINST row is hidden by the active status filter.
         rows.forEach((row, rowIndex) => {
+            const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
+            const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
+            const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
+            const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
+            if ((status === 'PENDING' || status === 'PARTIAL') && !purpose.startsWith('PAYMENT AGAINST')) {
+                targetKeys.add(invoice ? `${contact}|${invoice}` : `row:${rowIndex}`);
+            }
+        });
+
+        balanceSourceRows.forEach((row, rowIndex) => {
             const invoice = idxInv !== -1 ? showSheetText(row[idxInv]).trim().toUpperCase() : '';
             const contact = idxContact !== -1 ? normalizeContactLedgerKey(row[idxContact]) : '';
             const key = invoice ? `${contact}|${invoice}` : `row:${rowIndex}`;
@@ -2869,8 +2883,8 @@
             groups.set(key, group);
         });
 
-        return Array.from(groups.values()).reduce(
-            (sum, group) => sum + Math.max(group.pendingDeal - group.paid + group.refunded, 0),
+        return Array.from(groups.entries()).reduce(
+            (sum, [key, group]) => sum + (targetKeys.has(key) ? Math.max(group.pendingDeal - group.paid + group.refunded, 0) : 0),
             0
         );
     }
