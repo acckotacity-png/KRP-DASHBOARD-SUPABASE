@@ -4016,45 +4016,57 @@
             return;
         }
 
-        const upiId      = document.getElementById('globalUpiId').value.trim() || '9521867142-5@ybl';
+        const configuredUpiId = document.getElementById('globalUpiId').value.trim();
+        if (shareMode === 'reminder' && !configuredUpiId) {
+            showMessage('Settings में UPI ID save करें', 'error');
+            return;
+        }
+        const upiId      = configuredUpiId || '9521867142-5@ybl';
         const payeeName   = document.getElementById('merchantAccountHolder').value.trim() || document.getElementById('bizName').value.trim() || 'KRP ID Activation';
-        const contactName= showSheetText(record[getColIndex('CONTACT NO. OR NAME')]).trim() || 'Customer';
-        const contactPhone = normalizeWhatsAppPhone(contactName);
+        const contactValue = showSheetText(record[getColIndex('CONTACT NO. OR NAME')]).trim();
+        const contactPhone = normalizeWhatsAppPhone(contactValue);
+        const mobileNo = contactPhone ? formatWhatsAppPhone(contactPhone) : (contactValue || '-');
+        const customerName = showSheetText(record[getColIndex('CUSTOMER NAME')]).trim() || (contactPhone ? 'Customer' : contactValue) || 'Customer';
         const dealingAmtNum = parseFloat(record[getColIndex('DEALING AMOUNT')] || 0) || 0;
-        const receivedAmtNum = parseFloat(record[getColIndex('RECEIVED AMOUNT')] || 0) || 0;
-        const dueAmtNum = Math.max(dealingAmtNum - receivedAmtNum, 0);
+        const rawReceivedAmtNum = parseFloat(record[getColIndex('RECEIVED AMOUNT')] || 0) || 0;
+        const finalInvoicePending = buildTrackerInvoicePendingMap().get(rowIndex);
+        const dueAmtNum = shareMode === 'reminder' && finalInvoicePending !== undefined
+            ? finalInvoicePending : Math.max(dealingAmtNum - rawReceivedAmtNum, 0);
+        const receivedAmtNum = shareMode === 'reminder' ? Math.max(dealingAmtNum - dueAmtNum, 0) : rawReceivedAmtNum;
         const payableAmt = shareMode === 'reminder' ? dueAmtNum : dealingAmtNum;
         const dealingAmt = payableAmt.toFixed(2);
         const invoice    = record[getColIndex('INVOICE NO.')] || 'INV';
         const purpose    = record[getColIndex('PURPOSE')] || 'Payment';
 
-        const upiNote = shareMode === 'reminder' ? `DUE-${invoice}` : purpose;
-        const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${dealingAmt}&cu=INR&tn=${encodeURIComponent(upiNote)}&tr=${invoice}`;
+        const upiNote = shareMode === 'reminder' ? 'Pending Payment' : purpose;
+        const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${dealingAmt}&cu=INR&tn=${encodeURIComponent(upiNote)}` +
+            (shareMode === 'reminder' ? '' : `&tr=${encodeURIComponent(invoice)}`);
 
         currentQRPayload = {
-            upiId, contactName, contactPhone, dealingAmt, invoice, purpose, upiLink, shareMode,
+            upiId, contactName:customerName, mobileNo, contactPhone, dealingAmt, invoice, purpose, upiLink, shareMode,
             totalDeal: dealingAmtNum, receivedAmt: receivedAmtNum, dueAmt: dueAmtNum
         };
 
         const qrContainer = document.getElementById('qrCodeContainer');
         qrContainer.innerHTML = '';
-        new QRCode(qrContainer, { text: upiLink, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.H });
-
-        document.getElementById('qrAmountDesc').innerHTML =
-            `🧾 <strong>Invoice:</strong> ${invoice}<br>` +
-            `👤 <strong>Customer:</strong> ${contactName}<br>` +
-            `💰 <strong>Amount:</strong> ₹${parseFloat(dealingAmt).toLocaleString('en-IN')}<br>` +
-            `📱 <strong>UPI ID:</strong> ${upiId}<br>` +
-            `📌 <strong>Purpose:</strong> ${purpose}`;
+        const qrSize = shareMode === 'reminder' ? 160 : 200;
+        new QRCode(qrContainer, { text: upiLink, width: qrSize, height: qrSize, correctLevel: QRCode.CorrectLevel.H });
 
         const recordRemarks = record[getColIndex('REMARKS')] || '';
         document.getElementById('qrShareTitle').textContent = shareMode === 'reminder' ? 'Share Pending Payment Reminder' : 'Share Payment Request';
-        document.getElementById('qrAmountDesc').innerHTML =
-            `<strong>Invoice:</strong> ${escapeHtml(invoice)}<br>` +
-            `<strong>Customer:</strong> ${escapeHtml(contactName)}<br>` +
-            `<strong>${shareMode === 'reminder' ? 'Balance Due' : 'Amount'}:</strong> Rs. ${parseFloat(dealingAmt).toLocaleString('en-IN')}<br>` +
-            `<strong>UPI ID:</strong> ${escapeHtml(upiId)}<br>` +
-            `<strong>Purpose:</strong> ${escapeHtml(purpose)}`;
+        document.getElementById('qrAmountDesc').innerHTML = shareMode === 'reminder'
+            ? `<strong>Mobile No.:</strong> ${escapeHtml(mobileNo)}<br>` +
+              `<strong>Name:</strong> ${escapeHtml(customerName)}<br>` +
+              `<strong>Work:</strong> ${escapeHtml(purpose)}<br>` +
+              `<strong>Total Amount:</strong> Rs. ${dealingAmtNum.toLocaleString('en-IN')}<br>` +
+              `<strong>Paid Amount:</strong> Rs. ${receivedAmtNum.toLocaleString('en-IN')}<br>` +
+              `<strong>Due Amount:</strong> Rs. ${dueAmtNum.toLocaleString('en-IN')}<br>` +
+              `<strong>UPI ID:</strong> ${escapeHtml(upiId)}`
+            : `<strong>Invoice:</strong> ${escapeHtml(invoice)}<br>` +
+              `<strong>Customer:</strong> ${escapeHtml(customerName)}<br>` +
+              `<strong>Amount:</strong> Rs. ${parseFloat(dealingAmt).toLocaleString('en-IN')}<br>` +
+              `<strong>UPI ID:</strong> ${escapeHtml(upiId)}<br>` +
+              `<strong>Purpose:</strong> ${escapeHtml(purpose)}`;
 
         const contactRadio = document.getElementById('waTargetContact');
         const customRadio = document.getElementById('waTargetCustom');
@@ -4085,12 +4097,13 @@
         const bizName = localStorage.getItem('biz_name') || 'KRP ID Activation';
         return `*PENDING PAYMENT REMINDER*\n\n` +
             `*${bizName.toUpperCase()}*\n` +
-            `Invoice No: ${payload.invoice}\n` +
-            `Customer: ${payload.contactName}\n` +
+            `Mobile No: ${payload.mobileNo}\n` +
+            `Name: ${payload.contactName}\n` +
             `Work: ${payload.purpose}\n` +
-            `Total Deal Amt: Rs. ${payload.totalDeal.toLocaleString('en-IN')}\n` +
-            `Amount Paid: Rs. ${payload.receivedAmt.toLocaleString('en-IN')}\n` +
-            `*BALANCE DUE: Rs. ${payload.dueAmt.toLocaleString('en-IN')}*` +
+            `Total Amount: Rs. ${payload.totalDeal.toLocaleString('en-IN')}\n` +
+            `Paid Amount: Rs. ${payload.receivedAmt.toLocaleString('en-IN')}\n` +
+            `*DUE AMOUNT: Rs. ${payload.dueAmt.toLocaleString('en-IN')}*\n` +
+            `UPI ID: ${payload.upiId}` +
             `${remarksText}\n\n` +
             `Instant Payment Link:\n${payload.upiLink}\n\n` +
             `Please clear the pending payment by clicking the link or scanning the QR code.\n\n` +
@@ -4173,7 +4186,8 @@
             showMessage('Failed to process QR image', 'error');
             return;
         }
-        const file = new File([blob], `QR_${p.invoice}.png`, { type: 'image/png' });
+        const qrFileKey = p.shareMode === 'reminder' ? 'Pending_Payment' : p.invoice;
+        const file = new File([blob], `QR_${qrFileKey}.png`, { type: 'image/png' });
 
         let canShareFiles = false;
         try {
@@ -4193,13 +4207,13 @@
                 .catch(err => {
                     if (err.name !== 'AbortError') {
                         console.warn('Native share failed, using fallback:', err);
-                        desktopFallback(blob, shareMessageText, p.invoice);
+                        desktopFallback(blob, shareMessageText, qrFileKey);
                     }
                 });
             return;
         }
 
-        desktopFallback(blob, shareMessageText, p.invoice);
+        desktopFallback(blob, shareMessageText, qrFileKey);
     }
 
     function desktopFallback(blob, messageText, invoice) {
