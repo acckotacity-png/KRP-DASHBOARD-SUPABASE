@@ -2781,6 +2781,9 @@
                              statusVal === 'REFUND'  ? 'badge-refund'  :
                              statusVal === 'ADVANCE' ? 'badge-advance' : 
                              statusVal === 'PARTIAL' ? 'badge-partial' : 'badge-pending';
+            const displayedPendingAmount = getTrackerDisplayedPendingAmount(row);
+            const pendingAmountHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL')
+                ? `<small class="tracker-pending-amount">Amt Pending: ₹${displayedPendingAmount.toLocaleString('en-IN')}</small>` : '';
             let dateDisplay = formatDisplayDate(row[idxDate]);
 
             // Reminder Bell button visibility conditions
@@ -2815,7 +2818,7 @@
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Contact / Login ID">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
-                <td data-label="Status"><span class="badge ${badgeClass}">${statusVal}</span></td>
+                <td data-label="Status"><div class="tracker-status-with-amount"><span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}</div></td>
                 <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
@@ -2838,6 +2841,15 @@
 
     function formatMoney(value) {
         return 'Rs. ' + (parseFloat(value) || 0).toLocaleString('en-IN');
+    }
+
+    function getTrackerDisplayedPendingAmount(row) {
+        const idxStatus = getColIndex('PAYMENT STATUS');
+        const idxDeal = getColIndex('DEALING AMOUNT');
+        const idxReceived = getColIndex('RECEIVED AMOUNT');
+        const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
+        if (status !== 'PENDING' && status !== 'PARTIAL') return 0;
+        return Math.max((parseFloat(row[idxDeal]) || 0) - (parseFloat(row[idxReceived]) || 0), 0);
     }
 
     function calculatePendingDueFromEntries(rows, balanceSourceRows = currentData) {
@@ -3660,7 +3672,7 @@
                 }
             }
 
-            const remainingDue = Math.max(dAmt - rAmt, 0);
+            const remainingDue = getTrackerDisplayedPendingAmount(row);
             if      (status === 'PENDING') { pCount++;   pAmt += remainingDue; totAmt += dAmt; }
             else if (status === 'PARTIAL') { partialCount++; pAmt += remainingDue; sAmt += rAmt; totAmt += rAmt; }
             else if (status === 'SUCCESS') { sCount++;   sAmt   += rAmt; totAmt += rAmt; }
