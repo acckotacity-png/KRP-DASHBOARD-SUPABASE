@@ -2873,24 +2873,28 @@
 
         balanceSourceRows.forEach((row, rowIndex) => {
             const key = getPendingGroupKey(row, rowIndex);
-            const group = groups.get(key) || { pendingDeal: 0, paid: 0, refunded: 0 };
+            const group = groups.get(key) || { balance: 0 };
             const status = idxStatus !== -1 ? showSheetText(row[idxStatus]).trim().toUpperCase() : '';
             const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
             const deal = idxDeal !== -1 ? (parseFloat(row[idxDeal]) || 0) : 0;
             const received = idxRecv !== -1 ? (parseFloat(row[idxRecv]) || 0) : 0;
 
             if (purpose.startsWith('PAYMENT AGAINST')) {
-                group.paid += received;
+                group.balance -= received;
             } else if (status === 'REFUND' && purpose.startsWith('REFUND AGAINST')) {
-                group.refunded += received;
+                group.balance += received;
             } else if (status !== 'FAILED' && status !== 'REFUND') {
-                group.pendingDeal += Math.max(deal - received, 0);
+                group.balance += Math.max(deal - received, 0);
             }
+            // Match the customer-ledger running calculation exactly. A payment
+            // row must never create a negative due that cancels another entry
+            // encountered later in the source order.
+            group.balance = Math.max(group.balance, 0);
             groups.set(key, group);
         });
 
         return Array.from(groups.entries()).reduce(
-            (sum, [key, group]) => sum + (targetKeys.has(key) ? Math.max(group.pendingDeal - group.paid + group.refunded, 0) : 0),
+            (sum, [key, group]) => sum + (targetKeys.has(key) ? group.balance : 0),
             0
         );
     }
