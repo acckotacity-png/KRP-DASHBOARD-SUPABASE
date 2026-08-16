@@ -2760,9 +2760,18 @@
         const idxLogin   = getColIndex('LOGIN ID');
         const idxCreatedBy = getColIndex('CREATED BY');
         const idxTimestamp = getColIndex('Timestamp');
+        const invoicePendingByIndex = buildTrackerInvoicePendingMap();
 
         let filtered = currentData.filter(row => {
-            if (filters.statusF !== 'all' && idxStatus !== -1 && (row[idxStatus]?.toString().toUpperCase() || '') !== filters.statusF) return false;
+            if (filters.statusF !== 'all' && idxStatus !== -1) {
+                const originalIdx = currentData.indexOf(row);
+                const purpose = idxPurpose !== -1 ? showSheetText(row[idxPurpose]).trim().toUpperCase() : '';
+                let effectiveStatus = showSheetText(row[idxStatus]).trim().toUpperCase();
+                const balance = invoicePendingByIndex.get(originalIdx);
+                if (purpose.startsWith('PAYMENT AGAINST')) effectiveStatus = '';
+                else if (balance !== undefined && !['FAILED','REFUND','ADVANCE'].includes(effectiveStatus)) effectiveStatus = balance > 0 ? 'PENDING' : 'SUCCESS';
+                if (effectiveStatus !== filters.statusF) return false;
+            }
             if (!shouldIncludeByDate(row, idxDate, filters)) return false;
             if (filters.term && !row.some(cell => cell && cell.toString().toLowerCase().includes(filters.term))) return false;
             return true;
@@ -2777,7 +2786,6 @@
 
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
 
-        const invoicePendingByIndex = buildTrackerInvoicePendingMap();
         updateStats(filtered, invoicePendingByIndex);
 
         if (!filtered.length) {
@@ -2794,12 +2802,12 @@
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
             const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
             const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
-            let statusVal  = row[idxStatus]?.toString().toUpperCase() || 'PENDING';
+            let statusVal  = row[idxStatus]?.toString().trim().toUpperCase() || 'PENDING';
             const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
             const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
             if (isSupportingPayment) {
                 statusVal = '';
-            } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(statusVal)) {
+            } else if (finalInvoicePending !== undefined && !['FAILED','REFUND','ADVANCE'].includes(statusVal)) {
                 statusVal = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
             }
             let badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
@@ -3676,13 +3684,13 @@
         let pCount=0,pAmt=0,sCount=0,sAmt=0,advCount=0,advAmt=0,refCount=0,refAmt=0, partialCount=0;
         let totCount=data.length,totAmt=0,setupCount=0,setupAmt=0,idCount=0,idActAmt=0, totalDueAmt=0;
         data.forEach(row => {
-            let status  = row[idxStatus]?.toString().toUpperCase() || '';
+            let status  = row[idxStatus]?.toString().trim().toUpperCase() || '';
             const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
             const originalIdx = currentData.indexOf(row);
             const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
             if (isSupportingPayment) {
                 status = '';
-            } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(status)) {
+            } else if (finalInvoicePending !== undefined && !['FAILED','REFUND','ADVANCE'].includes(status)) {
                 status = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
             }
             let rAmt    = parseFloat(row[idxRecv])    || 0;
