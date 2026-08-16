@@ -2798,14 +2798,14 @@
             const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
             const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
             if (isSupportingPayment) {
-                statusVal = 'SUPPORTING';
+                statusVal = '';
             } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(statusVal)) {
                 statusVal = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
             }
             let badgeClass = statusVal === 'SUCCESS' ? 'badge-success' :
                              statusVal === 'FAILED'  ? 'badge-failed'  :
                              statusVal === 'REFUND'  ? 'badge-refund'  :
-                             (statusVal === 'ADVANCE' || statusVal === 'SUPPORTING') ? 'badge-advance' : 
+                             statusVal === 'ADVANCE' ? 'badge-advance' : 
                              statusVal === 'PARTIAL' ? 'badge-partial' : 'badge-pending';
             const displayedPendingAmount = statusVal === 'PENDING' || statusVal === 'PARTIAL'
                 ? (finalInvoicePending !== undefined ? finalInvoicePending : getTrackerDisplayedPendingAmount(row)) : 0;
@@ -2845,7 +2845,7 @@
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Contact / Login ID">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
-                <td data-label="Status"><div class="tracker-status-with-amount"><span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}</div></td>
+                <td data-label="Status"><div class="tracker-status-with-amount">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
                 <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">
@@ -3681,7 +3681,7 @@
             const originalIdx = currentData.indexOf(row);
             const finalInvoicePending = invoicePendingByIndex.get(originalIdx);
             if (isSupportingPayment) {
-                status = 'SUPPORTING';
+                status = '';
             } else if (finalInvoicePending !== undefined && ['SUCCESS','PENDING','PARTIAL'].includes(status)) {
                 status = finalInvoicePending > 0 ? 'PENDING' : 'SUCCESS';
             }
