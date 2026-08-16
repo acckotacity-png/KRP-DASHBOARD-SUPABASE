@@ -232,20 +232,43 @@ if (singleSessionEnabled) {
 }
 
 let idleTimer;
-const idleMs = Math.max(1, Number(AUTH_OPTIONS.idleLogoutMinutes) || 5) * 60 * 1000;
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  if (document.visibilityState === "hidden") return;
-  idleTimer = setTimeout(() => window.logoutKrpDashboard(), idleMs);
+let lastActivityWrite = 0;
+const idleMs = Math.max(1, Number(AUTH_OPTIONS.idleLogoutMinutes) || 60) * 60 * 1000;
+const lastActivityKey = `krp_last_activity_${session.user.id}_${deviceType}_${activeSessionToken}`;
+
+function readLastActivity() {
+  const stored = Number(sessionStorage.getItem(lastActivityKey));
+  return Number.isFinite(stored) && stored > 0 ? stored : Date.now();
 }
-["click", "keydown", "touchstart", "pointerdown", "scroll"].forEach(eventName =>
-  addEventListener(eventName, resetIdleTimer, { passive: true })
+
+function scheduleIdleCheck() {
+  clearTimeout(idleTimer);
+  const remainingMs = idleMs - (Date.now() - readLastActivity());
+  if (remainingMs <= 0) {
+    window.logoutKrpDashboard("idle");
+    return;
+  }
+  idleTimer = setTimeout(scheduleIdleCheck, Math.min(remainingMs, 30000));
+}
+
+function recordActivity() {
+  const now = Date.now();
+  if (now - lastActivityWrite < 1000) return;
+  lastActivityWrite = now;
+  sessionStorage.setItem(lastActivityKey, String(now));
+  scheduleIdleCheck();
+}
+
+if (!sessionStorage.getItem(lastActivityKey)) {
+  sessionStorage.setItem(lastActivityKey, String(Date.now()));
+}
+
+["click", "keydown", "touchstart", "pointerdown", "pointermove", "scroll"].forEach(eventName =>
+  addEventListener(eventName, recordActivity, { passive: true })
 );
-resetIdleTimer();
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") clearTimeout(idleTimer);
-  else resetIdleTimer();
-});
+addEventListener("focus", scheduleIdleCheck);
+document.addEventListener("visibilitychange", scheduleIdleCheck);
+scheduleIdleCheck();
 
 client.auth.onAuthStateChange((event, nextSession) => {
   if (event === "SIGNED_OUT" || !nextSession) location.replace(AUTH_OPTIONS.loginPage);
