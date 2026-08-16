@@ -4005,6 +4005,86 @@
         }
     }
 
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + width, y, x + width, y + height, r);
+        ctx.arcTo(x + width, y + height, x, y + height, r);
+        ctx.arcTo(x, y + height, x, y, r);
+        ctx.arcTo(x, y, x + width, y, r);
+        ctx.closePath();
+    }
+
+    function renderBrandedQrCard(qrContainer, payload) {
+        const source = qrContainer.querySelector('canvas');
+        if (!source) return;
+        const scale = 2, width = 320, height = 440;
+        const card = document.createElement('canvas');
+        card.width = width * scale;
+        card.height = height * scale;
+        card.dataset.brandedQr = '1';
+        card.style.width = '260px';
+        card.style.maxWidth = '100%';
+        card.style.height = 'auto';
+        const ctx = card.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        drawRoundedRect(ctx, 3, 3, width - 6, height - 6, 12);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#087a4b';
+        ctx.stroke();
+
+        ctx.fillStyle = '#087a4b';
+        ctx.beginPath();
+        ctx.arc(width / 2, 35, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 23px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('₹', width / 2, 43);
+        ctx.fillStyle = '#172033';
+        ctx.font = '800 19px Arial';
+        ctx.fillText(payload.businessName || 'KRP PAYMENT', width / 2, 72);
+        ctx.fillStyle = '#087a4b';
+        ctx.font = '800 12px Arial';
+        ctx.fillText('UPI ACCEPTED HERE', width / 2, 96);
+        ctx.fillStyle = '#4b5563';
+        ctx.font = '11px Arial';
+        ctx.fillText('Scan using any UPI payment app', width / 2, 116);
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(source, 55, 132, 210, 210);
+        ctx.imageSmoothingEnabled = true;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(width / 2, 237, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#087a4b';
+        ctx.beginPath();
+        ctx.arc(width / 2, 237, 17, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 19px Arial';
+        ctx.fillText('₹', width / 2, 244);
+        ctx.fillStyle = '#172033';
+        ctx.font = '800 12px Arial';
+        ctx.fillText(`Pay: Rs. ${Number(payload.dealingAmt || 0).toLocaleString('en-IN')}`, width / 2, 365);
+        ctx.fillStyle = '#374151';
+        ctx.font = '700 11px Arial';
+        ctx.fillText(payload.payeeName || 'KRP ID Activation', width / 2, 386);
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '10px Arial';
+        ctx.fillText(`UPI ID: ${payload.upiId}`, width / 2, 405);
+        ctx.fillStyle = '#087a4b';
+        ctx.font = '800 9px Arial';
+        ctx.fillText('SECURE UPI PAYMENT', width / 2, 425);
+
+        qrContainer.innerHTML = '';
+        qrContainer.appendChild(card);
+    }
+
     async function openQRAndShare(rowIndex, shareMode = 'payment') {
         const record = currentData[rowIndex];
         if (!record) return;
@@ -4042,8 +4122,9 @@
         const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${dealingAmt}&cu=INR&tn=${encodeURIComponent(upiNote)}` +
             (shareMode === 'reminder' ? '' : `&tr=${encodeURIComponent(invoice)}`);
 
+        const businessName = document.getElementById('bizName').value.trim() || localStorage.getItem('biz_name') || 'KRP PAYMENT';
         currentQRPayload = {
-            upiId, contactName:customerName, mobileNo, contactPhone, dealingAmt, invoice, purpose, upiLink, shareMode,
+            upiId, payeeName, businessName, contactName:customerName, mobileNo, contactPhone, dealingAmt, invoice, purpose, upiLink, shareMode,
             totalDeal: dealingAmtNum, receivedAmt: receivedAmtNum, dueAmt: dueAmtNum
         };
 
@@ -4051,6 +4132,7 @@
         qrContainer.innerHTML = '';
         const qrSize = shareMode === 'reminder' ? 160 : 200;
         new QRCode(qrContainer, { text: upiLink, width: qrSize, height: qrSize, correctLevel: QRCode.CorrectLevel.H });
+        renderBrandedQrCard(qrContainer, currentQRPayload);
 
         const recordRemarks = record[getColIndex('REMARKS')] || '';
         document.getElementById('qrShareTitle').textContent = shareMode === 'reminder' ? 'Share Pending Payment Reminder' : 'Share Payment Request';
