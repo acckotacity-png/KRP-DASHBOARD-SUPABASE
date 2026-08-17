@@ -689,6 +689,25 @@ html.krp-dark-theme #headerSettingsHub .modal-content,html.krp-dark-theme #purpo
 html.krp-dark-theme #purposeManagerModal input,html.krp-dark-theme #purposeManagerModal select,html.krp-dark-theme #settingsModal input,html.krp-dark-theme #settingsModal select,html.krp-dark-theme #settingsModal textarea,html.krp-dark-theme #upiModal input,html.krp-dark-theme #upiModal select,html.krp-dark-theme #upiModal textarea{background:#091925!important;color:#d5e0e7!important;border-color:#294652!important;box-shadow:inset 1px 1px 3px rgba(0,0,0,.18)!important}
 html.krp-dark-theme #purposeManagerModal select,html.krp-dark-theme #settingsModal select,html.krp-dark-theme #upiModal select{color-scheme:dark!important}
 html.krp-dark-theme #purposeManagerModal option,html.krp-dark-theme #settingsModal option,html.krp-dark-theme #upiModal option{background:#091925!important;color:#d5e0e7!important}
+#headerSettingsHub .settings-hub-option{background:#e9efeb!important;color:#263d34!important;border-color:#cbd9d1!important;box-shadow:0 3px 9px rgba(35,57,48,.07)!important}
+#headerSettingsHub .settings-hub-option i{color:#168b5c!important}
+#headerSettingsHub .settings-hub-option:hover{background:#dceae2!important;border-color:#9fc2ae!important}
+#purposeManagerModal .purpose-manager-section{background:#edf2ef!important;border-color:#c7d7cf!important;color:#263d34!important}
+#purposeManagerModal .purpose-manager-row{background:#f8faf9!important;border-color:#d4dfd9!important}
+#purposeManagerModal .purpose-manager-name{color:#263d34!important}
+#purposeManagerModal .purpose-manager-name small{color:#6f8279!important}
+#purposeManagerModal .purpose-manager-actions button{opacity:1!important}
+html.krp-dark-theme #headerSettingsHub .settings-hub-option{background:#152e3a!important;color:#d8e6df!important;border-color:#31505d!important;box-shadow:none!important}
+html.krp-dark-theme #headerSettingsHub .settings-hub-option i{color:#58d09a!important}
+html.krp-dark-theme #headerSettingsHub .settings-hub-option:hover{background:#1b3945!important;border-color:#3b6571!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-section{background:#0d202a!important;border-color:#426272!important;color:#d8e6df!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-row{background:#152b37!important;border-color:#294a59!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-name{color:#e1ece7!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-name small{color:#91a9b5!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-actions button{opacity:1!important;filter:none!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-actions button:nth-child(1){background:#173b50!important;color:#70bfe8!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-actions button:nth-child(2){background:#173d31!important;color:#75d4a4!important}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-actions button:nth-child(3){background:#48252b!important;color:#ff929d!important}
 @media(max-width:520px){.settings-back-btn{padding:5px 7px!important;margin-right:4px!important}.settings-back-btn span{display:none!important}.modal-header>span{font-size:12px!important}}
 
 @media(max-width:850px){
