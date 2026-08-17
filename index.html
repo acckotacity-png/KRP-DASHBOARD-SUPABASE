@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=36">
+    <link rel="stylesheet" href="theme.css?v=37">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -612,6 +612,7 @@
 <div id="purposeManagerModal" class="modal-overlay">
     <div class="modal-content" style="max-width:620px;">
         <div class="modal-header">
+            <button type="button" class="settings-back-btn" onclick="backToHeaderSettingsHub('purposeManagerModal')" aria-label="Back to Settings Menu"><i class="fas fa-arrow-left"></i><span>Back</span></button>
             <span><i class="fas fa-list-check"></i> Dropdown Settings Manager</span>
             <i class="fas fa-times close-modal" onclick="closePurposeManager()"></i>
         </div>
@@ -642,6 +643,7 @@
 <div id="settingsModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header">
+            <button type="button" class="settings-back-btn" onclick="backToHeaderSettingsHub('settingsModal')" aria-label="Back to Settings Menu"><i class="fas fa-arrow-left"></i><span>Back</span></button>
             <span><i class="fas fa-sliders-h"></i> Business Settings</span>
             <i class="fas fa-times close-modal" onclick="closeSettingsModal()"></i>
         </div>
@@ -660,6 +662,7 @@
 <div id="upiModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 420px;">
         <div class="modal-header">
+            <button type="button" class="settings-back-btn" onclick="backToHeaderSettingsHub('upiModal')" aria-label="Back to Settings Menu"><i class="fas fa-arrow-left"></i><span>Back</span></button>
             <span><i class="fas fa-wallet"></i> Payment Settings</span>
             <i class="fas fa-times close-modal" onclick="closeUpiModal()"></i>
         </div>
@@ -791,7 +794,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260817-1" defer></script>
+<script src="assets/app.js?v=20260817-2" defer></script>
 </body>
 </html>
 

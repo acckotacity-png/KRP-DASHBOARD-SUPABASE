@@ -676,6 +676,21 @@ html:not(.krp-dark-theme) .section-icon-line .tab-btn.active:hover{
   transform:none!important;filter:none!important;
 }
 
+/* Settings hierarchy and KRP-styled controls. */
+.settings-back-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:32px!important;padding:5px 9px!important;margin-right:8px!important;border:1px solid #b9d2c4!important;border-radius:8px!important;background:#e8f3ed!important;color:#147451!important;font-size:10px!important;font-weight:800!important;cursor:pointer!important;flex:0 0 auto!important}
+.settings-back-btn:hover{background:#d9ebe1!important;border-color:#8dbca4!important}
+#headerSettingsHub .modal-content,#purposeManagerModal .modal-content,#settingsModal .modal-content,#upiModal .modal-content{background:#f4f6f3!important;color:#25322d!important;border:1px solid rgba(41,65,55,.12)!important}
+#purposeManagerModal input,#purposeManagerModal select,#settingsModal input,#settingsModal select,#settingsModal textarea,#upiModal input,#upiModal select,#upiModal textarea{min-height:39px!important;border:1px solid rgba(69,94,83,.16)!important;border-radius:8px!important;background:#eef2ef!important;color:#25322d!important;box-shadow:inset 1px 1px 2px rgba(33,49,44,.05)!important}
+#purposeManagerModal select,#settingsModal select,#upiModal select{appearance:auto!important;-webkit-appearance:menulist!important;color-scheme:light!important;cursor:pointer!important;padding:0 10px!important}
+#purposeManagerModal option,#settingsModal option,#upiModal option{background:#f4f6f3!important;color:#25322d!important}
+html.krp-dark-theme .settings-back-btn{background:#173629!important;color:#8dd5b0!important;border-color:#315c49!important}
+html.krp-dark-theme .settings-back-btn:hover{background:#1d4735!important}
+html.krp-dark-theme #headerSettingsHub .modal-content,html.krp-dark-theme #purposeManagerModal .modal-content,html.krp-dark-theme #settingsModal .modal-content,html.krp-dark-theme #upiModal .modal-content{background:#10232e!important;color:#d9e5df!important;border-color:#294652!important}
+html.krp-dark-theme #purposeManagerModal input,html.krp-dark-theme #purposeManagerModal select,html.krp-dark-theme #settingsModal input,html.krp-dark-theme #settingsModal select,html.krp-dark-theme #settingsModal textarea,html.krp-dark-theme #upiModal input,html.krp-dark-theme #upiModal select,html.krp-dark-theme #upiModal textarea{background:#091925!important;color:#d5e0e7!important;border-color:#294652!important;box-shadow:inset 1px 1px 3px rgba(0,0,0,.18)!important}
+html.krp-dark-theme #purposeManagerModal select,html.krp-dark-theme #settingsModal select,html.krp-dark-theme #upiModal select{color-scheme:dark!important}
+html.krp-dark-theme #purposeManagerModal option,html.krp-dark-theme #settingsModal option,html.krp-dark-theme #upiModal option{background:#091925!important;color:#d5e0e7!important}
+@media(max-width:520px){.settings-back-btn{padding:5px 7px!important;margin-right:4px!important}.settings-back-btn span{display:none!important}.modal-header>span{font-size:12px!important}}
+
 @media(max-width:850px){
   #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1440px!important}
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}

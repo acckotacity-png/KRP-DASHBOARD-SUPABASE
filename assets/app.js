@@ -523,6 +523,10 @@
 
     function openHeaderSettingsHub() { document.getElementById('headerSettingsHub').classList.add('active'); }
     function closeHeaderSettingsHub() { document.getElementById('headerSettingsHub').classList.remove('active'); }
+    function backToHeaderSettingsHub(sourceModalId) {
+        document.getElementById(sourceModalId)?.classList.remove('active');
+        document.getElementById('headerSettingsHub')?.classList.add('active');
+    }
     function openPaymentFromHub() { closeHeaderSettingsHub(); openUpiModal(); }
     function openBusinessFromHub() { closeHeaderSettingsHub(); openSettingsModal(); }
     async function openPurposeManagerFromHub() { closeHeaderSettingsHub(); await refreshManagedDropdownSettings(true); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
