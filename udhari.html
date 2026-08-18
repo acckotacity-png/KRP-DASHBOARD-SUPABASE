@@ -144,6 +144,19 @@
     .customer-actions { gap: 5px !important; margin-top: 8px !important; }
     .customer-actions button { min-height: 31px !important; padding: 5px 7px !important; font-size: 9px !important; border-radius: 7px !important; }
     .empty-state { padding: 24px !important; font-size: 11px !important; }
+    .top-actions { display: flex !important; align-items: center !important; gap: 6px !important; }
+    .top-actions .icon-only, .customer-actions .icon-only { display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; }
+    .top-actions .icon-only { width: 34px !important; min-width: 34px !important; height: 34px !important; }
+    .customer-actions { display: flex !important; flex-wrap: nowrap !important; justify-content: flex-start !important; gap: 6px !important; }
+    .customer-actions .icon-only { flex: 0 0 34px !important; width: 34px !important; min-width: 34px !important; height: 34px !important; min-height: 34px !important; border-radius: 8px !important; font-size: 13px !important; }
+    .customer-actions .add-credit { background: #ebe7ff !important; color: #5130d7 !important; border: 1px solid #b9aff4 !important; }
+    .customer-actions .add-payment { background: #dcf8eb !important; color: #087b50 !important; border: 1px solid #82dcb4 !important; }
+    .customer-actions .open-ledger { background: #e5edf3 !important; color: #29485b !important; border: 1px solid #b8cad5 !important; }
+    .customer-actions .due-reminder { background: #dcf8e8 !important; color: #07844d !important; border: 1px solid #81dcae !important; }
+    html.krp-dark-theme .customer-actions .add-credit { background: #4931ba !important; color: #fff !important; border-color: #6d55df !important; }
+    html.krp-dark-theme .customer-actions .add-payment { background: #087b54 !important; color: #effff8 !important; border-color: #22a878 !important; }
+    html.krp-dark-theme .customer-actions .open-ledger { background: #183246 !important; color: #d9e9f3 !important; border-color: #3b5870 !important; }
+    html.krp-dark-theme .customer-actions .due-reminder { background: #08764b !important; color: #effff7 !important; border-color: #25a970 !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -171,10 +184,10 @@
 <main class="app">
   <div class="top">
     <h1><i class="fas fa-book-open"></i>Udhari Bahi Khata</h1>
-    <div>
-      <button class="outline" onclick="loadData(true)"><i class="fas fa-rotate"></i> Refresh</button>
-      <button class="success" data-right="create" onclick="openNewCustomerForm()"><i class="fas fa-user-plus"></i> New Customer</button>
-      <button class="primary" data-right="create" onclick="openForm()"><i class="fas fa-plus"></i> New Entry</button>
+    <div class="top-actions">
+      <button class="outline icon-only" onclick="loadData(true)" title="Refresh" aria-label="Refresh"><i class="fas fa-rotate"></i></button>
+      <button class="success icon-only" data-right="create" onclick="openNewCustomerForm()" title="New Customer" aria-label="New Customer"><i class="fas fa-user-plus"></i></button>
+      <button class="primary icon-only" data-right="create" onclick="openForm()" title="New Ledger Entry" aria-label="New Ledger Entry"><i class="fas fa-file-circle-plus"></i></button>
     </div>
   </div>
 
@@ -405,10 +418,10 @@
           <div><span>Created By</span><b>${escapeHtml(r[COL.createdBy]||'-')}</b><small style="display:block;color:#718096;font-size:9px;">${escapeHtml(r[COL.timestamp]||'-')}</small></div>
         </div>
         <div class="customer-actions">
-          <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(c.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
-          <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(c.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
-          <button class="outline" onclick="openLedger('${escapeHtml(c.key)}')"><i class="fas fa-book"></i> Full Ledger</button>
-          <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(c.key)}')"><i class="fab fa-whatsapp"></i> Due Reminder</button>
+          <button class="icon-only add-credit" data-right="create" onclick="addCustomerUdhari('${escapeHtml(c.key)}')" title="Add Udhari" aria-label="Add Udhari"><i class="fas fa-hand-holding-dollar"></i></button>
+          <button class="icon-only add-payment" data-right="create" onclick="addCustomerPayment('${escapeHtml(c.key)}')" title="Add Payment" aria-label="Add Payment"><i class="fas fa-indian-rupee-sign"></i></button>
+          <button class="icon-only open-ledger" onclick="openLedger('${escapeHtml(c.key)}')" title="Full Ledger" aria-label="Full Ledger"><i class="fas fa-book-open"></i></button>
+          <button class="icon-only due-reminder" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="WhatsApp Due Reminder" aria-label="WhatsApp Due Reminder"><i class="fab fa-whatsapp"></i></button>
         </div>
       </article>`;
     }).join(''):'<div class="empty-state"><i class="fas fa-user-slash"></i><br><br>No customer found</div>';
