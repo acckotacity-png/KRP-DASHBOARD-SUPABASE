@@ -178,6 +178,36 @@
       .ledger-dialog td::before { content: attr(data-label); color: #7b85a8; font-size: 10px; font-weight: 800; text-align: left; text-transform: uppercase; }
       .ledger-dialog td .actions { justify-content: flex-end; }
     }
+    /* Customer ledger: compact KPI strip and spreadsheet-style transaction grid at every width. */
+    .ledger-dialog { width: min(1320px, 99vw) !important; padding: 10px !important; border-radius: 10px !important; }
+    .ledger-dialog .dialog-head { margin-bottom: 7px !important; padding: 2px 2px 7px !important; }
+    .ledger-dialog .dialog-head h2 { font-size: 13px !important; }
+    .ledger-dialog .close { width: 26px !important; height: 26px !important; font-size: 14px !important; }
+    .ledger-summary { display: block !important; margin-bottom: 7px !important; }
+    .ledger-kpis { display: grid !important; grid-template-columns: repeat(5,minmax(105px,1fr)) !important; gap: 5px !important; margin-bottom: 6px !important; }
+    .ledger-kpis .card { min-width: 0 !important; padding: 6px 8px !important; border-radius: 7px !important; }
+    .ledger-kpis .card span { font-size: 7px !important; margin-bottom: 2px !important; }
+    .ledger-kpis .card strong { font-size: 12px !important; }
+    .ledger-command-row { display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 5px !important; }
+    .ledger-command-row button { min-height: 29px !important; padding: 5px 8px !important; border-radius: 6px !important; font-size: 8px !important; }
+    .ledger-dialog .table-wrap { display: block !important; width: 100% !important; max-height: 56vh !important; overflow: auto !important; border: 1px solid #bfcfc7 !important; border-radius: 6px !important; background: #f8faf9 !important; }
+    .ledger-dialog table { display: table !important; width: 100% !important; min-width: 1180px !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto !important; font-size: 8px !important; }
+    .ledger-dialog thead { display: table-header-group !important; }
+    .ledger-dialog tbody { display: table-row-group !important; }
+    .ledger-dialog tr { display: table-row !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; }
+    .ledger-dialog th, .ledger-dialog td { display: table-cell !important; height: 27px !important; padding: 4px 6px !important; border: 0 !important; border-right: 1px solid #d5dfda !important; border-bottom: 1px solid #d5dfda !important; color: #263d34 !important; text-align: left !important; white-space: nowrap !important; vertical-align: middle !important; }
+    .ledger-dialog th { position: sticky !important; top: 0 !important; z-index: 3 !important; height: 29px !important; background: #dfe9e3 !important; color: #29463a !important; font-size: 7px !important; text-transform: uppercase !important; letter-spacing: .15px !important; }
+    .ledger-dialog tbody tr:nth-child(even) td { background: #edf3ef !important; }
+    .ledger-dialog tbody tr:nth-child(odd) td { background: #f8faf9 !important; }
+    .ledger-dialog td::before { content: none !important; display: none !important; }
+    .ledger-dialog td .actions { display: flex !important; justify-content: flex-start !important; gap: 3px !important; }
+    .ledger-dialog td .actions button { width: 24px !important; height: 22px !important; min-height: 22px !important; padding: 0 !important; border-radius: 5px !important; font-size: 8px !important; }
+    html.krp-dark-theme .ledger-dialog .table-wrap { background: #091925 !important; border-color: #315064 !important; }
+    html.krp-dark-theme .ledger-dialog th { background: #183245 !important; color: #c4d6e1 !important; border-color: #345166 !important; }
+    html.krp-dark-theme .ledger-dialog td { color: #dbe7ee !important; border-color: #263f52 !important; }
+    html.krp-dark-theme .ledger-dialog tbody tr:nth-child(odd) td { background: #0d202d !important; }
+    html.krp-dark-theme .ledger-dialog tbody tr:nth-child(even) td { background: #122838 !important; }
+    @media(max-width:700px){.ledger-kpis{grid-template-columns:repeat(3,minmax(90px,1fr))!important}.ledger-dialog{padding:7px!important}.ledger-dialog .table-wrap{max-height:60vh!important}.ledger-dialog table{min-width:1050px!important}}
   </style>
 </head>
 <body>
@@ -619,23 +649,27 @@
     const totalPayment=entries.reduce((s,r)=>s+num(r[COL.payment]),0);
     document.getElementById('ledgerTitle').textContent=`${customer.name} · ${customer.mobile||latest[COL.mobile]} Ledger`;
     document.getElementById('ledgerSummary').innerHTML=`
-      <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
-      <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
-      <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
-      <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
-      <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
-      <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
-      <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
-      <button class="excel" onclick="exportCustomerLedger('${escapeHtml(customer.key)}')"><i class="fas fa-file-excel"></i> Excel Report</button>
-      <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> WhatsApp Due Reminder</button>`;
-    document.getElementById('ledgerRows').innerHTML=entries.map(r=>`<tr>
+      <div class="ledger-kpis">
+        <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
+        <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
+        <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
+        <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
+        <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
+      </div>
+      <div class="ledger-command-row">
+        <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
+        <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+        <button class="excel" onclick="exportCustomerLedger('${escapeHtml(customer.key)}')"><i class="fas fa-file-excel"></i> Excel</button>
+        <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> Due Reminder</button>
+      </div>`;
+    document.getElementById('ledgerRows').innerHTML=entries.length?entries.map(r=>`<tr>
       <td data-label="Date">${escapeHtml(r[COL.date])}</td><td data-label="Type">${escapeHtml(r[COL.type])}</td><td data-label="Description">${escapeHtml(r[COL.description])}</td>
       <td data-label="Udhari">${money(r[COL.udhar])}</td><td data-label="Payment">${money(r[COL.payment])}</td><td data-label="Balance"><b>${money(r[COL.balance])}</b></td>
       <td data-label="Interest">${money(r[COL.interest])}</td><td data-label="Total Payable"><b>${money(r[COL.total])}</b></td><td data-label="Due Date">${escapeHtml(r[COL.due])}</td>
       <td data-label="Status"><span class="badge ${String(r[COL.status]).toLowerCase()}">${escapeHtml(r[COL.status])}</span></td>
       <td data-label="Mode">${escapeHtml(r[COL.mode])}</td><td data-label="Reference">${escapeHtml(r[COL.ref])}</td><td data-label="Remarks">${escapeHtml(r[COL.remarks])}</td>
       <td data-label="Actions"><div class="actions"><button class="outline" data-right="edit" onclick="closeLedger();editEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-pen"></i></button><button class="danger" data-right="delete" onclick="deleteEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-trash"></i></button></div></td>
-    </tr>`).join('');
+    </tr>`).join(''):'<tr><td colspan="14" style="text-align:center!important;padding:14px!important;">No transaction entries</td></tr>';
     const ledgerModal=document.getElementById('ledgerModal');
     ledgerModal.hidden=false;
     ledgerModal.classList.add('open');
