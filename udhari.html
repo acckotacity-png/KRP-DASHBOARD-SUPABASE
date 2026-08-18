@@ -189,14 +189,22 @@
     html.krp-dark-theme .customer-balance.normal-balance { color: #62d19b !important; }
     html.krp-dark-theme .customer-balance.zero-balance { color: #c1ced6 !important; }
     html.krp-dark-theme .customer-info span { color: #d5aa49 !important; }
+    .cards { grid-template-columns: repeat(3,minmax(0,1fr)) !important; gap: 5px !important; margin-bottom: 6px !important; }
+    .cards .card { min-height: 46px !important; padding: 6px 9px !important; border-radius: 8px !important; background: linear-gradient(145deg,#fbfdfc,#e8f0eb) !important; border-color: #c5d5cc !important; box-shadow: 3px 4px 8px rgba(43,68,57,.11),-2px -2px 6px rgba(255,255,255,.82),inset 1px 1px 0 rgba(255,255,255,.72) !important; }
+    .cards .card span { margin-bottom: 2px !important; font-size: 6.5px !important; line-height: 1.15 !important; }
+    .cards .card strong { font-size: 12px !important; line-height: 1.15 !important; }
+    html.krp-dark-theme .cards .card { background: linear-gradient(145deg,#1a4039 0%,#163832 52%,#102c27 100%) !important; border-color: #2b594f !important; box-shadow: 3px 5px 9px rgba(0,0,0,.27),-2px -2px 6px rgba(59,105,91,.10),inset 1px 1px 0 rgba(176,229,209,.065),inset -1px -1px 0 rgba(0,0,0,.18) !important; }
+    html.krp-dark-theme .cards .card span { color: #d4a94b !important; }
+    html.krp-dark-theme .cards .card strong { color: #cbd7df !important; }
+    @media(max-width:420px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}.cards .card{min-height:44px!important}}
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
-    @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 800px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) {
       body { padding: 7px; }
       .top { align-items: stretch; padding: 12px; }
       .top > div { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-      .cards, .customer-grid { grid-template-columns: 1fr !important; }
+      .customer-grid { grid-template-columns: 1fr !important; }
       .grid { grid-template-columns: 1fr; }
       .field.wide { grid-column: span 1; }
       .customer-actions { grid-template-columns: 1fr 1fr; }
