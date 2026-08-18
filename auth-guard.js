@@ -1,5 +1,5 @@
 ﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js?v=2";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js?v=3";
 import { installSupabaseApiAdapter } from "./supabase-api.js?v=13";
 
 const guardStyle = document.getElementById("auth-guard-style");
@@ -143,7 +143,11 @@ const deviceType = (() => {
 })();
 const sessionTokenKey = `krp_active_session_${session.user.id}_${deviceType}`;
 const storedSessionToken = sessionStorage.getItem(sessionTokenKey);
-const activeSessionToken = storedSessionToken || crypto.randomUUID();
+const forceClaimKey = `krp_force_session_claim_${session.user.id}`;
+const forceNewLoginClaim = sessionStorage.getItem(forceClaimKey) === "1";
+sessionStorage.removeItem(forceClaimKey);
+const makeSessionToken = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+const activeSessionToken = forceNewLoginClaim ? makeSessionToken() : (storedSessionToken || makeSessionToken());
 sessionStorage.setItem(sessionTokenKey, activeSessionToken);
 const deviceLabel = (() => {
   const ua = navigator.userAgent;
@@ -154,12 +158,14 @@ const deviceLabel = (() => {
 
 let singleSessionEnabled = false;
 let displacedSession = null;
+let replacedPreviousSession = null;
 try {
   const { data: existing, error: readSessionError } = await client.from("active_sessions").select("session_token,device_label,device_type").eq("user_id", session.user.id).eq("device_type", deviceType).maybeSingle();
   if (readSessionError) throw readSessionError;
-  if (storedSessionToken && existing?.session_token && existing.session_token !== activeSessionToken) {
+  if (!forceNewLoginClaim && storedSessionToken && existing?.session_token && existing.session_token !== activeSessionToken) {
     displacedSession = existing;
   } else {
+    if (existing?.session_token && existing.session_token !== activeSessionToken) replacedPreviousSession = existing;
     const { error: claimError } = await client.from("active_sessions").upsert({
       user_id: session.user.id,
       device_type: deviceType,
@@ -185,6 +191,14 @@ function showRemoteLoginPopup(remoteDevice = "another system") {
   popup.textContent = `Yeh ID ab ${remoteDevice} par login hui hai. Is system se logout kiya ja raha hai.`;
   document.body.appendChild(popup);
 }
+function showNewLoginPopup(previousDevice = "previous browser") {
+  const popup = document.createElement("div");
+  popup.setAttribute("role", "status");
+  popup.style.cssText = "position:fixed;z-index:999999;right:14px;top:14px;max-width:340px;padding:13px 15px;border-radius:12px;background:#e9fff3;color:#075b37;border:1px solid #29b978;box-shadow:0 12px 34px rgba(0,0,0,.22);font:700 12px/1.45 Segoe UI,Arial,sans-serif";
+  popup.textContent = `Login successful. ${previousDevice} wali purani session logout kar di gayi hai.`;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 4200);
+}
 
 window.logoutKrpDashboard = async function logoutKrpDashboard(reason = "manual", remoteDevice = "") {
   if (logoutInProgress) return;
@@ -205,6 +219,7 @@ if (displacedSession) {
   await window.logoutKrpDashboard("remote_login", displacedSession.device_label || "another system");
   throw new Error("Session moved to another device");
 }
+if (replacedPreviousSession) setTimeout(() => showNewLoginPopup(replacedPreviousSession.device_label || "previous browser"), 250);
 
 async function verifySingleSession() {
   if (!singleSessionEnabled || logoutInProgress || document.visibilityState === "hidden") return;
