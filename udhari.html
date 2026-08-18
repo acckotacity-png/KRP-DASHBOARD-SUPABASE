@@ -164,6 +164,19 @@
       box-shadow: inset 1px 1px 0 rgba(174,232,210,.07), inset -1px -1px 0 rgba(0,0,0,.20), 4px 6px 12px rgba(0,0,0,.24), -2px -2px 7px rgba(47,91,79,.10) !important;
     }
     html.krp-dark-theme .customer-card .customer-info { border-color: rgba(143,196,177,.17) !important; }
+    html.krp-dark-theme .top, html.krp-dark-theme .tools, html.krp-dark-theme .card {
+      background: linear-gradient(145deg,#173a34 0%,#12312c 52%,#0d2622 100%) !important;
+      border-color: #28564d !important;
+      box-shadow: inset 1px 1px 0 rgba(174,232,210,.055),3px 5px 11px rgba(0,0,0,.20) !important;
+    }
+    html.krp-dark-theme .tools { background: linear-gradient(145deg,#13342f,#0e2925) !important; }
+    html.krp-dark-theme .ledger-dialog {
+      background: linear-gradient(145deg,#14362f 0%,#102c28 55%,#0b2420 100%) !important;
+      border-color: #2c5a50 !important;
+      box-shadow: inset 1px 1px 0 rgba(174,232,210,.055),0 16px 38px rgba(0,0,0,.46) !important;
+    }
+    html.krp-dark-theme .ledger-dialog .ledger-kpis .card { background: linear-gradient(145deg,#193e37,#12322d) !important; border-color:#2d5a50 !important; }
+    html.krp-dark-theme .ledger-dialog .ledger-command-row { padding: 5px !important; border: 1px solid #285047 !important; border-radius: 7px !important; background: rgba(7,28,24,.34) !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -218,6 +231,20 @@
     html.krp-dark-theme .ledger-dialog tbody tr:nth-child(odd) td { background: #0d202d !important; }
     html.krp-dark-theme .ledger-dialog tbody tr:nth-child(even) td { background: #122838 !important; }
     @media(max-width:700px){.ledger-kpis{grid-template-columns:repeat(3,minmax(90px,1fr))!important}.ledger-dialog{padding:7px!important}.ledger-dialog .table-wrap{max-height:60vh!important}.ledger-dialog table{min-width:1050px!important}}
+    @media(max-width:600px){
+      .modal{align-items:flex-start!important;padding:6px!important;overflow:hidden!important}
+      #entryModal .dialog,#customerModal .dialog{width:100%!important;max-height:calc(100dvh - 12px)!important;padding:10px 10px 0!important;border-radius:11px!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+      #entryModal form,#customerModal form{padding-bottom:0!important}
+      #entryModal .form-actions,#customerModal .form-actions{position:sticky!important;z-index:8!important;bottom:0!important;display:grid!important;grid-template-columns:.8fr 1.2fr!important;gap:7px!important;margin:10px -10px 0!important;padding:8px 10px calc(8px + env(safe-area-inset-bottom))!important;background:#f3f7f4!important;border-top:1px solid #c8d8d0!important;box-shadow:0 -7px 16px rgba(32,55,45,.10)!important}
+      #entryModal .form-actions button,#customerModal .form-actions button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:40px!important;margin:0!important;padding:7px 9px!important;font-size:11px!important;border-radius:8px!important}
+      #entryModal #saveButton,#customerModal #customerSaveButton{background:linear-gradient(145deg,#07975f,#06ae70)!important;color:#fff!important;border:1px solid #21c485!important;box-shadow:0 4px 10px rgba(5,142,89,.22)!important}
+      html.krp-dark-theme #entryModal .form-actions,html.krp-dark-theme #customerModal .form-actions{background:#102e29!important;border-color:#2d594f!important;box-shadow:0 -8px 18px rgba(0,0,0,.30)!important}
+      html.krp-dark-theme #entryModal .form-actions .outline,html.krp-dark-theme #customerModal .form-actions .outline{background:#183b35!important;color:#bdcec7!important;border-color:#3a6259!important}
+      .ledger-dialog{max-height:calc(100dvh - 12px)!important;overflow-y:auto!important}
+      .ledger-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+      .ledger-command-row{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important;scrollbar-width:thin!important}
+      .ledger-command-row button{flex:0 0 auto!important;white-space:nowrap!important}
+    }
   </style>
 </head>
 <body>

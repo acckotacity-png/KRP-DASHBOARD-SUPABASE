@@ -997,7 +997,7 @@
             document.querySelector('[data-tab="udhari"]').classList.add('active');
             const udhariFrame = document.getElementById('udhariFrame');
             if (udhariFrame && !udhariFrame.getAttribute('src')) {
-                udhariFrame.src = `udhari.html?v=20260819-9&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                udhariFrame.src = `udhari.html?v=20260819-10&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'transaction') {
             document.body.classList.remove('form-view');
