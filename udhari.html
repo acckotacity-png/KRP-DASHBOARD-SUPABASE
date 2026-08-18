@@ -159,10 +159,11 @@
     html.krp-dark-theme .customer-actions .open-ledger { background: #183246 !important; color: #d9e9f3 !important; border-color: #3b5870 !important; }
     html.krp-dark-theme .customer-actions .due-reminder { background: #08764b !important; color: #effff7 !important; border-color: #25a970 !important; }
     html.krp-dark-theme .customer-card {
-      background: linear-gradient(145deg,#1a4039 0%,#163832 48%,#112e29 100%) !important;
+      background: radial-gradient(circle at 8% 0%,rgba(213,180,72,.095),transparent 34%),radial-gradient(circle at 100% 100%,rgba(73,181,127,.10),transparent 38%),linear-gradient(145deg,#1a4039 0%,#163832 48%,#112e29 100%) !important;
       border-color: #28564d !important;
       box-shadow: inset 1px 1px 0 rgba(174,232,210,.07), inset -1px -1px 0 rgba(0,0,0,.20), 4px 6px 12px rgba(0,0,0,.24), -2px -2px 7px rgba(47,91,79,.10) !important;
     }
+    html:not(.krp-dark-theme) .customer-card { background: radial-gradient(circle at 8% 0%,rgba(211,177,66,.09),transparent 34%),radial-gradient(circle at 100% 100%,rgba(61,165,111,.085),transparent 38%),linear-gradient(145deg,#f8fbf9,#edf3ef) !important; }
     html.krp-dark-theme .customer-card .customer-info { border-color: rgba(143,196,177,.17) !important; }
     html.krp-dark-theme .top, html.krp-dark-theme .tools, html.krp-dark-theme .card {
       background: linear-gradient(145deg,#173a34 0%,#12312c 52%,#0d2622 100%) !important;
