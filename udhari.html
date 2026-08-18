@@ -84,14 +84,48 @@
     html.krp-dark-theme .field label { color: #a9bfd0 !important; }
     html.krp-dark-theme .field input, html.krp-dark-theme .field select, html.krp-dark-theme .field textarea { background: #14283a !important; color: #f0f6fa !important; border-color: #36516a !important; }
     html.krp-dark-theme .form-actions .outline { background: #1c3344 !important; color: #d9e6ee !important; border-color: #466178 !important; }
+    /* Match the main KRP Ledger palette and keep the iframe readable in both themes. */
+    body { font-size: 14px !important; }
+    .top, .tools, .card, .customer-card { background: #f7faf8 !important; color: #263d34 !important; border-color: #cad9d1 !important; box-shadow: 0 5px 14px rgba(38,61,52,.07) !important; }
+    .top h1, .customer-name, .card strong, .customer-info b { color: #20372e !important; }
+    .top h1 { font-size: 20px !important; }
+    .card span, .customer-info span { color: #647a70 !important; font-size: 10px !important; letter-spacing: .15px !important; }
+    .card strong { font-size: 18px !important; }
+    .customer-grid { grid-template-columns: repeat(2,minmax(300px,1fr)) !important; gap: 12px !important; }
+    .customer-card { padding: 16px !important; }
+    .customer-name { font-size: 17px !important; }
+    .customer-mobile { color: #526b60 !important; font-size: 12px !important; }
+    .customer-info { border-color: #d7e2dc !important; }
+    .customer-info b { font-size: 13px !important; }
+    .customer-actions button, .top button { min-height: 38px !important; font-size: 12px !important; opacity: 1 !important; }
+    .primary { background: #5130e8 !important; color: #fff !important; border: 1px solid #684cf0 !important; }
+    .success { background: #08a870 !important; color: #fff !important; border: 1px solid #19bd82 !important; }
+    .outline { background: #edf3ef !important; color: #29463a !important; border-color: #b9cec3 !important; }
+    .whatsapp { background: #18a965 !important; color: #fff !important; border: 1px solid #31bf7c !important; }
+    .excel { background: #147a49 !important; color: #fff !important; border: 1px solid #25965f !important; }
+    .search input { background: #f1f5f2 !important; color: #263d34 !important; border-color: #bfd0c7 !important; font-size: 13px !important; }
+    .status, #recordCount { font-size: 11px !important; }
+    html.krp-dark-theme body { background: #06131e !important; color: #d8e4ec !important; }
+    html.krp-dark-theme .top, html.krp-dark-theme .tools, html.krp-dark-theme .card, html.krp-dark-theme .customer-card { background: linear-gradient(145deg,#0c202c,#0a1925) !important; color: #dce7ed !important; border-color: #294252 !important; box-shadow: 0 7px 17px rgba(0,0,0,.23) !important; }
+    html.krp-dark-theme .top h1, html.krp-dark-theme .customer-name, html.krp-dark-theme .card strong, html.krp-dark-theme .customer-info b { color: #f0f6f9 !important; }
+    html.krp-dark-theme .card span, html.krp-dark-theme .customer-info span { color: #91aabd !important; }
+    html.krp-dark-theme .customer-mobile { color: #a8bdca !important; }
+    html.krp-dark-theme .customer-info { border-color: #294252 !important; }
+    html.krp-dark-theme .outline { background: #142b3a !important; color: #d9e7ef !important; border-color: #3a566a !important; }
+    html.krp-dark-theme .primary { background: #5538dc !important; color: #fff !important; border-color: #745df0 !important; }
+    html.krp-dark-theme .success { background: #078f61 !important; color: #f1fff8 !important; border-color: #20b980 !important; }
+    html.krp-dark-theme .whatsapp { background: #078d57 !important; color: #effff7 !important; border-color: #22b875 !important; }
+    html.krp-dark-theme .excel { background: #146b43 !important; color: #effff7 !important; border-color: #2b9665 !important; }
+    html.krp-dark-theme .search input { background: #091925 !important; color: #e4edf2 !important; border-color: #315064 !important; }
+    html.krp-dark-theme .search input::placeholder { color: #8299aa !important; opacity: 1 !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
-    @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); } }
+    @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) {
       body { padding: 7px; }
       .top { align-items: stretch; padding: 12px; }
       .top > div { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-      .cards, .customer-grid { grid-template-columns: 1fr; }
+      .cards, .customer-grid { grid-template-columns: 1fr !important; }
       .grid { grid-template-columns: 1fr; }
       .field.wide { grid-column: span 1; }
       .customer-actions { grid-template-columns: 1fr 1fr; }
