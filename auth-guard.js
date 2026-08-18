@@ -110,6 +110,21 @@ if (window.currentKrpUser.avatarPath) {
   const { data: avatarData } = await client.storage.from("krp-avatars").createSignedUrl(window.currentKrpUser.avatarPath, 3600);
   window.currentKrpUser.avatarUrl = avatarData?.signedUrl || "";
 }
+try {
+  sessionStorage.setItem(`krp_profile_bootstrap_${session.user.id}`, JSON.stringify({
+    full_name: access.full_name || window.currentKrpUser.name,
+    first_name: access.first_name || "",
+    last_name: access.last_name || "",
+    designation: access.designation || "",
+    email: access.email || window.currentKrpUser.email,
+    mobile_no: access.mobile_no || window.currentKrpUser.mobile,
+    address: access.address || "",
+    bio: access.bio || "",
+    avatar_path: access.avatar_path || "",
+    avatar_url: window.currentKrpUser.avatarUrl || "",
+    cached_at: Date.now()
+  }));
+} catch (_) {}
 window.dispatchEvent(new CustomEvent("krp-auth-ready", { detail: window.currentKrpUser }));
 const permissionStyle = document.createElement("style");
 permissionStyle.textContent = `${window.currentKrpUser.permissions.delete ? "" : '[onclick*="delete" i],.delete-btn,.btn-delete{display:none!important}'}
