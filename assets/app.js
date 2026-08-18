@@ -58,6 +58,7 @@
     let activeLedgerSource = 'main';
     let activeDefaulterMatch = null;
     let dismissedDefaulterLookupKey = '';
+    let defaulterOverrides = [];
     let currentIdActivationSerialMap = new Map();
     const DASHBOARD_ACTIVE_TAB_KEY = 'krp_active_dashboard_tab';
     const DASHBOARD_TABS = ['form', 'tracker', 'dashboard', 'expense', 'udhari', 'notepad', 'transaction'];
@@ -210,6 +211,7 @@
         initRecordsTrackerFilters();
         applyPurposeSettings(buildDefaultPurposeSettings(), false);
         loadPurposeManagerSettings();
+        loadDefaulterSettings();
         loadSavedBusinessSettings();
         wireContactAutofill();
         wireUtrNormalization();
@@ -1274,12 +1276,156 @@
         return keys;
     }
 
+    function getDefaulterOverrideMap() {
+        return new Map(defaulterOverrides.filter(item => item?.key).map(item => [String(item.key), item]));
+    }
+
+    function buildMonthlyDefaulterRegistry() {
+        if (!currentHeaders.length || !currentData.length) return [];
+        const idxContact = getColIndex('CONTACT NO. OR NAME');
+        const idxName = getColIndex('CUSTOMER NAME');
+        const idxInvoice = getColIndex('INVOICE NO.');
+        const idxDate = getColIndex('DATE');
+        const idxPurpose = getColIndex('PURPOSE');
+        const idxDeal = getColIndex('DEALING AMOUNT');
+        const idxReceived = getColIndex('RECEIVED AMOUNT');
+        const groups = new Map();
+        currentData.forEach((row, rowIndex) => {
+            const contact = idxContact !== -1 ? showSheetText(row[idxContact]).trim() : '';
+            const contactKey = normalizeContactLedgerKey(contact);
+            if (!contactKey) return;
+            const invoice = idxInvoice !== -1 ? showSheetText(row[idxInvoice]).trim() : '';
+            if (!invoice) return;
+            const groupKey = `${contactKey}|${invoice.toLowerCase()}`;
+            if (!groups.has(groupKey)) groups.set(groupKey, []);
+            groups.get(groupKey).push({ row, rowIndex });
+        });
+
+        const monthly = new Map();
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        groups.forEach(items => {
+            const sorted = items.map(item => {
+                const iso = idxDate !== -1 ? getLocalISODate(item.row[idxDate]) : '';
+                const date = iso ? new Date(`${iso}T00:00:00`) : null;
+                return { ...item, iso, date };
+            }).filter(item => item.date && !isNaN(item.date)).sort((a,b) => a.date - b.date || a.rowIndex - b.rowIndex);
+            const main = sorted.find(item => !showSheetText(item.row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST'));
+            if (!main) return;
+            const deal = Math.max(0, parseFloat(main.row[idxDeal]) || 0);
+            if (deal <= 0) return;
+            let paid = 0;
+            let completedAt = null;
+            sorted.forEach(item => {
+                paid += Math.max(0, parseFloat(item.row[idxReceived]) || 0);
+                if (!completedAt && paid >= deal) completedAt = item.date;
+            });
+            const endDate = completedAt || now;
+            const overdueDays = Math.floor((endDate - main.date) / 86400000);
+            if (overdueDays <= 7) return;
+            const contact = showSheetText(main.row[idxContact]).trim();
+            const contactKey = normalizeContactLedgerKey(contact);
+            const monthKey = main.iso.slice(0,7);
+            const key = `${contactKey}|${monthKey}`;
+            const pending = Math.max(deal - paid, 0);
+            const existing = monthly.get(key) || {
+                key, contactKey, contact, name: idxName !== -1 ? showSheetText(main.row[idxName]).trim() : '',
+                monthKey, monthLabel: new Intl.DateTimeFormat('en-IN',{month:'long',year:'numeric'}).format(main.date),
+                invoices: [], pending: 0, maxDays: 0, mainIndexes: []
+            };
+            existing.invoices.push(showSheetText(main.row[idxInvoice]).trim());
+            existing.pending += pending;
+            existing.maxDays = Math.max(existing.maxDays, overdueDays);
+            existing.mainIndexes.push(main.rowIndex);
+            monthly.set(key, existing);
+        });
+        const overrides = getDefaulterOverrideMap();
+        return Array.from(monthly.values()).map(item => {
+            const override = overrides.get(item.key) || {};
+            return { ...item, remark: override.remark || `Payment 7 दिन से ज्यादा pending रहा (${item.maxDays} days)`, excluded: !!override.excluded };
+        }).sort((a,b) => b.monthKey.localeCompare(a.monthKey) || a.name.localeCompare(b.name));
+    }
+
+    function getDefaulterForTrackerRow(rowIndex) {
+        return buildMonthlyDefaulterRegistry().find(item => !item.excluded && item.mainIndexes.includes(rowIndex)) || null;
+    }
+
+    async function loadDefaulterSettings() {
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getDefaulterSettings&t=${Date.now()}`, { cache:'no-store' });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error || 'Defaulter settings load failed');
+            defaulterOverrides = Array.isArray(result.overrides) ? result.overrides : [];
+            if (currentHeaders.length) renderTable(getTrackerFilters());
+        } catch (error) {
+            console.warn('Defaulter settings load failed', error);
+        }
+    }
+
+    function openDefaulterManagerFromHub() {
+        closeHeaderSettingsHub();
+        document.getElementById('defaulterManagerModal')?.classList.add('active');
+        renderDefaulterManagerList();
+    }
+    function closeDefaulterManager() { document.getElementById('defaulterManagerModal')?.classList.remove('active'); }
+    function updateDefaulterOverride(key, field, value) {
+        let item = defaulterOverrides.find(entry => entry.key === key);
+        if (!item) { item = { key, remark:'', excluded:false }; defaulterOverrides.push(item); }
+        item[field] = field === 'excluded' ? !!value : String(value || '').slice(0,300);
+    }
+    function renderDefaulterManagerList() {
+        const host = document.getElementById('defaulterManagerList');
+        if (!host) return;
+        const term = (document.getElementById('defaulterManagerSearch')?.value || '').trim().toLowerCase();
+        const rows = buildMonthlyDefaulterRegistry().filter(item => `${item.contact} ${item.name} ${item.monthLabel} ${item.invoices.join(' ')}`.toLowerCase().includes(term));
+        host.innerHTML = rows.length ? rows.map(item => `<div class="defaulter-manager-row ${item.excluded ? 'is-excluded' : ''}">
+            <div class="defaulter-manager-main"><strong>${escapeHtml(item.name || item.contact || 'Customer')}</strong><small>${escapeHtml(item.contact || '-')} · ${escapeHtml(item.monthLabel)} · ${item.maxDays} days</small><small>Invoices: ${escapeHtml(item.invoices.join(', '))}${item.pending > 0 ? ` · Pending ₹${item.pending.toLocaleString('en-IN')}` : ' · Payment cleared'}</small></div>
+            <textarea rows="2" maxlength="300" placeholder="Defaulter remark" onchange="updateDefaulterOverride('${escapeHtml(item.key)}','remark',this.value)">${escapeHtml(item.remark)}</textarea>
+            <label class="defaulter-exclude"><input type="checkbox" ${item.excluded ? 'checked' : ''} onchange="updateDefaulterOverride('${escapeHtml(item.key)}','excluded',this.checked);renderDefaulterManagerList()"> Defaulter alert hide करें</label>
+        </div>`).join('') : '<div class="defaulter-manager-empty">7 दिन से ज्यादा pending रहने वाला कोई customer नहीं मिला।</div>';
+    }
+    async function saveDefaulterSettings() {
+        try {
+            const payload = new URLSearchParams({ action:'saveDefaulterSettings', overrides:JSON.stringify(defaulterOverrides) });
+            const response = await fetch(APPS_SCRIPT_URL, { method:'POST', body:payload });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error || result.message || 'Save failed');
+            defaulterOverrides = result.overrides || [];
+            renderTable(getTrackerFilters());
+            renderDefaulterManagerList();
+            showMessage('Defaulter settings saved', 'success');
+        } catch (error) { showMessage(error.message || 'Defaulter settings save failed', 'error'); }
+    }
+
     function findPendingDefaulterMatch() {
         const contactInput = document.getElementById('contactName')?.value || '';
         const customerNameInput = document.getElementById('customerName')?.value || '';
         const loginInput = document.getElementById('loginId')?.value || '';
         const lookupKeys = [contactInput, customerNameInput, loginInput].map(normalizeDefaulterLookupValue).filter(Boolean);
         if (!lookupKeys.length || !currentHeaders.length || !currentData.length) return null;
+
+        const registryMatch = buildMonthlyDefaulterRegistry().find(item => {
+            if (item.excluded) return false;
+            const itemKeys = [item.contact, item.name, item.contactKey].map(normalizeDefaulterLookupValue).filter(Boolean);
+            return lookupKeys.some(key => itemKeys.includes(key));
+        });
+        if (!registryMatch) return null;
+        const registryRowIndex = registryMatch.mainIndexes[0];
+        const registryRow = currentData[registryRowIndex] || [];
+        const registryDeal = parseFloat(registryRow[getColIndex('DEALING AMOUNT')]) || 0;
+        return {
+            rowIndex: registryRowIndex,
+            lookupKey: registryMatch.key,
+            date: getLocalISODate(registryRow[getColIndex('DATE')]),
+            invoiceNo: registryMatch.invoices.join(', '),
+            contact: registryMatch.contact,
+            loginId: showSheetText(registryRow[getColIndex('LOGIN ID')]).trim(),
+            status: registryMatch.pending > 0 ? 'DEFAULTER / PENDING' : 'PAST DEFAULTER',
+            deal: registryDeal,
+            received: Math.max(registryDeal - registryMatch.pending, 0),
+            due: registryMatch.pending,
+            remarks: registryMatch.remark
+        };
 
         const idxInv = getColIndex('INVOICE NO.');
         const idxDate = getColIndex('DATE');
@@ -2763,6 +2909,8 @@
         const idxCreatedBy = getColIndex('CREATED BY');
         const idxTimestamp = getColIndex('Timestamp');
         const invoicePendingByIndex = buildTrackerInvoicePendingMap();
+        const defaulterByMainIndex = new Map();
+        buildMonthlyDefaulterRegistry().filter(item => !item.excluded).forEach(item => item.mainIndexes.forEach(index => defaulterByMainIndex.set(index, item)));
 
         let filtered = currentData.filter(row => {
             if (filters.statusF !== 'all' && idxStatus !== -1) {
@@ -2821,6 +2969,9 @@
                 ? (finalInvoicePending !== undefined ? finalInvoicePending : getTrackerDisplayedPendingAmount(row)) : 0;
             const pendingAmountHtml = (statusVal === 'PENDING' || statusVal === 'PARTIAL')
                 ? `<small class="tracker-pending-amount">Amt Pending: ₹${displayedPendingAmount.toLocaleString('en-IN')}</small>` : '';
+            const defaulterInfo = defaulterByMainIndex.get(originalIdx);
+            const defaulterHtml = defaulterInfo
+                ? `<small class="tracker-defaulter-flag" title="${escapeHtml(defaulterInfo.remark)}"><i class="fas fa-user-clock"></i> Defaulter in ${escapeHtml(defaulterInfo.monthLabel)}<span>${escapeHtml(defaulterInfo.remark)}</span></small>` : '';
             let dateDisplay = formatDisplayDate(row[idxDate]);
 
             // Reminder Bell button visibility conditions
@@ -2855,7 +3006,7 @@
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Contact / Login ID">${contactHtml}</td>
                 <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
-                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
+                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}${defaulterHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
                 <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
                 <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
                 <td data-label="Actions">

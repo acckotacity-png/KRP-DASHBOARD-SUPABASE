@@ -4,7 +4,8 @@
 create extension if not exists pgcrypto;
 
 create table if not exists public.app_users (
-  user_id uuid primary key references auth.users(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  device_type text not null default 'desktop' check (device_type in ('desktop','mobile')),
   email text not null unique,
   full_name text default '',
   role text not null default 'staff' check (role in ('admin','staff')),
@@ -17,7 +18,8 @@ create table if not exists public.active_sessions (
   session_token uuid not null,
   device_label text not null default '',
   signed_in_at timestamptz not null default now(),
-  last_seen timestamptz not null default now()
+  last_seen timestamptz not null default now(),
+  primary key (user_id, device_type)
 );
 
 create or replace function public.is_krp_user()
@@ -52,6 +54,7 @@ create table if not exists public.business_settings (
   upi_id text default '', terms_conditions text default '', purpose_options jsonb not null default '[]'::jsonb,
   financial_year_options jsonb not null default '[]'::jsonb, state_options jsonb not null default '[]'::jsonb,
   bank_options jsonb not null default '[]'::jsonb,
+  defaulter_overrides jsonb not null default '[]'::jsonb,
   updated_by uuid default auth.uid() references auth.users(id), updated_at timestamptz not null default now()
 );
 

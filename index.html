@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=38">
+    <link rel="stylesheet" href="theme.css?v=39">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -605,7 +605,22 @@
             <button type="button" class="settings-hub-option" onclick="openPaymentFromHub()"><i class="fas fa-wallet"></i><span>Payment Settings</span></button>
             <button type="button" class="settings-hub-option" onclick="openBusinessFromHub()"><i class="fas fa-building"></i><span>Business Settings</span></button>
             <button type="button" class="settings-hub-option" style="grid-column:1 / -1; min-height:76px;" onclick="openPurposeManagerFromHub()"><i class="fas fa-list-check"></i><span>Dropdown Settings</span></button>
+            <button type="button" class="settings-hub-option" style="grid-column:1 / -1; min-height:76px;" onclick="openDefaulterManagerFromHub()"><i class="fas fa-user-clock"></i><span>Defaulters List</span></button>
         </div>
+    </div>
+</div>
+
+<div id="defaulterManagerModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:680px;">
+        <div class="modal-header">
+            <button type="button" class="settings-back-btn" onclick="backToHeaderSettingsHub('defaulterManagerModal')" aria-label="Back to Settings Menu"><i class="fas fa-arrow-left"></i><span>Back</span></button>
+            <span><i class="fas fa-user-clock"></i> Defaulters List</span>
+            <i class="fas fa-times close-modal" onclick="closeDefaulterManager()"></i>
+        </div>
+        <p class="defaulter-manager-help">जिस invoice का payment 7 दिन से ज्यादा pending रहा, उसका customer उस invoice के month में यहाँ आएगा। Remarks केवल यहीं edit होंगे।</p>
+        <input type="search" id="defaulterManagerSearch" class="defaulter-manager-search" placeholder="Mobile no., name, invoice या month search करें" oninput="renderDefaulterManagerList()">
+        <div id="defaulterManagerList" class="defaulter-manager-list"></div>
+        <button type="button" class="btn-submit" style="width:100%;max-width:none;" onclick="saveDefaulterSettings()"><i class="fas fa-save"></i> Save Defaulter Changes</button>
     </div>
 </div>
 
@@ -794,7 +809,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260817-2" defer></script>
+<script src="assets/app.js?v=20260818-1" defer></script>
 </body>
 </html>
 

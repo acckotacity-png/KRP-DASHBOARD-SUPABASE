@@ -102,6 +102,19 @@ async function route(client,user,p){
     if(error)throw error;
     return {success:true,purposes,years,states,banks};
   }
+  if(action==="getDefaulterSettings"){
+    const {data,error}=await client.from("business_settings").select("defaulter_overrides").eq("id",1).maybeSingle();
+    if(error)throw error;
+    return {success:true,overrides:Array.isArray(data?.defaulter_overrides)?data.defaulter_overrides:[]};
+  }
+  if(action==="saveDefaulterSettings"){
+    const overrides=parseJson(p.overrides);
+    if(!Array.isArray(overrides))throw Error("Invalid defaulter settings");
+    const clean=overrides.slice(0,2000).map(x=>({key:s(x?.key).slice(0,180),remark:s(x?.remark).slice(0,300),excluded:!!x?.excluded})).filter(x=>x.key);
+    const {error}=await client.from("business_settings").upsert({id:1,defaulter_overrides:clean,updated_by:user.uid},{onConflict:"id"});
+    if(error)throw error;
+    return {success:true,overrides:clean};
+  }
   if(action==="getRecordsData"){const rows=await all(client,"monthly_records");return {success:true,headers:MONTH_HEADERS,data:rows.map(monthRow)};}
   if(["addRecord","updateRecordField","updateRecord","deleteRecord"].includes(action)&&!(p.rowIndex!==undefined&&p.data)){const table="monthly_records";if(action==="addRecord"){const {error}=await client.from(table).insert({entry_date:s(p.date),month:s(p.month),total_id:n(p.totalId),working_amount:n(p.working),transfer_amount:n(p.transfer),monthly_amount:n(p.monthly),setup_amount:n(p.setup),remarks:s(p.remarks)});if(error)throw error;}else{const id=await idAt(client,table,n(p.row)-2);if(action==="deleteRecord"){const {error}=await client.from(table).delete().eq("id",id);if(error)throw error;}else{const map={date:"entry_date",month:"month",totalId:"total_id",working:"working_amount",transfer:"transfer_amount",monthly:"monthly_amount",setup:"setup_amount",remarks:"remarks"};const update=action==="updateRecordField"?{[map[p.field]||p.field]:p.value}:{entry_date:s(p.date),month:s(p.month),total_id:n(p.totalId),working_amount:n(p.working),transfer_amount:n(p.transfer),monthly_amount:n(p.monthly),setup_amount:n(p.setup),remarks:s(p.remarks)};const {error}=await client.from(table).update(update).eq("id",id);if(error)throw error;}}return {success:true};}
   if(action==="getNotepadData"){const rows=await all(client,"notepad_tasks");return {success:true,headers:NOTE_HEADERS,data:rows.map(noteRow)};}
