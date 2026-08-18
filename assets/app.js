@@ -533,7 +533,7 @@
     function openBusinessFromHub() { closeHeaderSettingsHub(); openSettingsModal(); }
     async function openPurposeManagerFromHub() { closeHeaderSettingsHub(); await refreshManagedDropdownSettings(true); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
     function closePurposeManager() { document.getElementById('purposeManagerModal').classList.remove('active'); }
-    function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
+    function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); loadSavedBusinessSettings(); loadTermsHistory(); }
     function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
     function openUpiModal() { document.getElementById('upiModal').classList.add('active'); }
     function closeUpiModal() { document.getElementById('upiModal').classList.remove('active'); }
@@ -544,10 +544,22 @@
             showMessage('Saving settings...', 'pending');
             const result = await saveAllSettingsToSheet();
             showMessage(result.message || 'Business settings saved successfully!', 'success');
-            closeSettingsModal();
+            await loadTermsHistory();
         } catch (error) {
             showMessage(error.message || 'Settings Supabase me save nahi hui.', 'error');
         }
+    }
+
+    async function loadTermsHistory() {
+        const host = document.getElementById('termsHistoryList');
+        if (!host) return;
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getTermsHistory&t=${Date.now()}`, { cache:'no-store' });
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error || 'History load failed');
+            const rows = Array.isArray(result.history) ? result.history : [];
+            host.innerHTML = rows.length ? rows.map(item => `<div class="terms-history-item"><div><strong>${escapeHtml(item.changedBy || 'KRP User')}</strong><span>${escapeHtml(formatLedgerHistoryTimestamp(item.changedAt))}</span></div><p>${escapeHtml(item.terms || '(Terms cleared)')}</p></div>`).join('') : '<div class="terms-history-empty">Terms की कोई update history नहीं है।</div>';
+        } catch (error) { host.innerHTML = `<div class="terms-history-empty">${escapeHtml(error.message || 'History load failed')}</div>`; }
     }
 
     // ─── PRINT LOGIC ──────────────────────────────────────────────

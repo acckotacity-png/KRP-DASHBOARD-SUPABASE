@@ -111,6 +111,12 @@ create table if not exists public.audit_log (
   operation text not null, old_data jsonb, new_data jsonb, changed_by uuid default auth.uid(), changed_at timestamptz not null default now()
 );
 
+create table if not exists public.business_terms_history (
+  id bigint generated always as identity primary key, terms_text text not null default '',
+  changed_by uuid default auth.uid() references auth.users(id), changed_by_name text not null default '',
+  changed_at timestamptz not null default now()
+);
+
 create index if not exists main_records_sequence_idx on public.main_records(sequence_no);
 create index if not exists main_records_invoice_idx on public.main_records(invoice_no);
 create index if not exists main_records_contact_idx on public.main_records(contact_name);

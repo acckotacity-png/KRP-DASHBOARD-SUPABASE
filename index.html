@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=40">
+    <link rel="stylesheet" href="theme.css?v=41">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -669,6 +669,7 @@
             <div class="form-group" style="margin-bottom:10px;"><label>GSTIN (Optional)</label><input type="text" id="bizGst" placeholder="Enter GSTIN if any"></div>
             <div class="form-group" style="margin-bottom:10px;"><label>Business Address</label><textarea id="bizAddress" rows="2">Kota, Rajasthan</textarea></div>
             <div class="form-group" style="margin-bottom:10px;"><label>Terms &amp; Conditions</label><textarea id="bizTerms" rows="3" placeholder="Invoice terms and conditions"></textarea></div>
+            <div class="terms-history-panel"><div class="terms-history-title"><span><i class="fas fa-clock-rotate-left"></i> Terms Update History</span><button type="button" onclick="loadTermsHistory()"><i class="fas fa-rotate"></i></button></div><div id="termsHistoryList" class="terms-history-list"><div class="terms-history-empty">History loading...</div></div></div>
             <button type="submit" class="btn-submit" style="width:100%; max-width:none; background:#ff9800;">Save Configuration</button>
         </form>
     </div>
@@ -809,7 +810,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260818-2" defer></script>
+<script src="assets/app.js?v=20260818-3" defer></script>
 </body>
 </html>
 

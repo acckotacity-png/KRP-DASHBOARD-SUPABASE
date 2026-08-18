@@ -90,6 +90,11 @@ async function route(client,user,p){
   }
   if(action==="getSettings"){const {data,error}=await client.from("business_settings").select("*").eq("id",1).maybeSingle();if(error)throw error;const x=data?{businessName:data.business_name,contactNumber:data.contact_number,emailAddress:data.email_address,gstin:data.gstin,businessAddress:data.business_address,accountHolderName:data.account_holder_name,accountNumber:data.account_number,ifsc:data.ifsc,upiId:data.upi_id,termsConditions:data.terms_conditions}:{};return {success:true,hasSettings:!!data,settings:x};}
   if(action==="saveSettings"){const x={id:1,business_name:s(p.businessName),contact_number:s(p.contactNumber),email_address:s(p.emailAddress),gstin:s(p.gstin),business_address:s(p.businessAddress),account_holder_name:s(p.accountHolderName),account_number:s(p.accountNumber),ifsc:s(p.ifsc),upi_id:s(p.upiId),terms_conditions:s(p.termsConditions),updated_by:user.uid};const {error}=await client.from("business_settings").upsert(x);if(error)throw error;return {success:true,settings:p};}
+  if(action==="getTermsHistory"){
+    const {data,error}=await client.from("business_terms_history").select("terms_text,changed_by_name,changed_at").order("changed_at",{ascending:false}).limit(50);
+    if(error)throw error;
+    return {success:true,history:(data||[]).map(x=>({terms:x.terms_text,changedBy:x.changed_by_name,changedAt:x.changed_at}))};
+  }
   if(action==="getPurposeSettings"){
     const {data,error}=await client.from("business_settings").select("purpose_options,financial_year_options,state_options,bank_options").eq("id",1).maybeSingle();
     if(error)throw error;
