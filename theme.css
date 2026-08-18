@@ -721,6 +721,7 @@ body.krp-no-create [data-right="create"],body.krp-no-create .records-action-btn.
 body.krp-no-edit [data-right="edit"],body.krp-no-edit .btn-edit,body.krp-no-edit .btn-config,body.krp-no-edit .records-action-btn.update{display:none!important}
 body.krp-no-delete [data-right="delete"],body.krp-no-delete .btn-delete,body.krp-no-delete .records-action-btn.delete{display:none!important}
 body.krp-no-settings #mainSettingsBtn,body.krp-no-settings [data-admin-only]{display:none!important}
+.krp-access-hidden,.section-icon-line .tab-btn.krp-access-hidden,[data-section].krp-access-hidden{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
 /* Stronger dark-theme contrast for account and section icon buttons. */
 html.krp-dark-theme .account-icon-line .icon-action{background:#132b3a!important;border-color:#3b5567!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.035),0 3px 8px rgba(0,0,0,.28)!important}

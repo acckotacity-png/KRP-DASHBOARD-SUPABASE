@@ -197,7 +197,11 @@
         DASHBOARD_TABS.forEach(tab => {
             if (tab === 'form' || tab === 'tracker' || tab === 'dashboard' || tab === 'expense' || tab === 'udhari' || tab === 'notepad' || tab === 'transaction') {
                 const allowed = user.role === 'admin' || sections[tab] !== false;
-                document.querySelectorAll(`[data-tab="${tab}"],[data-section="${tab}"]`).forEach(el => el.style.display = allowed ? '' : 'none');
+                document.querySelectorAll(`[data-tab="${tab}"],[data-section="${tab}"]`).forEach(el => {
+                    el.classList.toggle('krp-access-hidden', !allowed);
+                    el.hidden = !allowed;
+                    el.setAttribute('aria-hidden', allowed ? 'false' : 'true');
+                });
             }
         });
     }
