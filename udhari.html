@@ -118,6 +118,32 @@
     html.krp-dark-theme .excel { background: #146b43 !important; color: #effff7 !important; border-color: #2b9665 !important; }
     html.krp-dark-theme .search input { background: #091925 !important; color: #e4edf2 !important; border-color: #315064 !important; }
     html.krp-dark-theme .search input::placeholder { color: #8299aa !important; opacity: 1 !important; }
+    /* Compact metrics are identical in light and dark; themes change colors only. */
+    body { padding: 7px !important; font-size: 12px !important; }
+    .top { padding: 10px 12px !important; margin-bottom: 8px !important; border-radius: 11px !important; }
+    .top h1 { font-size: 17px !important; }
+    .top > div { gap: 5px !important; }
+    .top button { min-height: 32px !important; padding: 6px 9px !important; font-size: 10px !important; border-radius: 7px !important; }
+    .cards { gap: 7px !important; margin-bottom: 8px !important; }
+    .card { padding: 9px 11px !important; border-radius: 9px !important; }
+    .card span { margin-bottom: 3px !important; font-size: 8px !important; }
+    .card strong { font-size: 15px !important; }
+    .tools { gap: 6px !important; padding: 8px 10px !important; border-radius: 9px !important; }
+    .search input { min-height: 34px !important; padding: 7px 31px !important; font-size: 11px !important; border-radius: 7px !important; }
+    .status, #recordCount { font-size: 9px !important; }
+    .customer-grid { gap: 8px !important; padding: 8px 0 !important; }
+    .customer-card { padding: 11px !important; border-radius: 10px !important; }
+    .customer-head { margin-bottom: 7px !important; }
+    .customer-name { margin-bottom: 2px !important; font-size: 14px !important; line-height: 1.2 !important; }
+    .customer-mobile { font-size: 9px !important; }
+    .customer-balance { font-size: 14px !important; }
+    .customer-info { gap: 5px 8px !important; padding: 7px 0 !important; }
+    .customer-info span { font-size: 7px !important; }
+    .customer-info b { margin-top: 2px !important; font-size: 11px !important; }
+    .customer-info small { font-size: 7px !important; }
+    .customer-actions { gap: 5px !important; margin-top: 8px !important; }
+    .customer-actions button { min-height: 31px !important; padding: 5px 7px !important; font-size: 9px !important; border-radius: 7px !important; }
+    .empty-state { padding: 24px !important; font-size: 11px !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
