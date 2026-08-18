@@ -65,8 +65,9 @@ async function route(client,user,p){
   const createActions=new Set(["add","addRecord","addNotepad","saveRecord","saveUdhariRecord","saveExpense","saveExpenseBudget"]);
   const editActions=new Set(["update","updateStatusUtr","updateRecordField","updateRecord","updateNotepad","updateUdhariRecord","updateExpense"]);
   const deleteActions=new Set(["delete","deleteRecord","deleteNotepad","deleteUdhariRecord","deleteExpense"]);
-  const settingsActions=new Set(["saveSettings","savePurposeSettings"]);
+  const settingsActions=new Set(["saveSettings","savePurposeSettings","saveDefaulterSettings"]);
   const requiredPermission=createActions.has(action)?"create":editActions.has(action)?"edit":deleteActions.has(action)?"delete":settingsActions.has(action)?"settings":"view";
+  if(settingsActions.has(action)&&user.role!=="admin")throw Error("ADMIN permission required");
   if(user.role!=="admin"&&user.permissions?.[requiredPermission]!==true)throw Error(`${requiredPermission.toUpperCase()} permission required`);
   if(action==="getData"){const rows=await all(client,"main_records");return {success:true,headers:MAIN_HEADERS,data:rows.map(mainRow)};}
   if(action==="add"||action==="update"){const payload=mainPayload(p);let saved;if(action==="add"){const {data,error}=await client.from("main_records").insert(payload).select("*").single();if(error)throw error;saved=data;}else{const id=await idAt(client,"main_records",p.row);const {data,error}=await client.from("main_records").update(payload).eq("id",id).select("*").single();if(error)throw error;saved=data;}return {success:true,headers:MAIN_HEADERS,...(action==="update"?{rowIndex:n(p.row)}:{}),savedRow:mainRow(saved)};}

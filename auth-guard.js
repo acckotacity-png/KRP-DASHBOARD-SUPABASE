@@ -93,7 +93,7 @@ window.currentKrpUser = {
     create: access.role === "admin" || access.can_create !== false,
     edit: access.role === "admin" || access.can_edit !== false,
     delete: access.role === "admin" || access.can_delete !== false,
-    settings: access.role === "admin" || access.can_manage_settings === true,
+    settings: access.role === "admin",
     sections: {
       form: access.role === "admin" || access.can_data_entry !== false,
       tracker: access.role === "admin" || access.can_tracker !== false,
@@ -114,8 +114,8 @@ window.dispatchEvent(new CustomEvent("krp-auth-ready", { detail: window.currentK
 const permissionStyle = document.createElement("style");
 permissionStyle.textContent = `${window.currentKrpUser.permissions.delete ? "" : '[onclick*="delete" i],.delete-btn,.btn-delete{display:none!important}'}
 ${window.currentKrpUser.permissions.edit ? "" : 'button[onclick^="edit" i],button[onclick*=";edit" i],[onclick*="editRecord" i],[onclick*="openEdit" i],[onclick*="openFullEdit" i],[onclick*="savePaymentUpdate" i],.edit-btn,.btn-edit,.btn-config,.records-action-btn.update{display:none!important}'}
-${window.currentKrpUser.permissions.create ? "" : '[onclick*="openForm" i],[onclick*="toggleForm" i],[onclick*="openExpense" i],[onclick*="openNotepadModal" i],[onclick*="openAddRecordsModal" i],[onclick*="addCustomer" i],.btn-add{display:none!important}'}
-${window.currentKrpUser.permissions.settings ? "" : '#mainSettingsBtn,[onclick*="openHeaderSettingsHub"]{display:none!important}'}
+${window.currentKrpUser.permissions.create ? "" : '[onclick*="openForm" i],[onclick*="toggleForm" i],[onclick*="openExpense" i],[onclick*="openNotepadModal" i],[onclick*="openAddRecordsModal" i],[onclick*="addCustomer" i],.btn-add,.records-action-btn.add,[data-right="create"]{display:none!important}'}
+${window.currentKrpUser.permissions.settings ? "" : '#mainSettingsBtn,[onclick*="openHeaderSettingsHub"],[data-admin-only]{display:none!important}'}
 ${Object.entries(window.currentKrpUser.permissions.sections).filter(([,allowed])=>!allowed).map(([section])=>`[data-tab="${section}"],[data-section="${section}"]{display:none!important}`).join('\n')}`;
 document.head.appendChild(permissionStyle);
 const guardedPageSection = {

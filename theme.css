@@ -716,6 +716,19 @@ html.krp-dark-theme #defaulterManagerModal .modal-content{background:#10232e!imp
 .terms-history-panel{margin:10px 0;padding:9px;border:1px solid #cbd9d1;border-radius:10px;background:#edf2ef}.terms-history-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px;color:#365247;font-size:10px;font-weight:850}.terms-history-title button{display:grid;place-items:center;width:26px;height:26px;border:1px solid #bdd0c6;border-radius:7px;background:#f8faf9;color:#168b5c;cursor:pointer}.terms-history-list{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow-y:auto}.terms-history-item{padding:7px 8px;border:1px solid #d5e0da;border-radius:8px;background:#f9fbfa}.terms-history-item>div{display:flex;justify-content:space-between;gap:8px}.terms-history-item strong{color:#2b443a;font-size:9px}.terms-history-item span{color:#71837a;font-size:8px}.terms-history-item p{margin:5px 0 0;color:#465f54;font-size:9px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}.terms-history-empty{padding:12px;text-align:center;color:#71837a;font-size:9px}html.krp-dark-theme .terms-history-panel{background:#0d202a;border-color:#31505d}html.krp-dark-theme .terms-history-title{color:#bcd2c8}html.krp-dark-theme .terms-history-title button{background:#173629;color:#82d4ab;border-color:#315c49}html.krp-dark-theme .terms-history-item{background:#142a35;border-color:#294a59}html.krp-dark-theme .terms-history-item strong{color:#e0ece7!important}html.krp-dark-theme .terms-history-item span,html.krp-dark-theme .terms-history-empty{color:#91a9b5!important}html.krp-dark-theme .terms-history-item p{color:#b8cbd3!important}@media(max-width:520px){.terms-history-list{max-height:150px}.terms-history-item>div{flex-direction:column;gap:2px}}
 @media(max-width:520px){.settings-back-btn{padding:5px 7px!important;margin-right:4px!important}.settings-back-btn span{display:none!important}.modal-header>span{font-size:12px!important}}
 
+/* Rights-aware controls: dynamic buttons follow the signed-in user's access. */
+body.krp-no-create [data-right="create"],body.krp-no-create .records-action-btn.add{display:none!important}
+body.krp-no-edit [data-right="edit"],body.krp-no-edit .btn-edit,body.krp-no-edit .btn-config,body.krp-no-edit .records-action-btn.update{display:none!important}
+body.krp-no-delete [data-right="delete"],body.krp-no-delete .btn-delete,body.krp-no-delete .records-action-btn.delete{display:none!important}
+body.krp-no-settings #mainSettingsBtn,body.krp-no-settings [data-admin-only]{display:none!important}
+
+/* Stronger dark-theme contrast for account and section icon buttons. */
+html.krp-dark-theme .account-icon-line .icon-action{background:#132b3a!important;border-color:#3b5567!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.035),0 3px 8px rgba(0,0,0,.28)!important}
+html.krp-dark-theme .account-icon-line .profile-action{color:#59e0a1!important}html.krp-dark-theme .account-icon-line .access-action{color:#38e0b0!important}html.krp-dark-theme .account-icon-line .settings-action{color:#ffd04a!important}html.krp-dark-theme .account-icon-line .theme-action{color:#8bc8ff!important}
+html.krp-dark-theme .section-icon-line .tab-btn{background:#142c3a!important;color:#a9c1d2!important;border-color:#385264!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 3px 8px rgba(0,0,0,.24)!important}
+html.krp-dark-theme .section-icon-line .tab-btn i{color:inherit!important;opacity:1!important;filter:none!important}
+html.krp-dark-theme .section-icon-line .tab-btn.active{background:#087a4d!important;color:#edfff5!important;border-color:#35c883!important;box-shadow:0 4px 10px rgba(0,0,0,.3)!important}
+
 @media(max-width:850px){
   #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1440px!important}
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}

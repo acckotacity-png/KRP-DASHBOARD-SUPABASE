@@ -3,7 +3,7 @@
 <head>
     <style id="auth-guard-style">html { visibility: hidden; }</style>
 <script src="api-gate.js?v=1"></script>
-<script type="module" src="auth-guard.js?v=19"></script>
+<script type="module" src="auth-guard.js?v=20"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=41">
+    <link rel="stylesheet" href="theme.css?v=42">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -36,8 +36,8 @@
           </div>
           <div class="view-filter account-icon-line" aria-label="Account controls">
               <button class="btn-settings icon-action profile-action" onclick="location.href='profile.html'" aria-label="My Profile"><i class="fas fa-user-circle"></i></button>
-              <button id="adminAccessBtn" class="btn-settings icon-action access-action" style="display:none" onclick="location.href='admin.html'" aria-label="Access Control"><i class="fas fa-user-shield"></i></button>
-              <button id="mainSettingsBtn" class="btn-settings icon-action settings-action" onclick="openHeaderSettingsHub()" aria-label="Settings Menu"><i class="fas fa-sliders-h"></i></button>
+              <button id="adminAccessBtn" data-admin-only class="btn-settings icon-action access-action" style="display:none" onclick="location.href='admin.html'" aria-label="Access Control"><i class="fas fa-user-shield"></i></button>
+              <button id="mainSettingsBtn" data-admin-only class="btn-settings icon-action settings-action" onclick="openHeaderSettingsHub()" aria-label="Settings Menu"><i class="fas fa-sliders-h"></i></button>
               <button id="themeToggleBtn" class="btn-settings icon-action theme-action" type="button" onclick="toggleKrpTheme()" aria-label="Switch to dark theme"><i class="fas fa-moon"></i></button>
           </div>
         </div>
@@ -118,7 +118,7 @@
               </div>
             </div>
             <div class="toolbar">
-                <button type="button" class="btn-submit" style="width:auto;margin:0;" onclick="openNotepadModal()"><i class="fas fa-plus"></i> Add Task</button>
+                <button type="button" class="btn-submit" data-right="create" style="width:auto;margin:0;" onclick="openNotepadModal()"><i class="fas fa-plus"></i> Add Task</button>
                 <div class="notepad-search-wrap"><input class="search-box" id="notepadSearch" placeholder="Search contact, name, ID or task..." autocomplete="off" oninput="renderNotepadTable()"><button type="button" class="notepad-search-clear" onclick="clearNotepadSearch()" title="Clear search" aria-label="Clear search"><i class="fas fa-times"></i></button></div>
                 <select class="filter-select" id="notepadTaskFilter" onchange="renderNotepadTable()"><option value="all">All Task Status</option><option>PENDING</option><option>IN PROGRESS</option><option>COMPLETED</option><option>CANCELLED</option></select>
                 <select class="filter-select" id="notepadPaymentFilter" onchange="renderNotepadTable()"><option value="all">All Payment Status</option><option>PENDING</option><option>PARTIAL</option><option>PAID</option></select>
@@ -520,7 +520,7 @@
     <div class="modal-content large-modal ledger-modal">
         <div class="modal-header">
             <span><i class="fas fa-book"></i> Ledger: <span id="ledgerContactTitle">-</span><small id="ledgerCustomerName" style="display:block;margin:4px 0 0 25px;font-size:11px;font-weight:600;opacity:.82;"></small></span>
-            <div class="ledger-header-actions"><button type="button" class="btn-submit ledger-excel-btn" onclick="exportActiveContactLedgerExcel()"><i class="fas fa-file-excel"></i> Excel</button><button type="button" class="btn-submit ledger-misc-payment-btn" onclick="openMiscellaneousPaymentEntry()"><i class="fas fa-money-check-dollar"></i> Miscellaneous Payment Entry</button></div>
+            <div class="ledger-header-actions"><button type="button" class="btn-submit ledger-excel-btn" onclick="exportActiveContactLedgerExcel()"><i class="fas fa-file-excel"></i> Excel</button><button type="button" class="btn-submit ledger-misc-payment-btn" data-right="create" onclick="openMiscellaneousPaymentEntry()"><i class="fas fa-money-check-dollar"></i> Miscellaneous Payment Entry</button></div>
             <i class="fas fa-times close-modal" onclick="closeContactLedger()"></i>
         </div>
         <div id="ledgerSummary" class="ledger-summary-grid"></div>
@@ -810,7 +810,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260818-3" defer></script>
+<script src="assets/app.js?v=20260819-2" defer></script>
 </body>
 </html>
 

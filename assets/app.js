@@ -188,9 +188,11 @@
         document.body.classList.toggle('krp-no-create', permissions.create === false);
         document.body.classList.toggle('krp-no-edit', permissions.edit === false);
         document.body.classList.toggle('krp-no-delete', permissions.delete === false);
-        document.body.classList.toggle('krp-no-settings', permissions.settings === false);
+        document.body.classList.toggle('krp-no-settings', user.role !== 'admin');
         const adminButton = document.getElementById('adminAccessBtn');
         if (adminButton) adminButton.style.display = user.role === 'admin' ? '' : 'none';
+        const settingsButton = document.getElementById('mainSettingsBtn');
+        if (settingsButton) settingsButton.style.display = user.role === 'admin' ? '' : 'none';
         const sections = permissions.sections || {};
         DASHBOARD_TABS.forEach(tab => {
             if (tab === 'form' || tab === 'tracker' || tab === 'dashboard' || tab === 'expense' || tab === 'udhari' || tab === 'notepad' || tab === 'transaction') {
@@ -523,23 +525,29 @@
         return result;
     }
 
-    function openHeaderSettingsHub() { document.getElementById('headerSettingsHub').classList.add('active'); }
+    function requireAdminSettings() {
+        if (window.currentKrpUser?.role === 'admin') return true;
+        showMessage('Settings aur Rights sirf Admin ke liye available hain.', 'error');
+        return false;
+    }
+    function openHeaderSettingsHub() { if (requireAdminSettings()) document.getElementById('headerSettingsHub').classList.add('active'); }
     function closeHeaderSettingsHub() { document.getElementById('headerSettingsHub').classList.remove('active'); }
     function backToHeaderSettingsHub(sourceModalId) {
         document.getElementById(sourceModalId)?.classList.remove('active');
         document.getElementById('headerSettingsHub')?.classList.add('active');
     }
-    function openPaymentFromHub() { closeHeaderSettingsHub(); openUpiModal(); }
-    function openBusinessFromHub() { closeHeaderSettingsHub(); openSettingsModal(); }
-    async function openPurposeManagerFromHub() { closeHeaderSettingsHub(); await refreshManagedDropdownSettings(true); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
+    function openPaymentFromHub() { if(!requireAdminSettings())return; closeHeaderSettingsHub(); openUpiModal(); }
+    function openBusinessFromHub() { if(!requireAdminSettings())return; closeHeaderSettingsHub(); openSettingsModal(); }
+    async function openPurposeManagerFromHub() { if(!requireAdminSettings())return; closeHeaderSettingsHub(); await refreshManagedDropdownSettings(true); renderPurposeManagerLists(); document.getElementById('purposeManagerModal').classList.add('active'); }
     function closePurposeManager() { document.getElementById('purposeManagerModal').classList.remove('active'); }
-    function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); loadSavedBusinessSettings(); loadTermsHistory(); }
+    function openSettingsModal() { if(!requireAdminSettings())return; document.getElementById('settingsModal').classList.add('active'); loadSavedBusinessSettings(); loadTermsHistory(); }
     function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
-    function openUpiModal() { document.getElementById('upiModal').classList.add('active'); }
+    function openUpiModal() { if(!requireAdminSettings())return; document.getElementById('upiModal').classList.add('active'); }
     function closeUpiModal() { document.getElementById('upiModal').classList.remove('active'); }
     
     async function saveBusinessSettings(e) {
         e.preventDefault();
+        if(!requireAdminSettings())return;
         try {
             showMessage('Saving settings...', 'pending');
             const result = await saveAllSettingsToSheet();
@@ -1375,6 +1383,7 @@
     }
 
     function openDefaulterManagerFromHub() {
+        if(!requireAdminSettings())return;
         closeHeaderSettingsHub();
         document.getElementById('defaulterManagerModal')?.classList.add('active');
         renderDefaulterManagerList();
@@ -1739,7 +1748,7 @@
         popup.className = 'ledger-actions-popup';
         popup.dataset.rowIndex = String(rowIndex);
         popup.innerHTML = `
-            <button type="button" class="payment" onclick="closeLedgerActionPopup();openLedgerPaymentModal(${rowIndex})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
+            <button type="button" class="payment" data-right="create" onclick="closeLedgerActionPopup();openLedgerPaymentModal(${rowIndex})"><i class="fas fa-money-bill-wave"></i><span>Payment / Refund</span></button>
             <button type="button" class="edit" onclick="closeLedgerActionPopup();editLedgerRecord(${rowIndex})"><i class="fas fa-edit"></i><span>Full Edit</span></button>
             <button type="button" class="quick" onclick="closeLedgerActionPopup();quickUpdateLedgerRecord(${rowIndex})"><i class="fas fa-sliders-h"></i><span>Quick Update</span></button>
             ${canSendReminder ? `<button type="button" class="sms" onclick="closeLedgerActionPopup();sendSmsReminder(${rowIndex})"><i class="fas fa-sms"></i><span>SMS Reminder</span></button>` : ''}
@@ -1896,7 +1905,7 @@
                 <td data-label="Remarks" class="ledger-remarks">${escapeHtml(row[idxRemarks] || '-')}</td>
                 <td data-label="Status">${displayStatus ? `<span class="badge ${badgeClass}">${displayStatus}</span>` : '<span aria-label="Supporting payment entry">—</span>'}</td>
                 <td data-label="Actions" class="ledger-actions"><div class="action-icons">
-                    ${isMainInvoiceRow ? `<button type="button" class="ledger-duplicate-trigger" onclick="duplicateLedgerActivation(${item.index})" title="Create another activation from this entry" aria-label="Duplicate activation entry"><i class="fas fa-plus"></i></button>` : ''}
+                    ${isMainInvoiceRow ? `<button type="button" class="ledger-duplicate-trigger" data-right="create" onclick="duplicateLedgerActivation(${item.index})" title="Create another activation from this entry" aria-label="Duplicate activation entry"><i class="fas fa-plus"></i></button>` : ''}
                     <button type="button" class="ledger-actions-trigger" onclick="openLedgerActionPopup(event,${item.index},${canSendReminder})" title="Open actions" aria-label="Open actions"><i class="fas fa-ellipsis-v"></i></button>
                 </div></td>
             </tr>`;
@@ -5867,7 +5876,7 @@
                 <td class="ledger-due ${balance > 0 ? 'positive' : ''}">${formatLedgerMoney(balance)}</td>
                 <td><span class="badge ${paymentStatus === 'PAID' ? 'badge-success' : paymentStatus === 'PARTIAL' ? 'badge-partial' : 'badge-pending'}">${escapeHtml(paymentStatus)}</span></td>
                 <td>${getNotepadReminderHtml(row)}</td>
-                <td><div class="records-row-actions"><button type="button" class="records-action-btn add" onclick="addNotepadPayment(${item.index})">Add Payment</button><button type="button" class="records-action-btn update" onclick="editNotepadFromLedger(${item.index})">Edit</button></div></td>
+                <td><div class="records-row-actions"><button type="button" class="records-action-btn add" data-right="create" onclick="addNotepadPayment(${item.index})">Add Payment</button><button type="button" class="records-action-btn update" data-right="edit" onclick="editNotepadFromLedger(${item.index})">Edit</button></div></td>
             </tr>`;
         }).join('');
         const header = document.querySelector('#contactLedgerModal .ledger-table thead tr');
