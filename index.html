@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=39">
+    <link rel="stylesheet" href="theme.css?v=40">
     <script src="theme.js?v=2"></script>
 </head>
 <body class="form-view">
@@ -311,7 +311,7 @@
                 <div class="form-grid">
                     <div class="form-group"><label class="required">Invoice (Auto)</label><input type="text" id="invoiceNo" required readonly placeholder="Generating..."></div>
                     <div class="form-group"><label class="required">Date</label><input type="date" id="date" required onchange="generateInvoiceNo()"></div>
-                    <div class="form-group"><label class="required">Contact No.</label><input type="text" id="contactName" required autocomplete="off"></div>
+                    <div class="form-group defaulter-contact-field"><label class="required">Contact No.</label><input type="text" id="contactName" required autocomplete="off"><div id="newEntryDefaulterChip" class="new-entry-defaulter-chip" role="status" aria-live="polite"></div></div>
                     <div class="form-group"><label>Customer Name</label><input type="text" id="customerName" autocomplete="name"></div>
                     <div class="form-group"><label>Bank Name</label><select id="bankOwner"><option value="">Select Bank</option></select></div>
                     <div class="form-group">
@@ -809,7 +809,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20260818-1" defer></script>
+<script src="assets/app.js?v=20260818-2" defer></script>
 </body>
 </html>
 

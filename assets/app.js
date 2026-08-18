@@ -1418,6 +1418,7 @@
             lookupKey: registryMatch.key,
             date: getLocalISODate(registryRow[getColIndex('DATE')]),
             invoiceNo: registryMatch.invoices.join(', '),
+            monthLabel: registryMatch.monthLabel,
             contact: registryMatch.contact,
             loginId: showSheetText(registryRow[getColIndex('LOGIN ID')]).trim(),
             status: registryMatch.pending > 0 ? 'DEFAULTER / PENDING' : 'PAST DEFAULTER',
@@ -1512,6 +1513,7 @@
         resetNewFormMultiSelect();
         generateInvoiceNo();
         calcNewAmt();
+        renderNewEntryDefaulterChip(null);
     }
 
     function acknowledgeDefaulterWarning(continueAnyway = true) {
@@ -1539,6 +1541,7 @@
 
     const checkPendingDefaulterWarning = debounce(function() {
         const match = findPendingDefaulterMatch();
+        renderNewEntryDefaulterChip(match);
         if (!match) {
             const modalActive = document.getElementById('defaulterWarningModal')?.classList.contains('active');
             if (modalActive) {
@@ -1547,13 +1550,16 @@
             }
             return;
         }
-        const lookupKey = match.lookupKey || '';
-        if (lookupKey && lookupKey === dismissedDefaulterLookupKey) return;
-        const modalActive = document.getElementById('defaulterWarningModal')?.classList.contains('active');
-        const activeKey = activeDefaulterMatch ? (activeDefaulterMatch.lookupKey || '') : '';
-        if (modalActive && lookupKey === activeKey) return;
-        openDefaulterWarningModal(match);
+        activeDefaulterMatch = match;
     }, 250);
+
+    function renderNewEntryDefaulterChip(match) {
+        const chip = document.getElementById('newEntryDefaulterChip');
+        if (!chip) return;
+        if (!match) { chip.classList.remove('visible'); chip.innerHTML = ''; return; }
+        chip.innerHTML = `<i class="fas fa-user-clock"></i><b>Defaulter</b><span>${escapeHtml(match.invoiceNo || '-')} · ${escapeHtml(match.monthLabel || '-')}</span>`;
+        chip.classList.add('visible');
+    }
 
     function wireDefaulterWarningLookup() {
         ['contactName', 'loginId'].forEach(id => {
@@ -3897,11 +3903,6 @@
     // ─── SUBMIT NEW ENTRY ─────────────────────────────────────────
     async function submitNewEntry(event) {
         event.preventDefault();
-        const pendingDefaulter = findPendingDefaulterMatch();
-        if (pendingDefaulter && pendingDefaulter.lookupKey !== dismissedDefaulterLookupKey) {
-            openDefaulterWarningModal(pendingDefaulter);
-            return;
-        }
         if (!validateAndNotifyRecordEntry('')) return;
         const btn = event.target.querySelector('.btn-submit');
         const ogText = btn.innerHTML;
@@ -3939,6 +3940,7 @@
                 resetNewFormMultiSelect();
                 activeDefaulterMatch = null;
                 dismissedDefaulterLookupKey = '';
+                renderNewEntryDefaulterChip(null);
                 switchTab('tracker');
                 const applied = applySavedTrackerRow(result);
                 if (!applied) loadTrackerData(true);
