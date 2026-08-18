@@ -158,6 +158,20 @@
   </div>
 </div>
 
+<div class="modal" id="customerModal">
+  <div class="dialog" style="width:min(560px,100%)">
+    <div class="dialog-head"><h2><i class="fas fa-user-plus"></i> Add New Customer</h2><button class="close" onclick="closeCustomerForm()">&times;</button></div>
+    <form id="customerForm" onsubmit="saveNewCustomer(event)">
+      <div class="grid" style="grid-template-columns:1fr">
+        <div class="field"><label>Mobile No. *</label><input id="newCustomerMobile" inputmode="numeric" maxlength="15" required></div>
+        <div class="field"><label>Customer Name *</label><input id="newCustomerName" required></div>
+        <div class="field"><label>Address / State</label><textarea id="newCustomerAddress"></textarea></div>
+      </div>
+      <div class="form-actions"><button type="button" class="outline" onclick="closeCustomerForm()">Cancel</button><button id="customerSaveButton" class="success" type="submit">Add Customer</button></div>
+    </form>
+  </div>
+</div>
+
 <div class="modal" id="entryModal">
   <div class="dialog">
     <div class="dialog-head"><h2 id="formTitle">Add Udhari Entry</h2><button class="close" onclick="closeForm()">&times;</button></div>
@@ -191,6 +205,7 @@
   const CACHE_KEY = 'krp_udhari_cache_v1_' + (sessionStorage.getItem('krp_cache_user_uid') || 'signed_out');
   const COL = { id:0,date:1,name:2,mobile:3,address:4,type:5,description:6,udhar:7,payment:8,balance:9,due:10,mode:11,ref:12,status:13,reminder:14,remarks:15,createdBy:16,timestamp:17,rate:18,interestType:19,interestStart:20,interestTill:21,interest:22,total:23 };
   let records = [];
+  let customersMaster = [];
   let query = '';
   let visible = 10;
   let filteredCount = 0;
@@ -226,11 +241,12 @@
   const localTodayIso = () => { const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 
   function setStatus(text, error=false) { const el=document.getElementById('statusMessage'); el.textContent=text; el.style.color=error?'#c62828':'#008f68'; }
-  function cache() { localStorage.setItem(CACHE_KEY, JSON.stringify({savedAt:Date.now(),records})); }
-  function restoreCache() { try { const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); if(c?.records){records=c.records;render();return true;} } catch(e){} return false; }
+  function cache() { localStorage.setItem(CACHE_KEY, JSON.stringify({savedAt:Date.now(),records,customersMaster})); }
+  function restoreCache() { try { const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); if(c?.records){records=c.records;customersMaster=Array.isArray(c.customersMaster)?c.customersMaster:[];render();return true;} } catch(e){} return false; }
   function applyServerData(result, message='Updated') {
     if(Array.isArray(result?.data)) {
       records=result.data;
+      customersMaster=Array.isArray(result.customers)?result.customers:customersMaster;
       cache();
       render();
       setStatus(message);
@@ -254,6 +270,7 @@
         const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
         if(Array.isArray(cached?.records)) {
           records=cached.records;
+          customersMaster=Array.isArray(cached.customersMaster)?cached.customersMaster:[];
           render();
           showingCache=true;
           setStatus('Ready · Cached JSON');
@@ -265,6 +282,7 @@
       const result=await request({action:'getUdhariData'});
       if(!result.success) throw new Error(result.error||'Load failed');
       records=result.data||[];
+      customersMaster=Array.isArray(result.customers)?result.customers:[];
       cache();
       render();
       setStatus(showingCache?'Background sync complete':'Updated');
@@ -278,6 +296,15 @@
 
   function getCustomers() {
     const grouped={};
+    customersMaster.forEach(customer=>{
+      const mobile=normalizeMobile(customer.mobileNo);
+      if(!mobile)return;
+      const latest=Array(24).fill('');
+      latest[COL.name]=customer.customerName;latest[COL.mobile]=mobile;latest[COL.address]=customer.address;
+      latest[COL.balance]=0;latest[COL.interest]=0;latest[COL.total]=0;latest[COL.status]='PAID';
+      latest[COL.createdBy]=customer.createdBy||'';latest[COL.timestamp]=customer.createdAt||'';
+      grouped[mobile]={key:mobile,mobile,name:customer.customerName,address:customer.address,entries:[],latest};
+    });
     records.slice().sort((a,b)=>dateTime(a[COL.date])-dateTime(b[COL.date])).forEach(r=>{
       const mobile=normalizeMobile(r[COL.mobile]);
       const key=mobile||`missing-${r[COL.id]}`;
@@ -410,9 +437,20 @@
 
   function openNewCustomerForm() {
     if(!requireRight('create'))return;
-    openForm();
-    document.getElementById('formTitle').textContent='Add New Customer Ledger Entry';
-    document.getElementById('mobileNo').focus();
+    document.getElementById('customerForm').reset();
+    document.getElementById('customerModal').classList.add('open');
+    document.getElementById('newCustomerMobile').focus();
+  }
+  function closeCustomerForm(){document.getElementById('customerModal').classList.remove('open');}
+  async function saveNewCustomer(event){
+    event.preventDefault();
+    if(!requireRight('create'))return;
+    const data={mobileNo:normalizeMobile(document.getElementById('newCustomerMobile').value),customerName:document.getElementById('newCustomerName').value.trim(),address:document.getElementById('newCustomerAddress').value.trim()};
+    if(data.mobileNo.length!==10)return alert('Sahi 10-digit mobile number enter karein');
+    if(findCustomer(data.mobileNo))return alert('Is mobile number ka customer pehle se bana hua hai');
+    const button=document.getElementById('customerSaveButton');button.disabled=true;setStatus('Customer saving...');
+    try{const result=await request({action:'saveUdhariCustomer',data:JSON.stringify(data)});if(!result.success)throw new Error(result.error||'Customer save failed');applyServerData(result,'Customer added');closeCustomerForm();}
+    catch(error){setStatus(error.message,true);alert(error.message||'Customer save failed');}finally{button.disabled=false;}
   }
 
   function addCustomerPayment(key) {
@@ -574,6 +612,7 @@
     }
     const data={entryId:document.getElementById('entryId').value,date:isoToDisplay(document.getElementById('date').value),customerName:document.getElementById('customerName').value.trim(),mobileNo:normalizeMobile(document.getElementById('mobileNo').value),address:document.getElementById('address').value.trim(),transactionType:document.getElementById('transactionType').value,description:document.getElementById('description').value.trim(),udharAmount:num(document.getElementById('udharAmount').value),paymentAmount:num(document.getElementById('paymentAmount').value),dueDate:isoToDisplay(document.getElementById('dueDate').value),paymentMode:document.getElementById('paymentMode').value,referenceNo:document.getElementById('referenceNo').value.trim(),reminderDate:isoToDisplay(document.getElementById('reminderDate').value),remarks:document.getElementById('remarks').value.trim(),interestRate:num(document.getElementById('interestRate').value),interestType:document.getElementById('interestType').value,interestStartDate:isoToDisplay(document.getElementById('interestStartDate').value),createdBy:window.parent.currentKrpUser?.email||''};
     if(data.mobileNo.length<10)return alert('Sahi mobile number enter karein');
+    if(!findCustomer(data.mobileNo))return alert('Pehle New Customer button se customer ki basic details add karein');
     if(data.transactionType!=='PAYMENT MILA'&&data.udharAmount<=0)return alert('Udhari amount enter karein');
     if(data.transactionType==='PAYMENT MILA'&&data.paymentAmount<=0)return alert('Payment amount enter karein');
     const button=document.getElementById('saveButton');button.disabled=true;setStatus('Saving...');
@@ -614,6 +653,7 @@
   }
 
   document.getElementById('entryModal').addEventListener('click',e=>{if(e.target.id==='entryModal')closeForm();});
+  document.getElementById('customerModal').addEventListener('click',e=>{if(e.target.id==='customerModal')closeCustomerForm();});
   document.getElementById('ledgerModal').addEventListener('click',e=>{if(e.target.id==='ledgerModal')closeLedger();});
   window.addEventListener('load',()=>{
     applyPermissionVisibility();
