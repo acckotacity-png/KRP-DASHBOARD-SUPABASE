@@ -75,6 +75,15 @@
     textarea { min-height: 70px; resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: #4318ff; box-shadow: 0 0 0 2px rgba(67,24,255,.1); }
     .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    .field[hidden] { display: none !important; }
+    .excel { background: #14804a; color: #fff; }
+    html.krp-dark-theme .dialog { background: #0d202d !important; border: 1px solid #294657 !important; color: #dbe7ef !important; }
+    html.krp-dark-theme .dialog-head { padding-bottom: 10px; border-bottom: 1px solid #294657; }
+    html.krp-dark-theme .dialog-head h2 { color: #f1f7fb !important; }
+    html.krp-dark-theme .close { background: #4b2229 !important; color: #ff9da5 !important; border: 1px solid #77404a !important; }
+    html.krp-dark-theme .field label { color: #a9bfd0 !important; }
+    html.krp-dark-theme .field input, html.krp-dark-theme .field select, html.krp-dark-theme .field textarea { background: #14283a !important; color: #f0f6fa !important; border-color: #36516a !important; }
+    html.krp-dark-theme .form-actions .outline { background: #1c3344 !important; color: #d9e6ee !important; border-color: #466178 !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -104,6 +113,7 @@
     <h1><i class="fas fa-book-open"></i>Udhari Bahi Khata</h1>
     <div>
       <button class="outline" onclick="loadData(true)"><i class="fas fa-rotate"></i> Refresh</button>
+      <button class="success" data-right="create" onclick="openNewCustomerForm()"><i class="fas fa-user-plus"></i> New Customer</button>
       <button class="primary" data-right="create" onclick="openForm()"><i class="fas fa-plus"></i> New Entry</button>
     </div>
   </div>
@@ -155,20 +165,20 @@
       <input type="hidden" id="entryId">
       <div class="grid">
         <div class="field"><label>Date *</label><input type="date" id="date" onchange="syncInterestDate()" required></div>
-        <div class="field"><label>Customer Name *</label><input id="customerName" required></div>
         <div class="field"><label>Mobile No. *</label><input id="mobileNo" inputmode="numeric" maxlength="15" oninput="lookupCustomer()" required><small id="customerLookup" class="status"></small></div>
+        <div class="field"><label>Customer Name *</label><input id="customerName" required></div>
         <div class="field"><label>Address / State</label><input id="address"></div>
         <div class="field"><label>Transaction Type</label><select id="transactionType" onchange="applyType()"><option>UDHAR DIYA</option><option>UDHAR LIYA</option><option>PAYMENT MILA</option></select></div>
         <div class="field"><label>Description</label><input id="description"></div>
-        <div class="field"><label>Udhari Diya Amount</label><input type="number" step="0.01" id="udharAmount"></div>
-        <div class="field"><label>Payment Mila Amount</label><input type="number" step="0.01" id="paymentAmount"></div>
-        <div class="field"><label>Due Date</label><input type="date" id="dueDate"></div>
-        <div class="field"><label>Payment Mode</label><select id="paymentMode"><option value="">Select</option><option>CASH</option><option>UPI</option><option>BANK</option><option>OTHER</option></select></div>
-        <div class="field"><label>UTR / Reference No.</label><input id="referenceNo"></div>
-        <div class="field"><label>Reminder Date</label><input type="date" id="reminderDate"></div>
-        <div class="field"><label>Interest Rate (%)</label><input type="number" step="0.01" id="interestRate" value="0"></div>
-        <div class="field"><label>Interest Type</label><select id="interestType"><option>MONTHLY</option><option>YEARLY</option></select></div>
-        <div class="field"><label>Interest Start Date</label><input type="date" id="interestStartDate"></div>
+        <div class="field credit-only"><label id="udharAmountLabel">Udhari Diya Amount</label><input type="number" step="0.01" id="udharAmount"></div>
+        <div class="field payment-only" hidden><label>Payment Mila Amount</label><input type="number" step="0.01" id="paymentAmount"></div>
+        <div class="field credit-only"><label>Due Date</label><input type="date" id="dueDate"></div>
+        <div class="field payment-only" hidden><label>Payment Mode</label><select id="paymentMode"><option value="">Select</option><option>CASH</option><option>UPI</option><option>BANK</option><option>OTHER</option></select></div>
+        <div class="field payment-only" hidden><label>UTR / Reference No.</label><input id="referenceNo"></div>
+        <div class="field credit-only"><label>Reminder Date</label><input type="date" id="reminderDate"></div>
+        <div class="field credit-only"><label>Interest Rate (%)</label><input type="number" step="0.01" id="interestRate" value="0"></div>
+        <div class="field credit-only"><label>Interest Type</label><select id="interestType"><option>MONTHLY</option><option>YEARLY</option></select></div>
+        <div class="field credit-only"><label>Interest Start Date</label><input type="date" id="interestStartDate"></div>
         <div class="field wide"><label>Remarks</label><textarea id="remarks"></textarea></div>
       </div>
       <div class="form-actions"><button type="button" class="outline" onclick="closeForm()">Cancel</button><button id="saveButton" class="success" type="submit">Save Entry</button></div>
@@ -270,7 +280,7 @@
     const grouped={};
     records.slice().sort((a,b)=>dateTime(a[COL.date])-dateTime(b[COL.date])).forEach(r=>{
       const mobile=normalizeMobile(r[COL.mobile]);
-      const key=mobile||String(r[COL.name]||'').trim().toLowerCase();
+      const key=mobile||`missing-${r[COL.id]}`;
       if(!grouped[key]) grouped[key]={key,mobile,name:r[COL.name],address:r[COL.address],entries:[]};
       grouped[key].entries.push(r);
       grouped[key].name=r[COL.name]||grouped[key].name;
@@ -341,11 +351,16 @@
     const interestType=document.getElementById('interestType');
     const interestStart=document.getElementById('interestStartDate');
     const isPayment=type==='PAYMENT MILA';
+    document.querySelectorAll('.credit-only').forEach(field=>field.hidden=isPayment);
+    document.querySelectorAll('.payment-only').forEach(field=>field.hidden=!isPayment);
+    document.getElementById('udharAmountLabel').textContent=type==='UDHAR LIYA'?'Udhari Liya Amount':'Udhari Diya Amount';
     rate.disabled=isPayment;
     interestType.disabled=isPayment;
     interestStart.disabled=isPayment;
     if(type==='PAYMENT MILA') {
       document.getElementById('udharAmount').value='';
+      document.getElementById('dueDate').value='';
+      document.getElementById('reminderDate').value='';
       rate.value='0';
       interestStart.value='';
       if(updateDescription) {
@@ -355,10 +370,14 @@
       }
     } else if(type==='UDHAR LIYA') {
       document.getElementById('paymentAmount').value='';
+      document.getElementById('paymentMode').value='';
+      document.getElementById('referenceNo').value='';
       if(!interestStart.value)interestStart.value=document.getElementById('date').value;
       if(updateDescription)description.value='Customer ne udhar liya';
     } else {
       document.getElementById('paymentAmount').value='';
+      document.getElementById('paymentMode').value='';
+      document.getElementById('referenceNo').value='';
       if(!interestStart.value)interestStart.value=document.getElementById('date').value;
       if(updateDescription)description.value='Customer ko udhar diya';
     }
@@ -387,6 +406,13 @@
       note.textContent=mobile.length>=10?'New customer mobile number':'';
       note.style.color='#b45309';
     }
+  }
+
+  function openNewCustomerForm() {
+    if(!requireRight('create'))return;
+    openForm();
+    document.getElementById('formTitle').textContent='Add New Customer Ledger Entry';
+    document.getElementById('mobileNo').focus();
   }
 
   function addCustomerPayment(key) {
@@ -451,6 +477,27 @@
     window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
   }
 
+  function exportCustomerLedger(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    const rows=[...customer.entries].sort((a,b)=>dateTime(a[COL.date])-dateTime(b[COL.date])).map(r=>({
+      'Mobile No':customer.mobile||r[COL.mobile], 'Customer Name':r[COL.name], 'Date':r[COL.date],
+      'Transaction Type':r[COL.type], 'Description':r[COL.description], 'Udhari Amount':num(r[COL.udhar]),
+      'Payment Amount':num(r[COL.payment]), 'Running Balance':num(r[COL.balance]), 'Interest':num(r[COL.interest]),
+      'Total Payable':num(r[COL.total]), 'Due Date':r[COL.due], 'Status':r[COL.status],
+      'Payment Mode':r[COL.mode], 'UTR / Reference':r[COL.ref], 'Reminder Date':r[COL.reminder],
+      'Remarks':r[COL.remarks], 'Created By':r[COL.createdBy], 'Saved At':r[COL.timestamp]
+    }));
+    const XLSX=window.parent?.XLSX||window.XLSX;
+    if(!XLSX)return alert('Excel library load nahi hui. Page refresh karke dobara try karein.');
+    const sheet=XLSX.utils.json_to_sheet(rows);
+    sheet['!cols']=[14,24,12,18,28,15,15,16,14,16,12,12,16,19,14,28,22,18].map(w=>({wch:w}));
+    const book=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book,sheet,'Customer Ledger');
+    const safeName=String(customer.name||'Customer').replace(/[\\/:*?"<>|]/g,' ').trim();
+    XLSX.writeFile(book,`${safeName}-${customer.mobile||'mobile'}-Udhari-Ledger.xlsx`);
+  }
+
   function openLedger(key) {
     const customer=findCustomer(key);
     if(!customer)return;
@@ -468,6 +515,7 @@
       <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
       <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
       <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+      <button class="excel" onclick="exportCustomerLedger('${escapeHtml(customer.key)}')"><i class="fas fa-file-excel"></i> Excel Report</button>
       <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> WhatsApp Due Reminder</button>`;
     document.getElementById('ledgerRows').innerHTML=entries.map(r=>`<tr>
       <td data-label="Date">${escapeHtml(r[COL.date])}</td><td data-label="Type">${escapeHtml(r[COL.type])}</td><td data-label="Description">${escapeHtml(r[COL.description])}</td>
