@@ -75,6 +75,7 @@
     textarea { min-height: 70px; resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: #4318ff; box-shadow: 0 0 0 2px rgba(67,24,255,.1); }
     .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) {
@@ -103,7 +104,7 @@
     <h1><i class="fas fa-book-open"></i>Udhari Bahi Khata</h1>
     <div>
       <button class="outline" onclick="loadData(true)"><i class="fas fa-rotate"></i> Refresh</button>
-      <button class="primary" onclick="openForm()"><i class="fas fa-plus"></i> New Entry</button>
+      <button class="primary" data-right="create" onclick="openForm()"><i class="fas fa-plus"></i> New Entry</button>
     </div>
   </div>
 
@@ -185,6 +186,26 @@
   let filteredCount = 0;
   let activeLedgerKey = '';
   let returnToLedgerKey = '';
+
+  function currentAccess() {
+    let user=null;
+    try { user=window.parent.currentKrpUser||window.currentKrpUser||null; } catch (_) { user=window.currentKrpUser||null; }
+    const permissions=user?.permissions||{};
+    const admin=user?.role==='admin';
+    return {create:admin||permissions.create===true,edit:admin||permissions.edit===true,delete:admin||permissions.delete===true};
+  }
+  function hasRight(right) { return currentAccess()[right]===true; }
+  function applyPermissionVisibility() {
+    const access=currentAccess();
+    document.body.classList.toggle('no-create',!access.create);
+    document.body.classList.toggle('no-edit',!access.edit);
+    document.body.classList.toggle('no-delete',!access.delete);
+  }
+  function requireRight(right) {
+    if(hasRight(right))return true;
+    alert(`${right.toUpperCase()} right aapko provide nahi kiya gaya hai.`);
+    return false;
+  }
 
   const money = value => '₹' + (Number(String(value || 0).replace(/,/g,'')) || 0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const num = value => Number(String(value || 0).replace(/,/g,'')) || 0;
@@ -287,8 +308,8 @@
           <div><span>Created By</span><b>${escapeHtml(r[COL.createdBy]||'-')}</b><small style="display:block;color:#718096;font-size:9px;">${escapeHtml(r[COL.timestamp]||'-')}</small></div>
         </div>
         <div class="customer-actions">
-          <button class="primary" onclick="addCustomerUdhari('${escapeHtml(c.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
-          <button class="success" onclick="addCustomerPayment('${escapeHtml(c.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+          <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(c.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
+          <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(c.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
           <button class="outline" onclick="openLedger('${escapeHtml(c.key)}')"><i class="fas fa-book"></i> Full Ledger</button>
           <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(c.key)}')"><i class="fab fa-whatsapp"></i> Due Reminder</button>
         </div>
@@ -327,7 +348,11 @@
       document.getElementById('udharAmount').value='';
       rate.value='0';
       interestStart.value='';
-      if(updateDescription)description.value='Customer se payment mila';
+      if(updateDescription) {
+        description.value='Customer se payment mila';
+        const customer=findCustomer(document.getElementById('mobileNo').value);
+        if(customer)document.getElementById('paymentAmount').value=Math.max(0,num(customer.latest[COL.total])).toFixed(2);
+      }
     } else if(type==='UDHAR LIYA') {
       document.getElementById('paymentAmount').value='';
       if(!interestStart.value)interestStart.value=document.getElementById('date').value;
@@ -365,6 +390,7 @@
   }
 
   function addCustomerPayment(key) {
+    if(!requireRight('create'))return;
     const customer=findCustomer(key);
     if(!customer)return;
     returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
@@ -375,6 +401,7 @@
     document.getElementById('address').value=customer.address||'';
     document.getElementById('transactionType').value='PAYMENT MILA';
     applyType();
+    document.getElementById('paymentAmount').value=Math.max(0,num(latest[COL.total])).toFixed(2);
     document.getElementById('description').value='Part / full payment received';
     document.getElementById('formTitle').textContent=`Payment - ${customer.name}`;
     lookupCustomer();
@@ -382,6 +409,7 @@
   }
 
   function addCustomerUdhari(key) {
+    if(!requireRight('create'))return;
     const customer=findCustomer(key);
     if(!customer)return;
     returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
@@ -438,8 +466,8 @@
       <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
       <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
       <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
-      <button class="primary" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
-      <button class="success" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
+      <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
+      <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
       <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> WhatsApp Due Reminder</button>`;
     document.getElementById('ledgerRows').innerHTML=entries.map(r=>`<tr>
       <td data-label="Date">${escapeHtml(r[COL.date])}</td><td data-label="Type">${escapeHtml(r[COL.type])}</td><td data-label="Description">${escapeHtml(r[COL.description])}</td>
@@ -447,7 +475,7 @@
       <td data-label="Interest">${money(r[COL.interest])}</td><td data-label="Total Payable"><b>${money(r[COL.total])}</b></td><td data-label="Due Date">${escapeHtml(r[COL.due])}</td>
       <td data-label="Status"><span class="badge ${String(r[COL.status]).toLowerCase()}">${escapeHtml(r[COL.status])}</span></td>
       <td data-label="Mode">${escapeHtml(r[COL.mode])}</td><td data-label="Reference">${escapeHtml(r[COL.ref])}</td><td data-label="Remarks">${escapeHtml(r[COL.remarks])}</td>
-      <td data-label="Actions"><div class="actions"><button class="outline" onclick="closeLedger();editEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-pen"></i></button><button class="danger" onclick="deleteEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-trash"></i></button></div></td>
+      <td data-label="Actions"><div class="actions"><button class="outline" data-right="edit" onclick="closeLedger();editEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-pen"></i></button><button class="danger" data-right="delete" onclick="deleteEntry('${escapeHtml(r[COL.id])}')"><i class="fas fa-trash"></i></button></div></td>
     </tr>`).join('');
     const ledgerModal=document.getElementById('ledgerModal');
     ledgerModal.hidden=false;
@@ -462,6 +490,7 @@
   }
 
   function openForm(record=null) {
+    if(!requireRight(record?'edit':'create'))return;
     document.getElementById('entryForm').reset();
     document.getElementById('entryId').value='';
     document.getElementById('date').value=localTodayIso();
@@ -485,10 +514,12 @@
     document.getElementById('entryModal').classList.add('open');
   }
   function closeForm(){document.getElementById('entryModal').classList.remove('open');}
-  function editEntry(id){const r=records.find(x=>String(x[COL.id])===String(id));if(r)openForm(r);}
+  function editEntry(id){if(!requireRight('edit'))return;const r=records.find(x=>String(x[COL.id])===String(id));if(r)openForm(r);}
 
   async function saveEntry(event) {
     event.preventDefault();
+    const editing=Boolean(document.getElementById('entryId').value);
+    if(!requireRight(editing?'edit':'create'))return;
     const selectedType=document.getElementById('transactionType').value;
     if(selectedType!=='PAYMENT MILA'&&!document.getElementById('interestStartDate').value) {
       document.getElementById('interestStartDate').value=document.getElementById('date').value;
@@ -513,6 +544,7 @@
   }
 
   async function deleteEntry(id) {
+    if(!requireRight('delete'))return;
     if(!confirm('Is Udhari entry ko delete karein?'))return;
     const previousRecords=records;
     closeLedger();
@@ -536,6 +568,8 @@
   document.getElementById('entryModal').addEventListener('click',e=>{if(e.target.id==='entryModal')closeForm();});
   document.getElementById('ledgerModal').addEventListener('click',e=>{if(e.target.id==='ledgerModal')closeLedger();});
   window.addEventListener('load',()=>{
+    applyPermissionVisibility();
+    setTimeout(applyPermissionVisibility,500);
     loadData(false);
     setInterval(()=>loadData(false),120000);
   });
