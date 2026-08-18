@@ -177,6 +177,18 @@
     }
     html.krp-dark-theme .ledger-dialog .ledger-kpis .card { background: linear-gradient(145deg,#193e37,#12322d) !important; border-color:#2d5a50 !important; }
     html.krp-dark-theme .ledger-dialog .ledger-command-row { padding: 5px !important; border: 1px solid #285047 !important; border-radius: 7px !important; background: rgba(7,28,24,.34) !important; }
+    html.krp-dark-theme { scrollbar-color: #2d5b50 #071a18 !important; }
+    html.krp-dark-theme ::-webkit-scrollbar { width: 7px !important; height: 7px !important; }
+    html.krp-dark-theme ::-webkit-scrollbar-track { background: #071a18 !important; }
+    html.krp-dark-theme ::-webkit-scrollbar-thumb { background: #2d5b50 !important; border: 1px solid #071a18 !important; border-radius: 8px !important; }
+    html.krp-dark-theme ::-webkit-scrollbar-corner { background: #071a18 !important; }
+    .customer-balance.overdue-balance { color: #d62835 !important; }
+    .customer-balance.normal-balance { color: #078a58 !important; }
+    .customer-balance.zero-balance { color: #334b41 !important; }
+    html.krp-dark-theme .customer-balance.overdue-balance { color: #ff626e !important; }
+    html.krp-dark-theme .customer-balance.normal-balance { color: #62d19b !important; }
+    html.krp-dark-theme .customer-balance.zero-balance { color: #c1ced6 !important; }
+    html.krp-dark-theme .customer-info span { color: #d5aa49 !important; }
     body.no-create [data-right="create"], body.no-edit [data-right="edit"], body.no-delete [data-right="delete"] { display: none !important; }
     @media (max-width: 1000px) { .customer-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; } }
     @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -469,12 +481,13 @@
     document.getElementById('customerCards').innerHTML=shown.length?shown.map(c=>{
       const r=c.latest;
       const balance=num(r[COL.balance]);
+      const balanceClass=balance===0?'zero-balance':String(r[COL.status]).toUpperCase()==='OVERDUE'?'overdue-balance':'normal-balance';
       const totalUdhari=c.entries.reduce((s,x)=>s+num(x[COL.udhar]),0);
       const totalPayment=c.entries.reduce((s,x)=>s+num(x[COL.payment]),0);
       return `<article class="customer-card">
         <div class="customer-head">
           <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div></div>
-          <div class="customer-balance ${balance<=0?'clear-balance':''}">${money(balance)}</div>
+          <div class="customer-balance ${balanceClass}">${money(balance)}</div>
         </div>
         <div class="customer-info">
           <div><span>Total Udhari</span><b>${money(totalUdhari)}</b></div>
