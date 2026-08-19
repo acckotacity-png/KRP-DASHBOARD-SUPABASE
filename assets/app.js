@@ -4399,7 +4399,7 @@
         showMessage('Opening saved contact on WhatsApp', 'success');
     }
 
-    function shareQRWithWhatsApp() {
+    async function shareQRWithWhatsApp() {
         if (!currentQRPayload) return;
         const p = currentQRPayload;
         const selectedPhone = getSelectedWhatsAppPhone();
@@ -4450,23 +4450,50 @@
         const qrFileKey = p.shareMode === 'reminder' ? 'Pending_Payment' : p.invoice;
         const file = new File([blob], `QR_${qrFileKey}.png`, { type: 'image/png' });
 
-        desktopFallback(blob, shareMessageText, qrFileKey);
+        if (navigator.share) {
+            try {
+                const shareData = { title: p.shareMode === 'reminder' ? 'Pending Payment Reminder' : 'Payment Request', text: shareMessageText, files: [file] };
+                if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+                    await navigator.share(shareData);
+                    showMessage('QR image aur payment message shared', 'success');
+                    closeQRModal();
+                    return;
+                }
+            } catch (error) {
+                if (error?.name === 'AbortError') return;
+                console.warn('Native QR file sharing unavailable; using fallback.', error);
+            }
+        }
+        await desktopFallback(blob, shareMessageText, qrFileKey);
     }
 
-    function desktopFallback(blob, messageText, invoice) {
+    async function desktopFallback(blob, messageText, invoice) {
         try {
+            let copiedToClipboard = false;
+            if (navigator.clipboard?.write && window.ClipboardItem && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                    copiedToClipboard = true;
+                } catch (clipboardError) {
+                    console.warn('QR clipboard copy unavailable.', clipboardError);
+                }
+            }
             const link = document.createElement('a');
             link.download = `QR_${invoice}.png`;
-            link.href = URL.createObjectURL(blob);
+            const objectUrl = URL.createObjectURL(blob);
+            link.href = objectUrl;
             link.click();
-            URL.revokeObjectURL(link.href);
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 3000);
 
             const phone = getSelectedWhatsAppPhone();
             if (!phone) throw new Error('Customer WhatsApp number not found');
             const phoneParam = phone ? `phone=${encodeURIComponent(phone)}&` : '';
-            const waUrlWithPhone = `https://api.whatsapp.com/send?${phoneParam}text=${encodeURIComponent(messageText + '\n\nQR image downloaded - please attach it to this chat.')}`;
+            const attachHelp = copiedToClipboard
+                ? '\n\nQR image clipboard me copied hai - WhatsApp chat me Ctrl+V karke send karein.'
+                : '\n\nQR image downloaded hai - ise WhatsApp chat me attach karke send karein.';
+            const waUrlWithPhone = `https://api.whatsapp.com/send?${phoneParam}text=${encodeURIComponent(messageText + attachHelp)}`;
             window.open(waUrlWithPhone, '_blank');
-            showMessage('QR image downloaded! Attach it in WhatsApp chat.', 'success');
+            showMessage(copiedToClipboard ? 'QR copied + downloaded. WhatsApp me paste karein.' : 'QR downloaded. WhatsApp me attach karein.', 'success');
             closeQRModal();
         } catch (e) {
             console.error('Desktop fallback failed:', e);
