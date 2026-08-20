@@ -493,7 +493,12 @@
     .crm-header{gap:6px!important;margin-bottom:7px!important;padding:5px 6px 7px!important}
     .crm-header h1{font-size:15px!important;gap:6px!important}.crm-header h1 i{font-size:15px!important}
     .header-actions{gap:4px!important}.header-actions button{min-height:30px!important;padding:5px 8px!important;border-radius:7px!important;font-size:9px!important;gap:4px!important}
-    .dashboard{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important;margin-bottom:7px!important;padding:5px!important;border-radius:8px!important}
+    .dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin-bottom:7px!important;padding:5px!important;border-radius:8px!important}
+    .txn-summary-pair{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;min-width:0!important;background:#fff!important;border:1px solid #dce6ef!important;border-radius:8px!important;overflow:hidden!important}
+    .txn-summary-pair .dash-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;display:flex!important;flex-direction:column!important;justify-content:center!important;min-width:0!important}
+    .txn-summary-pair .dash-card+.dash-card{border-left:1px solid #dce6ef!important}
+    .txn-summary-pair .dash-label{font-weight:800!important;white-space:normal!important}
+    .txn-summary-pair .dash-value{font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
     .dash-card,.dash-card.success{grid-column:auto!important;min-height:44px!important;padding:5px 4px!important;border-radius:7px!important}
     .dash-card .dash-label{margin-bottom:2px!important;font-size:7px!important;line-height:1.1!important}
     .dash-card .dash-value{font-size:11px!important;line-height:1.15!important;word-break:normal!important;overflow-wrap:anywhere!important}
@@ -506,7 +511,7 @@
     .form-actions{gap:5px!important;margin-top:8px!important}.form-actions button{min-height:31px!important;padding:5px 10px!important;border-radius:7px!important;font-size:9px!important}
     .modal-content{max-width:1180px!important;border-radius:10px!important}.modal-header{padding:8px 10px!important}.modal-header h2{font-size:13px!important}.modal-body{padding:7px!important}.modal-summary-grid{gap:4px!important;margin-bottom:6px!important}.m-card{padding:5px!important;border-radius:6px!important}.m-card .m-label{font-size:7px!important}.m-card .m-value{font-size:10px!important}
     @media(max-width:900px){.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dash-card.success{grid-column:auto!important}}
-    @media(max-width:520px){body{padding:3px!important}.app-container{padding:5px!important}.crm-header{flex-direction:row!important;align-items:center!important}.crm-header h1{font-size:12px!important}.header-actions button{width:29px!important;min-width:29px!important;padding:0!important;font-size:0!important}.header-actions button i{font-size:11px!important}.header-actions button span,#toggleBtnText{display:none!important}.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dash-card{min-height:40px!important}.dash-card .dash-value{font-size:9px!important}.form-grid{grid-template-columns:1fr 1fr!important}.data-entry-panel .form-actions{position:sticky!important;bottom:-10px!important;padding:7px 0 calc(7px + env(safe-area-inset-bottom))!important;background:inherit!important}.ledger-tools{flex-wrap:nowrap!important}.ledger-search{min-width:0!important}}
+    @media(max-width:520px){body{padding:3px!important}.app-container{padding:5px!important}.crm-header{flex-direction:row!important;align-items:center!important}.crm-header h1{font-size:12px!important}.header-actions button{width:29px!important;min-width:29px!important;padding:0!important;font-size:0!important}.header-actions button i{font-size:11px!important}.header-actions button span,#toggleBtnText{display:none!important}.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;padding:3px!important}.txn-summary-pair{border-radius:6px!important}.txn-summary-pair .dash-card{min-height:43px!important;padding:4px 2px!important}.txn-summary-pair .dash-label{font-size:6px!important;line-height:1.05!important}.txn-summary-pair .dash-value{font-size:8px!important;line-height:1.1!important}.form-grid{grid-template-columns:1fr 1fr!important}.data-entry-panel .form-actions{position:sticky!important;bottom:-10px!important;padding:7px 0 calc(7px + env(safe-area-inset-bottom))!important;background:inherit!important}.ledger-tools{flex-wrap:nowrap!important}.ledger-search{min-width:0!important}}
 
     /* Transaction controls must remain readable in the active dark theme. */
     html.krp-dark-theme .header-actions button,
@@ -528,6 +533,9 @@
     html.krp-dark-theme .show-more-btn{background:#13283a!important;color:#dbeafe!important;border-color:#3b82f6!important}
     html.krp-dark-theme .search-clear{background:#7f1d1d!important;color:#fecaca!important}
     html.krp-dark-theme .close-modal{color:#fecaca!important}
+    html.krp-dark-theme .txn-summary-pair{background:linear-gradient(90deg,#0a1722,#10212e)!important;border-color:rgba(148,163,184,.16)!important}
+    html.krp-dark-theme .txn-summary-pair .dash-card{background:transparent!important}
+    html.krp-dark-theme .txn-summary-pair .dash-card+.dash-card{border-left-color:rgba(148,163,184,.18)!important}
   </style>
 </head>
 <body>
@@ -543,33 +551,36 @@
   </div>
 
   <div class="dashboard" id="dashboard">
-    <div class="dash-card highlight">
-      <div class="dash-label"><i class="fas fa-calendar-alt"></i> Months</div>
-      <div class="dash-value month" id="dashMonths">0</div>
+    <div class="txn-summary-pair">
+      <div class="dash-card highlight">
+        <div class="dash-label"><i class="fas fa-calendar-alt"></i> Months</div>
+        <div class="dash-value month" id="dashMonths">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label"><i class="fas fa-id-card"></i> Total ID</div>
+        <div class="dash-value" id="dashTotalId">0</div>
+      </div>
     </div>
-    <div class="dash-card">
-      <div class="dash-label"><i class="fas fa-id-card"></i> Total ID</div>
-      <div class="dash-value" id="dashTotalId">0</div>
+    <div class="txn-summary-pair">
+      <div class="dash-card">
+        <div class="dash-label">Working Amt</div>
+        <div class="dash-value" id="dashWorking">₹0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Monthly Paid</div>
+        <div class="dash-value" id="dashMonthlyPaid">₹0</div>
+      </div>
     </div>
-    <div class="dash-card">
-      <div class="dash-label">Working Amt</div>
-      <div class="dash-value" id="dashWorking">₹0</div>
+    <div class="txn-summary-pair">
+      <div class="dash-card">
+        <div class="dash-label">Transfer Amt</div>
+        <div class="dash-value" id="dashTransfer">₹0</div>
+      </div>
+      <div class="dash-card success">
+        <div class="dash-label"><i class="fas fa-arrow-right"></i> Remaining Transferable</div>
+        <div class="dash-value" id="dashRemainingTransferable">₹0</div>
+      </div>
     </div>
-    <div class="dash-card">
-      <div class="dash-label">Transfer Amt</div>
-      <div class="dash-value" id="dashTransfer">₹0</div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-label">Monthly Paid</div>
-      <div class="dash-value" id="dashMonthlyPaid">₹0</div>
-    </div>
-    <div class="dash-card success">
-      <div class="dash-label"><i class="fas fa-arrow-right"></i> Remaining Transferable</div>
-      <div class="dash-value" id="dashRemainingTransferable">₹0</div>
-    </div>
-    <div class="dash-card status-pending"><div class="dash-label"><i class="fas fa-clock"></i> Pending Status</div><div class="dash-value" id="mainPendingStatus">0 ID · ₹0</div></div>
-    <div class="dash-card status-success"><div class="dash-label"><i class="fas fa-circle-check"></i> Success Status</div><div class="dash-value" id="mainSuccessStatus">0 ID · ₹0</div></div>
-    <div class="dash-card status-refund"><div class="dash-label"><i class="fas fa-rotate-left"></i> Refund Status</div><div class="dash-value" id="mainRefundStatus">0 ID · ₹0</div></div>
   </div>
 
   <div class="data-entry-panel" id="entryPanel">
@@ -877,7 +888,6 @@
       updateStatus('Main Dashboard se Transaction page open karein', 'error');
       return;
     }
-    loadMainStatusSummary();
     const cached = readTransactionCache();
     if (!force && cached && Date.now() - Number(cached.savedAt || 0) < TRANSACTION_CACHE_TTL) {
       if (!records.length) showCachedTransactions();
@@ -925,13 +935,6 @@
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return response.json();
       });
-  }
-
-  function loadMainStatusSummary(){
-    return jsonpRequest({action:'getMainStatusSummary'}).then(result=>{
-      const map=result?.summary||{},money=value=>'₹'+Number(value||0).toLocaleString('en-IN',{maximumFractionDigits:2});
-      [['mainPendingStatus','PENDING'],['mainSuccessStatus','SUCCESS'],['mainRefundStatus','REFUND']].forEach(([id,key])=>{const value=map[key]||{};const el=document.getElementById(id);if(el)el.textContent=`${Number(value.ids||0)} ID · ${money(value.amount)}`;});
-    }).catch(()=>{});
   }
 
   // ============================================================
