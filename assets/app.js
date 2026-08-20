@@ -989,7 +989,7 @@
             document.querySelector('[data-tab="expense"]').classList.add('active');
             const expenseFrame = document.getElementById('expenseFrame');
             if (expenseFrame && !expenseFrame.getAttribute('src')) {
-                expenseFrame.src = `expense.html?v=20260810-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                expenseFrame.src = `expense.html?v=20260821-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'udhari') {
             document.body.classList.remove('form-view');
@@ -997,7 +997,7 @@
             document.querySelector('[data-tab="udhari"]').classList.add('active');
             const udhariFrame = document.getElementById('udhariFrame');
             if (udhariFrame && !udhariFrame.getAttribute('src')) {
-                udhariFrame.src = `udhari.html?v=20260819-13&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                udhariFrame.src = `udhari.html?v=20260821-1&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'transaction') {
             document.body.classList.remove('form-view');
@@ -1005,7 +1005,7 @@
             document.querySelector('[data-tab="transaction"]').classList.add('active');
             const transactionFrame = document.getElementById('transactionFrame');
             if (transactionFrame && !transactionFrame.getAttribute('src')) {
-                transactionFrame.src = `transaction.html?v=20260821-5&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                transactionFrame.src = `transaction.html?v=20260821-6&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else {
             document.body.classList.remove('form-view');

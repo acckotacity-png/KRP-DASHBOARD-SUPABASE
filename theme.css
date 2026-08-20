@@ -734,3 +734,45 @@ html.krp-dark-theme .section-icon-line .tab-btn.active{background:#087a4d!import
   #contactLedgerModal .main-ledger-fit .ledger-table{min-width:1440px!important}
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}
 }
+
+/* 2026 charcoal-lime dark system: reference-aligned, restrained and readable. */
+html.krp-dark-theme{color-scheme:dark!important;--krp-night:#0d100f;--krp-night-2:#131715;--krp-night-3:#1a1f1c;--krp-night-4:#222824;--krp-night-border:#303832;--krp-night-text:#f1f5f2;--krp-night-muted:#9ca8a0;--krp-lime:#a3ff3f;background:var(--krp-night)!important}
+html.krp-dark-theme body{background:radial-gradient(circle at 50% -20%,rgba(163,255,63,.055),transparent 34%),var(--krp-night)!important;color:var(--krp-night-text)!important}
+html.krp-dark-theme body .container,html.krp-dark-theme body .app-container,html.krp-dark-theme body .wrap{color:var(--krp-night-text)!important}
+html.krp-dark-theme body .profile-header,html.krp-dark-theme body .nav-tabs,html.krp-dark-theme body .unified-dashboard-menu,html.krp-dark-theme body .tracker-container,html.krp-dark-theme body .analytics-panel,html.krp-dark-theme body .notepad-dashboard-panel,html.krp-dark-theme body .transaction-frame-wrap,html.krp-dark-theme body .dashboard,html.krp-dark-theme body .panel,html.krp-dark-theme body .modal-content,html.krp-dark-theme body .data-entry-panel,html.krp-dark-theme body .ledger-tools{background:linear-gradient(145deg,#111513,#171b18)!important;border-color:var(--krp-night-border)!important;box-shadow:0 10px 28px rgba(0,0,0,.25)!important;color:var(--krp-night-text)!important}
+html.krp-dark-theme body .card,html.krp-dark-theme body .box,html.krp-dark-theme body .stat-card,html.krp-dark-theme body .stat-pair-card,html.krp-dark-theme body .dash-card,html.krp-dark-theme body .mini-kpi,html.krp-dark-theme body .summary-card,html.krp-dark-theme body .customer-card,html.krp-dark-theme body .record-card,html.krp-dark-theme body .records-card,html.krp-dark-theme body .m-card,html.krp-dark-theme body .ledger-summary-item,html.krp-dark-theme body .ledger-history-item{background:linear-gradient(145deg,var(--krp-night-3),#1d231f)!important;border-color:var(--krp-night-border)!important;box-shadow:none!important;color:var(--krp-night-text)!important}
+html.krp-dark-theme body h1,html.krp-dark-theme body h2,html.krp-dark-theme body h3,html.krp-dark-theme body h4,html.krp-dark-theme body strong,html.krp-dark-theme body .dash-value,html.krp-dark-theme body .m-value,html.krp-dark-theme body .section-title{color:var(--krp-night-text)!important}
+html.krp-dark-theme body p,html.krp-dark-theme body small,html.krp-dark-theme body .muted,html.krp-dark-theme body .meta,html.krp-dark-theme body .dash-label,html.krp-dark-theme body .m-label,html.krp-dark-theme body .hint{color:var(--krp-night-muted)!important}
+html.krp-dark-theme body input,html.krp-dark-theme body select,html.krp-dark-theme body textarea,html.krp-dark-theme body .search-box,html.krp-dark-theme body .filter-select{background:#101412!important;color:var(--krp-night-text)!important;border-color:#38413a!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.22)!important}
+html.krp-dark-theme body input:focus,html.krp-dark-theme body select:focus,html.krp-dark-theme body textarea:focus{border-color:#7cbd3d!important;box-shadow:0 0 0 2px rgba(163,255,63,.12)!important}
+html.krp-dark-theme body input::placeholder,html.krp-dark-theme body textarea::placeholder{color:#737f77!important;opacity:1!important}
+html.krp-dark-theme body option{background:#121613!important;color:var(--krp-night-text)!important}
+html.krp-dark-theme body .account-icon-line .icon-action,html.krp-dark-theme body .section-icon-line .tab-btn,html.krp-dark-theme body .view-filter>button,html.krp-dark-theme body .unified-menu-toggle,html.krp-dark-theme body .header-actions button,html.krp-dark-theme body .outline,html.krp-dark-theme body .btn.light{background:linear-gradient(145deg,#202622,#181d1a)!important;color:#dfe7e1!important;border-color:#38413a!important;box-shadow:0 4px 10px rgba(0,0,0,.22)!important}
+html.krp-dark-theme body .account-icon-line .icon-action:hover,html.krp-dark-theme body .section-icon-line .tab-btn:hover,html.krp-dark-theme body .view-filter>button:hover{background:#272e29!important;border-color:#566259!important}
+html.krp-dark-theme body .section-icon-line .tab-btn.active,html.krp-dark-theme body .nav-tabs .tab-btn.active,html.krp-dark-theme body .view-filter>button:first-child{background:linear-gradient(135deg,#b5ff55,var(--krp-lime))!important;color:#10150d!important;border-color:#baff69!important;box-shadow:0 5px 16px rgba(163,255,63,.14)!important}
+html.krp-dark-theme body .section-icon-line .tab-btn.active i,html.krp-dark-theme body .nav-tabs .tab-btn.active i,html.krp-dark-theme body .view-filter>button:first-child i{color:#10150d!important}
+html.krp-dark-theme body .btn-primary,html.krp-dark-theme body .btn-save,html.krp-dark-theme body .records-action-btn.add,html.krp-dark-theme body .header-actions .btn-primary,html.krp-dark-theme body .header-actions .btn-success{background:linear-gradient(135deg,#a3ff3f,#7ed52d)!important;color:#10150d!important;border-color:#b2ff5e!important;font-weight:800!important}
+html.krp-dark-theme body .btn-primary i,html.krp-dark-theme body .btn-save i,html.krp-dark-theme body .header-actions .btn-primary i,html.krp-dark-theme body .header-actions .btn-success i{color:#10150d!important}
+html.krp-dark-theme body table,html.krp-dark-theme body thead,html.krp-dark-theme body tbody,html.krp-dark-theme body tr,html.krp-dark-theme body td{background:var(--krp-night-2)!important;color:#e8eee9!important;border-color:#2b332e!important}
+html.krp-dark-theme body th{background:#202622!important;color:#cbd5ce!important;border-color:#39423b!important}
+html.krp-dark-theme body tbody tr:nth-child(even) td{background:#171c19!important}
+html.krp-dark-theme body tbody tr:hover td{background:#222a24!important}
+html.krp-dark-theme body a,html.krp-dark-theme body .link,html.krp-dark-theme body .month-link,html.krp-dark-theme body .contact-link{color:#b0f75e!important}
+html.krp-dark-theme body .badge-success,html.krp-dark-theme body [data-status="SUCCESS"]{background:#20341b!important;color:#b7ff67!important;border-color:#456b31!important}
+html.krp-dark-theme body .badge-pending,html.krp-dark-theme body [data-status="PENDING"]{background:#493514!important;color:#ffd16a!important;border-color:#785a26!important}
+html.krp-dark-theme body .badge-refund,html.krp-dark-theme body .badge-failed,html.krp-dark-theme body [data-status="REFUND"]{background:#482023!important;color:#ff9aa1!important;border-color:#76363b!important}
+html.krp-dark-theme body .modal-overlay,html.krp-dark-theme body .overlap-ledger-modal{background:rgba(5,7,6,.78)!important}
+html.krp-dark-theme body ::-webkit-scrollbar-track{background:#101412!important}html.krp-dark-theme body ::-webkit-scrollbar-thumb{background:#3b463e!important;border-radius:999px!important}html.krp-dark-theme body ::-webkit-scrollbar-thumb:hover{background:#566359!important}
+
+/* Transaction and customer-ledger tables use the same charcoal hierarchy. */
+html.krp-dark-theme body #dataTable thead th,html.krp-dark-theme body .ledger-table thead th{background:#202622!important;color:#dce6df!important;border-color:#39423b!important}
+html.krp-dark-theme body #dataTable tbody td,html.krp-dark-theme body .ledger-table tbody td{background:#121614!important;color:#edf3ef!important;border-color:#29312c!important}
+html.krp-dark-theme body #dataTable tbody tr:nth-child(even) td,html.krp-dark-theme body .ledger-table tbody tr:nth-child(even) td{background:#181d1a!important}
+html.krp-dark-theme body #dataTable tbody tr:hover td,html.krp-dark-theme body .ledger-table tbody tr:hover td{background:#232a25!important}
+html.krp-dark-theme body #dataTable .badge-id{background:#dfffc3!important;color:#28620f!important}
+html.krp-dark-theme body #dataTable .remarks-cell{background:inherit!important;color:#edf3ef!important}
+html.krp-dark-theme body #dataTable .pending-cell{background:inherit!important;color:#c5e99d!important}
+html.krp-dark-theme body #dataTable .remaining-cell{background:inherit!important;color:#ff929a!important}
+html.krp-dark-theme body #dataTable .col-actions .edit-btn{background:#314a27!important;color:#c7ff89!important;border-color:#547c3e!important}
+html.krp-dark-theme body #dataTable .col-actions .delete-btn{background:#542327!important;color:#ffabb0!important;border-color:#7d353b!important}
+@media(max-width:600px){html.krp-dark-theme body .profile-header,html.krp-dark-theme body .nav-tabs,html.krp-dark-theme body .tracker-container,html.krp-dark-theme body .transaction-frame-wrap{box-shadow:0 6px 18px rgba(0,0,0,.22)!important}}
