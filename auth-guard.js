@@ -170,7 +170,9 @@ const deviceType = (() => {
 const sessionTokenKey = `krp_active_session_${session.user.id}_${deviceType}`;
 const storedSessionToken = localStorage.getItem(sessionTokenKey);
 const forceClaimKey = `krp_force_session_claim_${session.user.id}`;
-const forceNewLoginClaim = localStorage.getItem(forceClaimKey) === "1";
+// A second tab/PWA window in the same browser shares localStorage and must reuse
+// the same device token. Only a genuinely new browser storage claims a new token.
+const forceNewLoginClaim = localStorage.getItem(forceClaimKey) === "1" && !storedSessionToken;
 localStorage.removeItem(forceClaimKey);
 const makeSessionToken = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 const activeSessionToken = forceNewLoginClaim ? makeSessionToken() : (storedSessionToken || makeSessionToken());
@@ -232,6 +234,20 @@ window.logoutKrpDashboard = async function logoutKrpDashboard(reason = "manual",
   if (reason === "remote_login") {
     showRemoteLoginPopup(remoteDevice);
     await new Promise(resolve => setTimeout(resolve, 2600));
+    // If another context in this same browser already wrote the replacement
+    // token, signing out here would clear its shared Supabase localStorage too.
+    // Block only this stale page; keep the newly active browser session intact.
+    if (localStorage.getItem(sessionTokenKey) !== activeSessionToken) {
+      document.body.innerHTML = `<main style="position:fixed;inset:0;z-index:1000000;display:grid;place-items:center;padding:20px;background:#07111d;color:#f8fafc;font-family:Segoe UI,Arial,sans-serif">
+        <section style="width:min(420px,100%);padding:22px;border:1px solid #294652;border-radius:14px;background:#10232e;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.38)">
+          <h2 style="margin:0 0 9px;font-size:19px">Session updated</h2>
+          <p style="margin:0 0 16px;color:#b8c8d2;font-size:13px;line-height:1.5">इसी Chrome में नई KRP window active है। इस पुराने page को सुरक्षित रूप से रोक दिया गया है।</p>
+          <button type="button" onclick="location.replace('${AUTH_OPTIONS.homePage}')" style="border:0;border-radius:9px;padding:10px 15px;background:#168447;color:#fff;font-weight:800;cursor:pointer">Active App खोलें</button>
+        </section>
+      </main>`;
+      reveal();
+      return;
+    }
   } else if (singleSessionEnabled) {
     await client.from("active_sessions").delete().eq("user_id", session.user.id).eq("device_type", deviceType).eq("session_token", activeSessionToken);
   }
