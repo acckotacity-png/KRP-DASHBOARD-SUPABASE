@@ -651,6 +651,39 @@
       #dataTable{min-width:1395px!important}
       #dataTable th:last-child,#dataTable td:last-child{position:static!important;right:auto!important;box-shadow:none!important}
     }
+
+    /* Keep summary copy visible and always open the sheet from its first column. */
+    .txn-summary-pair:last-child .dash-card:last-child{min-width:0!important}
+    .txn-summary-pair:last-child .dash-label{overflow-wrap:anywhere!important}
+    .txn-summary-pair:last-child .dash-value{overflow:visible!important;text-overflow:clip!important}
+
+    /* High-contrast text hierarchy for light and dark themes. */
+    .crm-header h1{color:#17324a!important;font-weight:850!important}
+    .txn-summary-pair .dash-label{color:#526b7c!important;font-weight:850!important;opacity:1!important}
+    .txn-summary-pair .dash-value{color:#102a43!important;font-weight:900!important;opacity:1!important}
+    .ledger-meta,.ledger-meta span{color:#17324a!important;font-weight:800!important;opacity:1!important}
+    #statusMessage{color:#17663a!important;font-weight:800!important}
+    #dataTable thead th{color:#173d3a!important;font-weight:900!important;letter-spacing:.02em!important;opacity:1!important}
+    #dataTable tbody td{color:#172b28!important;font-weight:650!important;opacity:1!important}
+    #dataTable .number-cell{color:#153d55!important;font-weight:850!important}
+    #dataTable .pending-cell{color:#1e5f91!important}
+    #dataTable .remaining-cell{color:#c52b32!important}
+    #dataTable .remarks-cell{color:#172b28!important;font-weight:850!important}
+    #dataTable .remarks-meta{color:#5b716b!important;font-weight:700!important;opacity:1!important}
+    html.krp-dark-theme .crm-header h1,html.krp-dark-theme .crm-header h1 i{color:#f4f8fb!important}
+    html.krp-dark-theme .txn-summary-pair .dash-label{color:#a9bdca!important}
+    html.krp-dark-theme .txn-summary-pair .dash-value{color:#f5f9fc!important}
+    html.krp-dark-theme .ledger-meta,html.krp-dark-theme .ledger-meta span{color:#e8f1f6!important}
+    html.krp-dark-theme #statusMessage{background:#17382c!important;color:#8ce3b1!important;border:1px solid #2e634c!important}
+    html.krp-dark-theme #dataTable thead th{color:#eaf3f7!important;font-weight:900!important}
+    html.krp-dark-theme #dataTable tbody td{color:#e3edf2!important;font-weight:650!important}
+    html.krp-dark-theme #dataTable .number-cell{color:#d8e9f4!important;font-weight:850!important}
+    html.krp-dark-theme #dataTable .pending-cell{color:#a9d3f2!important}
+    html.krp-dark-theme #dataTable .remaining-cell{color:#ff9299!important}
+    html.krp-dark-theme #dataTable .remarks-cell{color:#f5f8fa!important;font-weight:850!important}
+    html.krp-dark-theme #dataTable .remarks-meta{color:#9eb2bd!important;font-weight:700!important}
+    html.krp-dark-theme .ledger-search input{color:#f2f6f8!important}
+    html.krp-dark-theme .ledger-search input::placeholder{color:#899da9!important;opacity:1!important}
   </style>
 </head>
 <body>
@@ -764,7 +797,7 @@
     </div>
   </div>
 
-  <div class="table-wrapper">
+  <div class="table-wrapper" id="mainLedgerScroll" tabindex="0" aria-label="KRP Transaction Ledger table; scroll horizontally and vertically">
     <table id="dataTable">
       <thead>
         <tr>
@@ -1241,6 +1274,13 @@
     input.focus();
   }
 
+  function resetMainLedgerScroll() {
+    const scroller = document.getElementById('mainLedgerScroll');
+    if (!scroller) return;
+    scroller.scrollLeft = 0;
+    scroller.scrollTop = 0;
+  }
+
   function toggleMoreRecords() {
     visibleRecordCount = visibleRecordCount >= filteredRecordCount ? 10 : visibleRecordCount + 10;
     renderTable(true);
@@ -1392,10 +1432,15 @@
 
   // APP CORE START
   window.onload = () => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     resetFormAndClearSelection();
     showCachedTransactions();
     loadFromSheet({ silent: true });
+    resetMainLedgerScroll();
+    requestAnimationFrame(resetMainLedgerScroll);
+    setTimeout(resetMainLedgerScroll, 180);
   };
+  window.addEventListener('pageshow', () => setTimeout(resetMainLedgerScroll, 0));
 </script>
 </body>
 </html>
