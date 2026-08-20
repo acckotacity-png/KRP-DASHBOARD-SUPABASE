@@ -735,6 +735,28 @@ html.krp-dark-theme .section-icon-line .tab-btn.active{background:#087a4d!import
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}
 }
 
+/* Mobile tracker: give the contact column more room and keep phone numbers intact. */
+@media(max-width:520px){
+  #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){
+    grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)!important;
+  }
+  #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"]{
+    min-width:0!important;padding-left:10px!important;padding-right:8px!important;
+  }
+  #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"] .tracker-contact-stack{
+    width:100%!important;min-width:0!important;gap:4px!important;
+  }
+  #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"] .phone-contact-link{
+    display:block!important;width:max-content!important;max-width:none!important;
+    white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;
+    font-size:clamp(11px,3.35vw,13px)!important;line-height:1.15!important;
+  }
+  #tableContainer.mobile-card-view #dataTable td[data-label="Contact / Login ID"] .tracker-login-subline{
+    max-width:100%!important;white-space:nowrap!important;overflow:hidden!important;
+    text-overflow:ellipsis!important;overflow-wrap:normal!important;word-break:normal!important;
+  }
+}
+
 /* Disabled after review: retain the original KRP deep-navy dark theme. */
 @media not all {
 /* 2026 charcoal-lime dark system: reference-aligned, restrained and readable. */

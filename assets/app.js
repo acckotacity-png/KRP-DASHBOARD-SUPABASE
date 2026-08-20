@@ -2978,8 +2978,9 @@
         filtered.forEach((row) => {
             const originalIdx = currentData.indexOf(row);
             const contactText = showSheetText(row[idxContact]).trim() || '-';
+            const contactIsPhone = /^\+?[\d\s()-]{10,22}$/.test(contactText);
             const contactLinkHtml = contactText !== '-' ?
-                `<button type="button" class="contact-ledger-link" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
+                `<button type="button" class="contact-ledger-link${contactIsPhone ? ' phone-contact-link' : ''}" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
             const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
             const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
