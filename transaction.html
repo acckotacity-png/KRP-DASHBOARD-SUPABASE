@@ -626,6 +626,31 @@
     #dataTable{touch-action:pan-x pan-y!important}
     @media(max-width:720px){.txn-summary-pair{min-height:56px!important}.txn-summary-pair .dash-card{min-height:56px!important;padding:6px 3px!important}.txn-summary-pair .dash-label{font-size:8px!important;margin-bottom:4px!important}.txn-summary-pair .dash-value{font-size:11px!important}.app-container>.table-wrapper{max-height:calc(100dvh - 190px)!important;min-height:240px!important}}
     @media(max-width:420px){.dashboard{gap:4px!important;padding:4px!important}.txn-summary-pair .dash-label{font-size:7px!important}.txn-summary-pair .dash-value{font-size:10px!important}}
+
+    /* Phone layout: no overlap, readable swipeable summaries and real last Actions column. */
+    @media(max-width:600px){
+      body{padding:3px!important}
+      .app-container{padding:7px!important}
+      .crm-header{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:7px 4px 9px!important}
+      .crm-header h1{width:100%!important;font-size:16px!important;line-height:1.2!important;white-space:normal!important}
+      .header-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;gap:6px!important}
+      .header-actions button{width:100%!important;min-width:0!important;min-height:38px!important;padding:7px 5px!important;font-size:11px!important;border-radius:8px!important}
+      .header-actions button i{font-size:12px!important}
+      .header-actions button span,#toggleBtnText{display:inline!important;font-size:11px!important}
+      .dashboard{display:flex!important;grid-template-columns:none!important;overflow-x:auto!important;overflow-y:hidden!important;gap:6px!important;padding:5px!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important}
+      .txn-summary-pair{flex:0 0 215px!important;min-width:215px!important;min-height:62px!important;scroll-snap-align:start!important}
+      .txn-summary-pair .dash-card{min-height:62px!important;padding:7px 5px!important}
+      .txn-summary-pair .dash-label{font-size:8px!important;line-height:1.15!important}
+      .txn-summary-pair .dash-value{font-size:12px!important;overflow:visible!important;text-overflow:clip!important}
+      .ledger-tools{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;margin:7px 0!important}
+      .ledger-search{width:100%!important;max-width:none!important}
+      .ledger-search input{width:100%!important;min-height:38px!important;font-size:11px!important}
+      .ledger-meta{width:100%!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:6px!important;flex-wrap:wrap!important}
+      .ledger-meta>span{font-size:10px!important}
+      .app-container>.table-wrapper{max-height:calc(100dvh - 270px)!important;min-height:310px!important;touch-action:pan-x pan-y!important}
+      #dataTable{min-width:1395px!important}
+      #dataTable th:last-child,#dataTable td:last-child{position:static!important;right:auto!important;box-shadow:none!important}
+    }
   </style>
 </head>
 <body>
@@ -733,7 +758,7 @@
       <input type="search" id="ledgerSearch" placeholder="Search date, month, amount or remarks..." oninput="handleLedgerSearch(this.value)" />
       <button type="button" id="ledgerSearchClear" class="search-clear" onclick="clearLedgerSearch()" title="Clear search" aria-label="Clear search"><i class="fas fa-times"></i></button>
     </div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <div class="ledger-meta" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
       <span style="font-weight: 600; font-size: 0.85rem;"><i class="fas fa-list-ul" style="color: #2b6cb0;"></i> Ledger List (<span id="rowCount">0</span>)</span>
       <span id="statusMessage" class="status-msg"><i class="fas fa-check-circle"></i> Ready</span>
     </div>
