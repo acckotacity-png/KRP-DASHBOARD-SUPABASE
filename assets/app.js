@@ -1,7 +1,7 @@
     // ─── CONFIG ───────────────────────────────────────────────────
     // YAHAN APNA APPS SCRIPT URL ZAROOR PASTE KAREIN
     const APPS_SCRIPT_URL = './__krp_supabase_api__';
-    const USER_CACHE_SUFFIX = sessionStorage.getItem('krp_cache_user_uid') || 'anonymous';
+    const USER_CACHE_SUFFIX = localStorage.getItem('krp_cache_user_uid') || 'anonymous';
     const userCacheKey = base => `${base}_${USER_CACHE_SUFFIX}`;
     const TRACKER_CACHE_KEY = userCacheKey('krp_tracker_data_cache_v1');
     const NOTEPAD_CACHE_KEY = userCacheKey('krp_notepad_data_cache_v1');

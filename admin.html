@@ -35,7 +35,7 @@
 <script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,AUTH_OPTIONS} from './supabase-config.js';
-const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:sessionStorage,autoRefreshToken:true}});
+const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:localStorage,autoRefreshToken:true}});
 const state={requests:[],users:[],mode:'requests'};
 const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';

@@ -6,7 +6,7 @@
   <title>Daily Expense Tracker</title>
   <style id="auth-guard-style">html{visibility:hidden}</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=22"></script>
+  <script type="module" src="auth-guard.js?v=23"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="theme.css?v=45"><script src="theme.js?v=1"></script>
   <style>
@@ -79,7 +79,7 @@
 </div></div>
 
 <script>
-const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense_cache_v2_'+(sessionStorage.getItem('krp_cache_user_uid')||'signed_out');
+const API=new URLSearchParams(location.search).get('api')||'',CACHE='krp_expense_cache_v2_'+(localStorage.getItem('krp_cache_user_uid')||'signed_out');
 const C={id:0,date:1,month:2,category:3,sub:4,desc:5,mode:6,paidTo:7,amount:8,ref:9,bill:10,type:11,priority:12,budget:13,spent:14,remaining:15,monthTotal:16,used:17,alert:18,remark:19,added:20,time:21};
 let records=[],budgets=[],preferredMonth='',preferredYear='';
 const MONTH_NAMES=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];

@@ -2,6 +2,17 @@
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js?v=3";
 import { installSupabaseApiAdapter } from "./supabase-api.js?v=13";
 
+// Migrate the previous tab-only Supabase session once, then keep the PWA session
+// across Chrome restarts. localStorage is Supabase's standard browser persistence.
+try {
+  for (let i = 0; i < window.sessionStorage.length; i += 1) {
+    const key = window.sessionStorage.key(i);
+    if (key?.startsWith("sb-") && key.endsWith("-auth-token") && !window.localStorage.getItem(key)) {
+      window.localStorage.setItem(key, window.sessionStorage.getItem(key));
+    }
+  }
+} catch (_) {}
+
 const guardStyle = document.getElementById("auth-guard-style");
 const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
   && SUPABASE_PUBLISHABLE_KEY
@@ -26,7 +37,7 @@ if (!configured) {
 }
 
 const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: { persistSession: true, storage: window.sessionStorage, autoRefreshToken: true, detectSessionInUrl: true }
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
 window.supabaseClient = client;
@@ -44,7 +55,7 @@ if (!session?.user) {
   location.replace(loginUrl());
   throw new Error("Authentication required");
 }
-sessionStorage.setItem("krp_cache_user_uid", session.user.id);
+localStorage.setItem("krp_cache_user_uid", session.user.id);
 
 async function readMyAccess() {
   return client.from("app_users").select("*").eq("user_id", session.user.id).maybeSingle();
@@ -111,7 +122,7 @@ if (window.currentKrpUser.avatarPath) {
   window.currentKrpUser.avatarUrl = avatarData?.signedUrl || "";
 }
 try {
-  sessionStorage.setItem(`krp_profile_bootstrap_${session.user.id}`, JSON.stringify({
+  localStorage.setItem(`krp_profile_bootstrap_${session.user.id}`, JSON.stringify({
     full_name: access.full_name || window.currentKrpUser.name,
     first_name: access.first_name || "",
     last_name: access.last_name || "",
@@ -157,13 +168,13 @@ const deviceType = (() => {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || ipadDesktopMode ? "mobile" : "desktop";
 })();
 const sessionTokenKey = `krp_active_session_${session.user.id}_${deviceType}`;
-const storedSessionToken = sessionStorage.getItem(sessionTokenKey);
+const storedSessionToken = localStorage.getItem(sessionTokenKey);
 const forceClaimKey = `krp_force_session_claim_${session.user.id}`;
-const forceNewLoginClaim = sessionStorage.getItem(forceClaimKey) === "1";
-sessionStorage.removeItem(forceClaimKey);
+const forceNewLoginClaim = localStorage.getItem(forceClaimKey) === "1";
+localStorage.removeItem(forceClaimKey);
 const makeSessionToken = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 const activeSessionToken = forceNewLoginClaim ? makeSessionToken() : (storedSessionToken || makeSessionToken());
-sessionStorage.setItem(sessionTokenKey, activeSessionToken);
+localStorage.setItem(sessionTokenKey, activeSessionToken);
 const deviceLabel = (() => {
   const ua = navigator.userAgent;
   const browser = /Edg/i.test(ua) ? "Edge" : /Chrome/i.test(ua) ? "Chrome" : /Firefox/i.test(ua) ? "Firefox" : /Safari/i.test(ua) ? "Safari" : "Browser";
@@ -224,7 +235,7 @@ window.logoutKrpDashboard = async function logoutKrpDashboard(reason = "manual",
   } else if (singleSessionEnabled) {
     await client.from("active_sessions").delete().eq("user_id", session.user.id).eq("device_type", deviceType).eq("session_token", activeSessionToken);
   }
-  sessionStorage.removeItem(sessionTokenKey);
+  localStorage.removeItem(sessionTokenKey);
   await client.auth.signOut({ scope: "local" });
   location.replace(AUTH_OPTIONS.loginPage);
 };
@@ -267,7 +278,7 @@ const idleMs = Math.max(1, Number(AUTH_OPTIONS.idleLogoutMinutes) || 60) * 60 * 
 const lastActivityKey = `krp_last_activity_${session.user.id}_${deviceType}_${activeSessionToken}`;
 
 function readLastActivity() {
-  const stored = Number(sessionStorage.getItem(lastActivityKey));
+  const stored = Number(localStorage.getItem(lastActivityKey));
   return Number.isFinite(stored) && stored > 0 ? stored : Date.now();
 }
 
@@ -285,12 +296,12 @@ function recordActivity() {
   const now = Date.now();
   if (now - lastActivityWrite < 1000) return;
   lastActivityWrite = now;
-  sessionStorage.setItem(lastActivityKey, String(now));
+  localStorage.setItem(lastActivityKey, String(now));
   scheduleIdleCheck();
 }
 
-if (!sessionStorage.getItem(lastActivityKey)) {
-  sessionStorage.setItem(lastActivityKey, String(Date.now()));
+if (!localStorage.getItem(lastActivityKey)) {
+  localStorage.setItem(lastActivityKey, String(Date.now()));
 }
 
 ["click", "keydown", "touchstart", "pointerdown", "pointermove", "scroll"].forEach(eventName =>

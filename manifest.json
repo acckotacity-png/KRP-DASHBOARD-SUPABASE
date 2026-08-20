@@ -2,9 +2,13 @@
   "name": "KRP ID Activation Dashboard",
   "short_name": "KRP Dashboard",
   "description": "KRP ID Activation and Transaction Dashboard",
+  "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "launch_handler": {
+    "client_mode": ["focus-existing", "navigate-existing"]
+  },
   "background_color": "#f4f7fe",
   "theme_color": "#05a66f",
   "icons": [

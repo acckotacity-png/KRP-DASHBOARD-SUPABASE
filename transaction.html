@@ -3,7 +3,7 @@
 <head>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=22"></script>
+  <script type="module" src="auth-guard.js?v=23"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KRP Transaction Ledger</title>
@@ -888,7 +888,7 @@
   let ledgerSearchTerm = '';
   let visibleRecordCount = 10;
   let filteredRecordCount = 0;
-  const TRANSACTION_CACHE_KEY = 'krp_transaction_records_v1_' + (sessionStorage.getItem('krp_cache_user_uid') || 'signed_out');
+  const TRANSACTION_CACHE_KEY = 'krp_transaction_records_v1_' + (localStorage.getItem('krp_cache_user_uid') || 'signed_out');
   const TRANSACTION_CACHE_TTL = 2 * 60 * 1000;
 
   function readTransactionCache() {

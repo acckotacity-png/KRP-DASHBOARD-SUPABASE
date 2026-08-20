@@ -6,7 +6,7 @@
   <title>Udhari Bahi Khata</title>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=22"></script>
+  <script type="module" src="auth-guard.js?v=23"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="theme.css?v=45"><script src="theme.js?v=1"></script>
   <style>
@@ -363,7 +363,7 @@
 
 <script>
   const API_URL = new URLSearchParams(location.search).get('api') || '';
-  const CACHE_KEY = 'krp_udhari_cache_v1_' + (sessionStorage.getItem('krp_cache_user_uid') || 'signed_out');
+  const CACHE_KEY = 'krp_udhari_cache_v1_' + (localStorage.getItem('krp_cache_user_uid') || 'signed_out');
   const COL = { id:0,date:1,name:2,mobile:3,address:4,type:5,description:6,udhar:7,payment:8,balance:9,due:10,mode:11,ref:12,status:13,reminder:14,remarks:15,createdBy:16,timestamp:17,rate:18,interestType:19,interestStart:20,interestTill:21,interest:22,total:23 };
   let records = [];
   let customersMaster = [];
