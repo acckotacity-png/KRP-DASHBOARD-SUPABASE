@@ -559,6 +559,35 @@
     html.krp-dark-theme #dataTable .remaining-cell{color:#fca5a5!important;background:#321b22!important}
     html.krp-dark-theme #dataTable .remarks-cell{color:#f8fafc!important;background:#13251f!important}
     html.krp-dark-theme #dataTable .remarks-meta{color:#a8b8ca!important}
+
+    /* Match the customer-ledger table palette in both themes. */
+    #dataTable thead th{background:#cfddd7!important;color:#102a26!important;border-color:#b8cac3!important}
+    #dataTable tbody td{background:#f5f7f6!important;color:#10211e!important;border-color:#cfdbd6!important}
+    #dataTable tbody tr:nth-child(even) td{background:#e8eeeb!important}
+    #dataTable tbody tr:hover td{background:#dfeae5!important}
+    #dataTable .pending-cell{background:inherit!important;color:#174f87!important}
+    #dataTable .remaining-cell{background:inherit!important;color:#b42318!important}
+    #dataTable .remarks-cell{background:inherit!important;color:#10211e!important}
+    #dataTable .remarks-meta{color:#5d716b!important}
+    #dataTable .badge-id{background:#edf8f1!important;color:#16813b!important}
+    #dataTable th:last-child,#dataTable td:last-child{position:sticky!important;right:0!important;z-index:2!important;border-left:1px solid #b8cac3!important;box-shadow:-5px 0 8px rgba(15,23,42,.05)!important}
+    #dataTable th:last-child{z-index:5!important;background:#cfddd7!important}
+    #dataTable td:last-child{background:#f5f7f6!important}
+    #dataTable tbody tr:nth-child(even) td:last-child{background:#e8eeeb!important}
+    #dataTable tbody tr:hover td:last-child{background:#dfeae5!important}
+    html.krp-dark-theme #dataTable thead th{background:#153743!important;color:#f1f7f5!important;border-color:#294a55!important}
+    html.krp-dark-theme #dataTable tbody td{background:#09232c!important;color:#f3f8f7!important;border-color:#1e3d47!important}
+    html.krp-dark-theme #dataTable tbody tr:nth-child(even) td{background:#0d2a33!important}
+    html.krp-dark-theme #dataTable tbody tr:hover td{background:#143541!important}
+    html.krp-dark-theme #dataTable .pending-cell{background:inherit!important;color:#bfdbfe!important}
+    html.krp-dark-theme #dataTable .remaining-cell{background:inherit!important;color:#fca5a5!important}
+    html.krp-dark-theme #dataTable .remarks-cell{background:inherit!important;color:#f3f8f7!important}
+    html.krp-dark-theme #dataTable .remarks-meta{color:#93a9b3!important}
+    html.krp-dark-theme #dataTable .badge-id{background:#edf8f1!important;color:#16813b!important}
+    html.krp-dark-theme #dataTable th:last-child{background:#153743!important;border-left-color:#294a55!important}
+    html.krp-dark-theme #dataTable td:last-child{background:#09232c!important;border-left-color:#1e3d47!important;box-shadow:-5px 0 9px rgba(0,0,0,.18)!important}
+    html.krp-dark-theme #dataTable tbody tr:nth-child(even) td:last-child{background:#0d2a33!important}
+    html.krp-dark-theme #dataTable tbody tr:hover td:last-child{background:#143541!important}
   </style>
 </head>
 <body>
@@ -686,8 +715,8 @@
           <th style="width:90px;text-align:right!important;">OTHER AMT</th>
           <th style="width:110px;text-align:right!important;">TOTAL PENDING</th>
           <th style="width:110px;text-align:right!important;">REMAINING</th>
-          <th style="width:68px;text-align:center!important;">ACTIONS</th>
           <th style="width:190px;">REMARKS</th>
+          <th style="width:68px;text-align:center!important;">ACTIONS</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -737,8 +766,8 @@
               <th style="width: 110px;">TRANSFER AMT</th>
               <th style="width: 110px;">MONTHLY PAID</th>
               <th style="width: 110px; background:#e8f0fe; color:#1a5fb0;">REMAINING</th>
-              <th style="width: 140px; text-align: center;">ACTIONS</th>
               <th style="width: 180px;">REMARKS</th>
+              <th style="width: 90px; text-align: center;">ACTIONS</th>
             </tr>
           </thead>
           <tbody id="modalTableBody"></tbody>
@@ -872,13 +901,13 @@
           <td>₹${r.transferAmt.toFixed(2)}</td>
           <td>₹${r.monthlyPaid.toFixed(2)}</td>
           <td style="font-weight:600; color:#1a5fb0;">₹${r.remainingAmt.toFixed(2)}</td>
+          <td>${r.remarks || '-'}</td>
           <td>
             <div class="col-actions" style="justify-content: center;">
               <button class="edit-btn" onclick="editRecord(${r.id})" title="Edit entry" aria-label="Edit entry"><i class="fas fa-pen"></i></button>
               <button class="delete-btn" onclick="deleteRecord(${r.id})" title="Delete entry" aria-label="Delete entry"><i class="fas fa-trash"></i></button>
             </div>
           </td>
-          <td>${r.remarks || '-'}</td>
         </tr>`;
       });
     }
@@ -1111,13 +1140,13 @@
         <td class="number-cell">₹${rec.otherAmt.toFixed(2)}</td>
         <td class="number-cell pending-cell">₹${rec.totalPending.toFixed(2)}</td>
         <td class="number-cell remaining-cell">₹${rec.remainingAmt.toFixed(2)}</td>
+        <td class="remarks-cell">${rec.remarks || '-'}<small class="remarks-meta">By ${rec.createdBy||'-'} · ${rec.timestamp||'-'}</small></td>
         <td class="actions-cell">
           <div class="col-actions" style="justify-content: center;">
             <button class="edit-btn" onclick="editRecord(${rec.id})" title="Edit entry" aria-label="Edit entry"><i class="fas fa-pen"></i></button>
             <button class="delete-btn" onclick="deleteRecord(${rec.id})" title="Delete entry" aria-label="Delete entry"><i class="fas fa-trash"></i></button>
           </div>
         </td>
-        <td class="remarks-cell">${rec.remarks || '-'}<small class="remarks-meta">By ${rec.createdBy||'-'} · ${rec.timestamp||'-'}</small></td>
       </tr>`;
     });
     tbody.innerHTML = html;
