@@ -507,6 +507,27 @@
     .modal-content{max-width:1180px!important;border-radius:10px!important}.modal-header{padding:8px 10px!important}.modal-header h2{font-size:13px!important}.modal-body{padding:7px!important}.modal-summary-grid{gap:4px!important;margin-bottom:6px!important}.m-card{padding:5px!important;border-radius:6px!important}.m-card .m-label{font-size:7px!important}.m-card .m-value{font-size:10px!important}
     @media(max-width:900px){.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dash-card.success{grid-column:auto!important}}
     @media(max-width:520px){body{padding:3px!important}.app-container{padding:5px!important}.crm-header{flex-direction:row!important;align-items:center!important}.crm-header h1{font-size:12px!important}.header-actions button{width:29px!important;min-width:29px!important;padding:0!important;font-size:0!important}.header-actions button i{font-size:11px!important}.header-actions button span,#toggleBtnText{display:none!important}.dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dash-card{min-height:40px!important}.dash-card .dash-value{font-size:9px!important}.form-grid{grid-template-columns:1fr 1fr!important}.data-entry-panel .form-actions{position:sticky!important;bottom:-10px!important;padding:7px 0 calc(7px + env(safe-area-inset-bottom))!important;background:inherit!important}.ledger-tools{flex-wrap:nowrap!important}.ledger-search{min-width:0!important}}
+
+    /* Transaction controls must remain readable in the active dark theme. */
+    html.krp-dark-theme .header-actions button,
+    html.krp-dark-theme .form-actions button,
+    html.krp-dark-theme .col-actions button,
+    html.krp-dark-theme .show-more-btn,
+    html.krp-dark-theme .search-clear,
+    html.krp-dark-theme .close-modal{opacity:1!important;visibility:visible!important;font-weight:700!important}
+    html.krp-dark-theme .header-actions button{background:#13283a!important;color:#f8fafc!important;border-color:#38536a!important}
+    html.krp-dark-theme .header-actions button i{color:#93c5fd!important}
+    html.krp-dark-theme .header-actions .btn-success{background:#15803d!important;color:#fff!important;border-color:#22a653!important}
+    html.krp-dark-theme .header-actions .btn-primary{background:#2563eb!important;color:#fff!important;border-color:#4b83ee!important}
+    html.krp-dark-theme .header-actions .btn-success i,html.krp-dark-theme .header-actions .btn-primary i{color:#fff!important}
+    html.krp-dark-theme .form-actions .btn-save{background:#15803d!important;color:#fff!important;border:1px solid #22a653!important}
+    html.krp-dark-theme .form-actions .btn-cancel{background:#334155!important;color:#f8fafc!important;border:1px solid #64748b!important}
+    html.krp-dark-theme .col-actions .edit-btn{background:#1d4ed8!important;color:#fff!important;border:1px solid #60a5fa!important}
+    html.krp-dark-theme .col-actions .delete-btn{background:#b91c1c!important;color:#fff!important;border:1px solid #f87171!important}
+    html.krp-dark-theme .col-actions button i{color:inherit!important}
+    html.krp-dark-theme .show-more-btn{background:#13283a!important;color:#dbeafe!important;border-color:#3b82f6!important}
+    html.krp-dark-theme .search-clear{background:#7f1d1d!important;color:#fecaca!important}
+    html.krp-dark-theme .close-modal{color:#fecaca!important}
   </style>
 </head>
 <body>
@@ -813,11 +834,11 @@
         html += `<tr>
           <td>${r.date}</td>
           <td>${r.totalId}</td>
-          <td>?${r.workingAmt.toFixed(2)}</td>
-          <td>?${r.transferAmt.toFixed(2)}</td>
-          <td>?${r.monthlyPaid.toFixed(2)}</td>
+          <td>₹${r.workingAmt.toFixed(2)}</td>
+          <td>₹${r.transferAmt.toFixed(2)}</td>
+          <td>₹${r.monthlyPaid.toFixed(2)}</td>
           <td>${r.remarks || ''}</td>
-          <td style="font-weight:600; color:#1a5fb0;">?${r.remainingAmt.toFixed(2)}</td>
+          <td style="font-weight:600; color:#1a5fb0;">₹${r.remainingAmt.toFixed(2)}</td>
           <td>
             <div class="col-actions" style="justify-content: center;">
               <button class="edit-btn" onclick="editRecord(${r.id})"><i class="fas fa-pen"></i></button>
@@ -830,10 +851,10 @@
     
     document.getElementById('modalTableBody').innerHTML = html;
     document.getElementById('mTotalId').textContent = tId;
-    document.getElementById('mWorking').textContent = '?' + wk.toFixed(2);
-    document.getElementById('mTransfer').textContent = '?' + tf.toFixed(2);
-    document.getElementById('mPaid').textContent = '?' + mp.toFixed(2);
-    document.getElementById('mRemaining').textContent = '?' + rem.toFixed(2);
+    document.getElementById('mWorking').textContent = '₹' + wk.toFixed(2);
+    document.getElementById('mTransfer').textContent = '₹' + tf.toFixed(2);
+    document.getElementById('mPaid').textContent = '₹' + mp.toFixed(2);
+    document.getElementById('mRemaining').textContent = '₹' + rem.toFixed(2);
   }
 
   function closeMonthLedger() {
@@ -1058,13 +1079,13 @@
         <td>${rec.date}</td>
         <td><span class="month-link" onclick="openMonthLedger('${rec.month}')"><i class="far fa-folder" style="margin-right:3px;"></i>${rec.month}</span></td>
         <td>${rec.totalId}</td>
-        <td>?${rec.workingAmt.toFixed(2)}</td>
-        <td>?${rec.transferAmt.toFixed(2)}</td>
-        <td>?${rec.monthlyPaid.toFixed(2)}</td>
-        <td>?${rec.otherAmt.toFixed(2)}</td>
+        <td>₹${rec.workingAmt.toFixed(2)}</td>
+        <td>₹${rec.transferAmt.toFixed(2)}</td>
+        <td>₹${rec.monthlyPaid.toFixed(2)}</td>
+        <td>₹${rec.otherAmt.toFixed(2)}</td>
         <td style="background: #fffcf0; font-weight: 500;">${rec.remarks}<small style="display:block;color:#718096;font-size:9px;margin-top:3px;">By ${rec.createdBy||'-'} · ${rec.timestamp||'-'}</small></td>
-        <td style="font-weight:600; color:#1a5fb0;">?${rec.totalPending.toFixed(2)}</td>
-        <td style="font-weight:600; color:#1a5fb0;">?${rec.remainingAmt.toFixed(2)}</td>
+        <td style="font-weight:600; color:#1a5fb0;">₹${rec.totalPending.toFixed(2)}</td>
+        <td style="font-weight:600; color:#1a5fb0;">₹${rec.remainingAmt.toFixed(2)}</td>
         <td>
           <div class="col-actions" style="justify-content: center;">
             <button class="edit-btn" onclick="editRecord(${rec.id})"><i class="fas fa-pen"></i></button>
@@ -1156,10 +1177,10 @@
         updateStatus('Updating Sheet...');
         callGSAction('updateRecord', sheetFormattedData, editingRowId)
           .then(() => {
-            updateStatus('? Updated successfully');
+            updateStatus('Updated successfully');
             loadFromSheet({ silent: true, force: true }); 
           })
-          .catch(() => updateStatus('? Sync Error', 'error'));
+          .catch(() => updateStatus('Sync Error', 'error'));
       }
     } else {
       sheetFormattedData.id = nextId++;
@@ -1168,10 +1189,10 @@
       updateStatus('Saving to Sheet...');
       callGSAction('saveRecord', sheetFormattedData)
         .then(() => {
-          updateStatus('? Saved successfully');
+          updateStatus('Saved successfully');
           loadFromSheet({ silent: true, force: true });
         })
-        .catch(() => updateStatus('? Sync Error', 'error'));
+        .catch(() => updateStatus('Sync Error', 'error'));
     }
     closeForm(); resetFormAndClearSelection(); renderTable();
     if (currentActivePopupMonth) setTimeout(refreshMonthLedgerUI, 200);
@@ -1215,7 +1236,7 @@
     
     callGSAction('deleteRecord', null, id)
       .then(() => updateStatus('Entry deleted successfully'))
-      .catch(() => updateStatus('? Error deleting', 'error'));
+      .catch(() => updateStatus('Error deleting', 'error'));
   }
 
   function resetFormAndClearSelection() {
