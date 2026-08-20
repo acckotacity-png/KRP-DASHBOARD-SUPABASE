@@ -735,6 +735,8 @@ html.krp-dark-theme .section-icon-line .tab-btn.active{background:#087a4d!import
   #contactLedgerModal .main-ledger-fit .ledger-table th,#contactLedgerModal .main-ledger-fit .ledger-table td{padding:8px!important;font-size:10px!important}
 }
 
+/* Disabled after review: retain the original KRP deep-navy dark theme. */
+@media not all {
 /* 2026 charcoal-lime dark system: reference-aligned, restrained and readable. */
 html.krp-dark-theme{color-scheme:dark!important;--krp-night:#0d100f;--krp-night-2:#131715;--krp-night-3:#1a1f1c;--krp-night-4:#222824;--krp-night-border:#303832;--krp-night-text:#f1f5f2;--krp-night-muted:#9ca8a0;--krp-lime:#a3ff3f;background:var(--krp-night)!important}
 html.krp-dark-theme body{background:radial-gradient(circle at 50% -20%,rgba(163,255,63,.055),transparent 34%),var(--krp-night)!important;color:var(--krp-night-text)!important}
@@ -776,3 +778,4 @@ html.krp-dark-theme body #dataTable .remaining-cell{background:inherit!important
 html.krp-dark-theme body #dataTable .col-actions .edit-btn{background:#314a27!important;color:#c7ff89!important;border-color:#547c3e!important}
 html.krp-dark-theme body #dataTable .col-actions .delete-btn{background:#542327!important;color:#ffabb0!important;border-color:#7d353b!important}
 @media(max-width:600px){html.krp-dark-theme body .profile-header,html.krp-dark-theme body .nav-tabs,html.krp-dark-theme body .tracker-container,html.krp-dark-theme body .transaction-frame-wrap{box-shadow:0 6px 18px rgba(0,0,0,.22)!important}}
+}
