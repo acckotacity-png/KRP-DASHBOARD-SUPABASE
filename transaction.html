@@ -588,6 +588,44 @@
     html.krp-dark-theme #dataTable td:last-child{background:#09232c!important;border-left-color:#1e3d47!important;box-shadow:-5px 0 9px rgba(0,0,0,.18)!important}
     html.krp-dark-theme #dataTable tbody tr:nth-child(even) td:last-child{background:#0d2a33!important}
     html.krp-dark-theme #dataTable tbody tr:hover td:last-child{background:#143541!important}
+
+    /* Readable zoom pass: wider sheet with deliberate horizontal scrolling. */
+    .crm-header h1{font-size:16px!important}
+    .header-actions button{min-height:32px!important;padding:6px 10px!important;font-size:10px!important}
+    .txn-summary-pair .dash-label{font-size:8px!important}
+    .txn-summary-pair .dash-value{font-size:12px!important}
+    .ledger-search input{min-height:35px!important;font-size:11px!important}
+    .ledger-tools>div span{font-size:11px!important}
+    #dataTable{min-width:1395px!important;font-size:11px!important}
+    #dataTable thead th{height:36px!important;padding:7px 8px!important;font-size:9px!important}
+    #dataTable tbody td{height:38px!important;padding:7px 8px!important;font-size:11px!important;line-height:1.3!important}
+    #dataTable th:first-child,#dataTable td:first-child{position:sticky!important;left:0!important;z-index:2!important;text-align:center!important;border-right:1px solid #b8cac3!important;box-shadow:4px 0 7px rgba(15,23,42,.04)!important}
+    #dataTable th:first-child{z-index:6!important;background:#cfddd7!important}
+    #dataTable td:first-child{background:#f5f7f6!important}
+    #dataTable tbody tr:nth-child(even) td:first-child{background:#e8eeeb!important}
+    #dataTable tbody tr:hover td:first-child{background:#dfeae5!important}
+    #dataTable .badge-id{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:25px!important;height:20px!important;padding:2px 6px!important;white-space:nowrap!important;word-break:normal!important;font-family:inherit!important;font-size:10px!important;line-height:1!important}
+    #dataTable .col-actions{gap:5px!important}
+    #dataTable .col-actions button{width:28px!important;height:28px!important;min-height:28px!important;padding:0!important;font-size:10px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
+    #dataTable .remarks-cell{min-width:240px!important;font-size:10px!important}
+    #dataTable .remarks-meta{font-size:8px!important}
+    html.krp-dark-theme #dataTable th:first-child{background:#153743!important;border-right-color:#294a55!important}
+    html.krp-dark-theme #dataTable td:first-child{background:#09232c!important;border-right-color:#1e3d47!important;box-shadow:4px 0 8px rgba(0,0,0,.16)!important}
+    html.krp-dark-theme #dataTable tbody tr:nth-child(even) td:first-child{background:#0d2a33!important}
+    html.krp-dark-theme #dataTable tbody tr:hover td:first-child{background:#143541!important}
+    @media(max-width:520px){.txn-summary-pair .dash-label{font-size:7px!important}.txn-summary-pair .dash-value{font-size:9px!important}#dataTable{font-size:11px!important}#dataTable tbody td{font-size:11px!important}}
+
+    /* Larger summary and native two-axis touch scrolling. */
+    html,body{touch-action:pan-x pan-y pinch-zoom!important;overscroll-behavior:auto!important}
+    .dashboard{gap:8px!important;padding:7px!important}
+    .txn-summary-pair{min-height:62px!important;border-radius:9px!important}
+    .txn-summary-pair .dash-card{min-height:62px!important;padding:8px 6px!important}
+    .txn-summary-pair .dash-label{font-size:9px!important;line-height:1.15!important;margin-bottom:5px!important}
+    .txn-summary-pair .dash-value{font-size:14px!important;line-height:1.2!important}
+    .app-container>.table-wrapper{overflow:auto!important;max-height:calc(100dvh - 205px)!important;min-height:250px!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important;overscroll-behavior:auto!important;scroll-behavior:smooth!important}
+    #dataTable{touch-action:pan-x pan-y!important}
+    @media(max-width:720px){.txn-summary-pair{min-height:56px!important}.txn-summary-pair .dash-card{min-height:56px!important;padding:6px 3px!important}.txn-summary-pair .dash-label{font-size:8px!important;margin-bottom:4px!important}.txn-summary-pair .dash-value{font-size:11px!important}.app-container>.table-wrapper{max-height:calc(100dvh - 190px)!important;min-height:240px!important}}
+    @media(max-width:420px){.dashboard{gap:4px!important;padding:4px!important}.txn-summary-pair .dash-label{font-size:7px!important}.txn-summary-pair .dash-value{font-size:10px!important}}
   </style>
 </head>
 <body>
@@ -705,18 +743,18 @@
     <table id="dataTable">
       <thead>
         <tr>
-          <th style="width:34px;">#</th>
-          <th style="width:82px;">DATE</th>
-          <th style="width:92px;">MONTH</th>
-          <th style="width:58px;text-align:center!important;">TOTAL ID</th>
-          <th style="width:100px;text-align:right!important;">WORKING AMT</th>
-          <th style="width:100px;text-align:right!important;">TRANSFER AMT</th>
-          <th style="width:100px;text-align:right!important;">MONTHLY PAID</th>
-          <th style="width:90px;text-align:right!important;">OTHER AMT</th>
-          <th style="width:110px;text-align:right!important;">TOTAL PENDING</th>
-          <th style="width:110px;text-align:right!important;">REMAINING</th>
-          <th style="width:190px;">REMARKS</th>
-          <th style="width:68px;text-align:center!important;">ACTIONS</th>
+          <th style="width:50px;">#</th>
+          <th style="width:100px;">DATE</th>
+          <th style="width:110px;">MONTH</th>
+          <th style="width:75px;text-align:center!important;">TOTAL ID</th>
+          <th style="width:125px;text-align:right!important;">WORKING AMT</th>
+          <th style="width:125px;text-align:right!important;">TRANSFER AMT</th>
+          <th style="width:125px;text-align:right!important;">MONTHLY PAID</th>
+          <th style="width:105px;text-align:right!important;">OTHER AMT</th>
+          <th style="width:125px;text-align:right!important;">TOTAL PENDING</th>
+          <th style="width:125px;text-align:right!important;">REMAINING</th>
+          <th style="width:240px;">REMARKS</th>
+          <th style="width:90px;text-align:center!important;">ACTIONS</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>

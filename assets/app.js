@@ -1005,7 +1005,7 @@
             document.querySelector('[data-tab="transaction"]').classList.add('active');
             const transactionFrame = document.getElementById('transactionFrame');
             if (transactionFrame && !transactionFrame.getAttribute('src')) {
-                transactionFrame.src = `transaction.html?v=20260821-2&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                transactionFrame.src = `transaction.html?v=20260821-4&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else {
             document.body.classList.remove('form-view');
