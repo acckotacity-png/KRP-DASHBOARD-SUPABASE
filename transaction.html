@@ -536,6 +536,29 @@
     html.krp-dark-theme .txn-summary-pair{background:linear-gradient(90deg,#0a1722,#10212e)!important;border-color:rgba(148,163,184,.16)!important}
     html.krp-dark-theme .txn-summary-pair .dash-card{background:transparent!important}
     html.krp-dark-theme .txn-summary-pair .dash-card+.dash-card{border-left-color:rgba(148,163,184,.18)!important}
+
+    /* Clean spreadsheet-style ledger: compact columns, clear totals, remarks last. */
+    #dataTable{min-width:1135px!important;font-size:10px!important}
+    #dataTable thead th{position:sticky!important;top:0!important;z-index:3!important;height:32px!important;padding:6px!important;font-size:8px!important;white-space:nowrap!important;text-align:left!important}
+    #dataTable tbody td{height:31px!important;padding:5px 6px!important;font-size:10px!important;line-height:1.25!important}
+    #dataTable tbody tr:nth-child(even) td{background:#f8fafc!important}
+    #dataTable tbody tr:hover td{background:#eef6ff!important}
+    #dataTable .number-cell{font-variant-numeric:tabular-nums!important;white-space:nowrap!important;text-align:right!important;font-weight:700!important}
+    #dataTable .id-cell{text-align:center!important;font-weight:800!important}
+    #dataTable .pending-cell{color:#1d4ed8!important;background:#eff6ff!important}
+    #dataTable .remaining-cell{color:#b42318!important;background:#fff4f2!important}
+    #dataTable .actions-cell{text-align:center!important;white-space:nowrap!important}
+    #dataTable .remarks-cell{min-width:190px!important;color:#334155!important;background:#fffdf5!important;font-weight:700!important;overflow-wrap:anywhere!important}
+    #dataTable .remarks-meta{display:block!important;margin-top:2px!important;color:#64748b!important;font-size:8px!important;font-weight:600!important;line-height:1.15!important}
+    #dataTable .month-link{white-space:nowrap!important}
+    .table-wrapper{scrollbar-color:#94a3b8 transparent!important;scrollbar-width:thin!important}
+    .table-wrapper::-webkit-scrollbar{height:7px!important}.table-wrapper::-webkit-scrollbar-thumb{background:#94a3b8!important;border-radius:999px!important}
+    html.krp-dark-theme #dataTable tbody tr:nth-child(even) td{background:#0c1b27!important}
+    html.krp-dark-theme #dataTable tbody tr:hover td{background:#14283a!important}
+    html.krp-dark-theme #dataTable .pending-cell{color:#93c5fd!important;background:#10243a!important}
+    html.krp-dark-theme #dataTable .remaining-cell{color:#fca5a5!important;background:#321b22!important}
+    html.krp-dark-theme #dataTable .remarks-cell{color:#f8fafc!important;background:#13251f!important}
+    html.krp-dark-theme #dataTable .remarks-meta{color:#a8b8ca!important}
   </style>
 </head>
 <body>
@@ -653,18 +676,18 @@
     <table id="dataTable">
       <thead>
         <tr>
-          <th style="width: 50px;">#</th>
-          <th style="width: 100px;">DATE</th>
-          <th style="width: 110px;">MONTH</th>
-          <th style="width: 80px;">TOTAL ID</th>
-          <th style="width: 120px;">WORKING AMT</th>
-          <th style="width: 110px;">TRANSFER AMT</th>
-          <th style="width: 120px;">MONTHLY PAID</th>
-          <th style="width: 100px;">OTHER AMT</th>
-          <th style="width: 160px; background: #fffcf0; color: #b06500;">REMARKS</th>
-          <th style="width: 130px; background:#e8f0fe; color:#1a5fb0;">TOTAL PENDING</th>
-          <th style="width: 120px; background:#e8f0fe; color:#1a5fb0;">REMAINING</th>
-          <th style="width: 140px; text-align: center;">ACTIONS</th>
+          <th style="width:34px;">#</th>
+          <th style="width:82px;">DATE</th>
+          <th style="width:92px;">MONTH</th>
+          <th style="width:58px;text-align:center!important;">TOTAL ID</th>
+          <th style="width:100px;text-align:right!important;">WORKING AMT</th>
+          <th style="width:100px;text-align:right!important;">TRANSFER AMT</th>
+          <th style="width:100px;text-align:right!important;">MONTHLY PAID</th>
+          <th style="width:90px;text-align:right!important;">OTHER AMT</th>
+          <th style="width:110px;text-align:right!important;">TOTAL PENDING</th>
+          <th style="width:110px;text-align:right!important;">REMAINING</th>
+          <th style="width:68px;text-align:center!important;">ACTIONS</th>
+          <th style="width:190px;">REMARKS</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -713,9 +736,9 @@
               <th style="width: 110px;">WORKING AMT</th>
               <th style="width: 110px;">TRANSFER AMT</th>
               <th style="width: 110px;">MONTHLY PAID</th>
-              <th style="width: 140px;">REMARKS</th>
               <th style="width: 110px; background:#e8f0fe; color:#1a5fb0;">REMAINING</th>
               <th style="width: 140px; text-align: center;">ACTIONS</th>
+              <th style="width: 180px;">REMARKS</th>
             </tr>
           </thead>
           <tbody id="modalTableBody"></tbody>
@@ -848,14 +871,14 @@
           <td>₹${r.workingAmt.toFixed(2)}</td>
           <td>₹${r.transferAmt.toFixed(2)}</td>
           <td>₹${r.monthlyPaid.toFixed(2)}</td>
-          <td>${r.remarks || ''}</td>
           <td style="font-weight:600; color:#1a5fb0;">₹${r.remainingAmt.toFixed(2)}</td>
           <td>
             <div class="col-actions" style="justify-content: center;">
-              <button class="edit-btn" onclick="editRecord(${r.id})"><i class="fas fa-pen"></i></button>
-              <button class="delete-btn" onclick="deleteRecord(${r.id})"><i class="fas fa-trash"></i></button>
+              <button class="edit-btn" onclick="editRecord(${r.id})" title="Edit entry" aria-label="Edit entry"><i class="fas fa-pen"></i></button>
+              <button class="delete-btn" onclick="deleteRecord(${r.id})" title="Delete entry" aria-label="Delete entry"><i class="fas fa-trash"></i></button>
             </div>
           </td>
+          <td>${r.remarks || '-'}</td>
         </tr>`;
       });
     }
@@ -1081,20 +1104,20 @@
         <td><span class="badge-id">${idx + 1}</span></td>
         <td>${rec.date}</td>
         <td><span class="month-link" onclick="openMonthLedger('${rec.month}')"><i class="far fa-folder" style="margin-right:3px;"></i>${rec.month}</span></td>
-        <td>${rec.totalId}</td>
-        <td>₹${rec.workingAmt.toFixed(2)}</td>
-        <td>₹${rec.transferAmt.toFixed(2)}</td>
-        <td>₹${rec.monthlyPaid.toFixed(2)}</td>
-        <td>₹${rec.otherAmt.toFixed(2)}</td>
-        <td style="background: #fffcf0; font-weight: 500;">${rec.remarks}<small style="display:block;color:#718096;font-size:9px;margin-top:3px;">By ${rec.createdBy||'-'} · ${rec.timestamp||'-'}</small></td>
-        <td style="font-weight:600; color:#1a5fb0;">₹${rec.totalPending.toFixed(2)}</td>
-        <td style="font-weight:600; color:#1a5fb0;">₹${rec.remainingAmt.toFixed(2)}</td>
-        <td>
+        <td class="id-cell">${rec.totalId}</td>
+        <td class="number-cell">₹${rec.workingAmt.toFixed(2)}</td>
+        <td class="number-cell">₹${rec.transferAmt.toFixed(2)}</td>
+        <td class="number-cell">₹${rec.monthlyPaid.toFixed(2)}</td>
+        <td class="number-cell">₹${rec.otherAmt.toFixed(2)}</td>
+        <td class="number-cell pending-cell">₹${rec.totalPending.toFixed(2)}</td>
+        <td class="number-cell remaining-cell">₹${rec.remainingAmt.toFixed(2)}</td>
+        <td class="actions-cell">
           <div class="col-actions" style="justify-content: center;">
-            <button class="edit-btn" onclick="editRecord(${rec.id})"><i class="fas fa-pen"></i></button>
-            <button class="delete-btn" onclick="deleteRecord(${rec.id})"><i class="fas fa-trash"></i></button>
+            <button class="edit-btn" onclick="editRecord(${rec.id})" title="Edit entry" aria-label="Edit entry"><i class="fas fa-pen"></i></button>
+            <button class="delete-btn" onclick="deleteRecord(${rec.id})" title="Delete entry" aria-label="Delete entry"><i class="fas fa-trash"></i></button>
           </div>
         </td>
+        <td class="remarks-cell">${rec.remarks || '-'}<small class="remarks-meta">By ${rec.createdBy||'-'} · ${rec.timestamp||'-'}</small></td>
       </tr>`;
     });
     tbody.innerHTML = html;
@@ -1267,8 +1290,8 @@
     if (!records.length) { alert('No data to export!'); return; }
     const excelData = sortByDateAsc(records).map((r, i) => ({
       '#': i + 1, 'DATE': r.date, 'MONTH': r.month, 'TOTAL ID': r.totalId, 'WORKING AMOUNT': r.workingAmt,
-      'TRANSFER AMT': r.transferAmt, 'MONTHLY PAID': r.monthlyPaid, 'OTHER AMT': r.otherAmt, 'REMARKS': r.remarks,
-      'TOTAL PENDING': r.totalPending, 'REMAINING': r.remainingAmt
+      'TRANSFER AMT': r.transferAmt, 'MONTHLY PAID': r.monthlyPaid, 'OTHER AMT': r.otherAmt,
+      'TOTAL PENDING': r.totalPending, 'REMAINING': r.remainingAmt, 'REMARKS': r.remarks
     }));
     const ws = XLSX.utils.json_to_sheet(excelData); const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transaction_Ledger');
