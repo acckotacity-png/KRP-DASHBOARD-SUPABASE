@@ -637,9 +637,11 @@
       .header-actions button{width:100%!important;min-width:0!important;min-height:38px!important;padding:7px 5px!important;font-size:11px!important;border-radius:8px!important}
       .header-actions button i{font-size:12px!important}
       .header-actions button span,#toggleBtnText{display:inline!important;font-size:11px!important}
-      .dashboard{display:flex!important;grid-template-columns:none!important;overflow-x:auto!important;overflow-y:hidden!important;gap:6px!important;padding:5px!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important}
-      .txn-summary-pair{flex:0 0 215px!important;min-width:215px!important;min-height:62px!important;scroll-snap-align:start!important}
-      .txn-summary-pair .dash-card{min-height:62px!important;padding:7px 5px!important}
+      .dashboard{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;overflow:visible!important;gap:6px!important;padding:5px!important;touch-action:auto!important}
+      .txn-summary-pair{display:grid!important;grid-template-columns:1fr!important;min-width:0!important;min-height:124px!important}
+      .txn-summary-pair .dash-card{min-width:0!important;min-height:62px!important;padding:7px 5px!important}
+      .txn-summary-pair .dash-card+.dash-card{border-left:0!important;border-top:1px solid #dce6ef!important}
+      html.krp-dark-theme .txn-summary-pair .dash-card+.dash-card{border-top-color:rgba(148,163,184,.18)!important}
       .txn-summary-pair .dash-label{font-size:8px!important;line-height:1.15!important}
       .txn-summary-pair .dash-value{font-size:12px!important;overflow:visible!important;text-overflow:clip!important}
       .ledger-tools{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;margin:7px 0!important}
