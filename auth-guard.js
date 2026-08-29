@@ -42,12 +42,24 @@ const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 
 window.supabaseClient = client;
 
-let { data: sessionData } = await client.auth.getSession();
+const authTimeout = (promise, ms = 12000) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error("AUTH_TIMEOUT")), ms))
+]);
+
+let sessionData;
+try {
+  ({ data: sessionData } = await authTimeout(client.auth.getSession()));
+} catch (_) {
+  await authTimeout(client.auth.signOut({ scope: "local" }), 2500).catch(() => {});
+  location.replace(loginUrl("session_expired"));
+  throw new Error("Stored session check timed out");
+}
 let session = sessionData?.session;
 if (session) {
-  const { error: userCheckError } = await client.auth.getUser();
+  const { error: userCheckError } = await authTimeout(client.auth.getUser()).catch(() => ({ error: new Error("AUTH_TIMEOUT") }));
   if (userCheckError) {
-    const { data: refreshed } = await client.auth.refreshSession();
+    const { data: refreshed } = await authTimeout(client.auth.refreshSession()).catch(() => ({ data: null }));
     session = refreshed?.session || null;
   }
 }
@@ -61,12 +73,12 @@ async function readMyAccess() {
   return client.from("app_users").select("*").eq("user_id", session.user.id).maybeSingle();
 }
 
-let { data: access, error: accessError } = await readMyAccess();
+let { data: access, error: accessError } = await authTimeout(readMyAccess()).catch(error => ({ data: null, error }));
 if (accessError) {
-  const { data: refreshed } = await client.auth.refreshSession();
+  const { data: refreshed } = await authTimeout(client.auth.refreshSession()).catch(() => ({ data: null }));
   if (refreshed?.session) {
     session = refreshed.session;
-    ({ data: access, error: accessError } = await readMyAccess());
+    ({ data: access, error: accessError } = await authTimeout(readMyAccess()).catch(error => ({ data: null, error })));
   }
 }
 
@@ -75,7 +87,10 @@ if (accessError) {
   document.body.innerHTML = `<main style="max-width:620px;margin:70px auto;padding:24px;font-family:Arial;color:#1b2559;text-align:center">
     <h2>Session verify नहीं हो सकी</h2>
     <p style="color:#687386">Internet या authentication service में temporary problem है। आपका account logout नहीं किया गया है।</p>
-    <button onclick="location.reload()" style="border:0;border-radius:9px;padding:11px 18px;background:#168447;color:white;font-weight:700;cursor:pointer">Retry</button>
+    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+      <button onclick="location.reload()" style="border:0;border-radius:9px;padding:11px 18px;background:#168447;color:white;font-weight:700;cursor:pointer">Retry</button>
+      <button onclick="window.supabaseClient.auth.signOut({scope:'local'}).finally(()=>location.replace('${AUTH_OPTIONS.loginPage}'))" style="border:1px solid #b8c4cf;border-radius:9px;padding:10px 18px;background:#fff;color:#26364a;font-weight:700;cursor:pointer">Sign In Again</button>
+    </div>
   </main>`;
   throw new Error("Access verification temporarily failed");
 }

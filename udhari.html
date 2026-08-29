@@ -6,7 +6,7 @@
   <title>Udhari Bahi Khata</title>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=24"></script>
+  <script type="module" src="auth-guard.js?v=25"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="theme.css?v=47"><script src="theme.js?v=3"></script>
   <style>
@@ -376,16 +376,19 @@
   function currentAccess() {
     let user=null;
     try { user=window.parent.currentKrpUser||window.currentKrpUser||null; } catch (_) { user=window.currentKrpUser||null; }
+    if(!user)return {ready:false,create:false,edit:false,delete:false};
     const permissions=user?.permissions||{};
     const admin=user?.role==='admin';
-    return {create:admin||permissions.create===true,edit:admin||permissions.edit===true,delete:admin||permissions.delete===true};
+    return {ready:true,create:admin||permissions.create===true,edit:admin||permissions.edit===true,delete:admin||permissions.delete===true};
   }
   function hasRight(right) { return currentAccess()[right]===true; }
   function applyPermissionVisibility() {
     const access=currentAccess();
+    if(!access.ready)return false;
     document.body.classList.toggle('no-create',!access.create);
     document.body.classList.toggle('no-edit',!access.edit);
     document.body.classList.toggle('no-delete',!access.delete);
+    return true;
   }
   function requireRight(right) {
     if(hasRight(right))return true;
@@ -823,7 +826,12 @@
   document.getElementById('ledgerModal').addEventListener('click',e=>{if(e.target.id==='ledgerModal')closeLedger();});
   window.addEventListener('load',()=>{
     applyPermissionVisibility();
-    setTimeout(applyPermissionVisibility,500);
+    window.addEventListener('krp-auth-ready',applyPermissionVisibility);
+    let permissionAttempts=0;
+    const permissionTimer=setInterval(()=>{
+      permissionAttempts+=1;
+      if(applyPermissionVisibility()||permissionAttempts>=30)clearInterval(permissionTimer);
+    },400);
     loadData(false);
     setInterval(()=>loadData(false),120000);
   });
