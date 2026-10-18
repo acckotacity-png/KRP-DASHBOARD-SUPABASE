@@ -1238,7 +1238,34 @@
         if (!raw) return '<span class="utr-value">-</span>';
         const parts = raw.split(',').map(part => part.trim()).filter(Boolean);
         const values = parts.length ? parts : [raw];
-        return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="utr-value">${escapeHtml(part)}</span>`).join('<span class="utr-separator"> </span>')}</span>`;
+        return `<span class="utr-stack" title="${escapeHtml(raw)}">${values.map(part => `<span class="tracker-copy-row"><span class="utr-value">${escapeHtml(part)}</span><button type="button" class="tracker-copy-btn" data-copy-value="${escapeHtml(part)}" onclick="copyTrackerValue(this)" title="Copy UTR" aria-label="Copy UTR"><i class="far fa-copy"></i></button></span>`).join('<span class="utr-separator"> </span>')}</span>`;
+    }
+    async function copyTrackerValue(button) {
+        const value = button?.dataset?.copyValue || '';
+        if (!value) return;
+        try {
+            if (navigator.clipboard?.writeText && window.isSecureContext) {
+                await navigator.clipboard.writeText(value);
+            } else {
+                const input = document.createElement('textarea');
+                input.value = value;
+                input.setAttribute('readonly', '');
+                input.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+                document.body.appendChild(input);
+                input.select();
+                if (!document.execCommand('copy')) throw new Error('Copy unavailable');
+                input.remove();
+            }
+            button.classList.add('copied');
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            showMessage('Copied: ' + value, 'success');
+            setTimeout(() => {
+                button.classList.remove('copied');
+                button.innerHTML = '<i class="far fa-copy"></i>';
+            }, 1200);
+        } catch (_) {
+            showMessage('Copy नहीं हुआ। दोबारा try करें।', 'error');
+        }
     }
     function normalizeMobile10(value) {
         const digits = showSheetText(value).replace(/\D/g, '');
@@ -2982,7 +3009,7 @@
             const contactLinkHtml = contactText !== '-' ?
                 `<button type="button" class="contact-ledger-link${contactIsPhone ? ' phone-contact-link' : ''}" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
-            const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline">Login ID: ${escapeHtml(loginIdText)}</small>` : ''}</div>`;
+            const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline"><span>Login ID: ${escapeHtml(loginIdText)}</span><button type="button" class="tracker-copy-btn" data-copy-value="${escapeHtml(loginIdText)}" onclick="copyTrackerValue(this)" title="Copy Login ID" aria-label="Copy Login ID"><i class="far fa-copy"></i></button></small>` : ''}</div>`;
             const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
             let statusVal  = row[idxStatus]?.toString().trim().toUpperCase() || 'PENDING';
             const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');

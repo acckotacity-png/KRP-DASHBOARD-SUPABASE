@@ -829,3 +829,20 @@ html.krp-custom-theme input,html.krp-custom-theme select,html.krp-custom-theme t
 html.krp-custom-theme table,html.krp-custom-theme thead,html.krp-custom-theme tbody,html.krp-custom-theme tr,html.krp-custom-theme th,html.krp-custom-theme td{border-color:var(--krp-user-border)!important;color:var(--krp-user-text)!important}
 html.krp-custom-theme .btn-primary,html.krp-custom-theme .btn-submit,html.krp-custom-theme .btn-success,html.krp-custom-theme .tab-btn.active{background:var(--krp-user-accent)!important;border-color:var(--krp-user-accent)!important;color:#fff!important}
 html.krp-custom-theme a,html.krp-custom-theme .link,html.krp-custom-theme .month-link,html.krp-custom-theme .contact-ledger-link{color:var(--krp-user-accent)!important}
+
+/* Mobile tracker: one clean outer edge, wider cards and one-tap copy controls. */
+.tracker-copy-row,.tracker-login-subline{display:flex!important;align-items:center!important;gap:5px!important;min-width:0!important}
+.tracker-copy-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 23px!important;width:23px!important;height:23px!important;min-width:23px!important;margin:0!important;padding:0!important;border:1px solid #bcd7cc!important;border-radius:6px!important;background:#e8f7f0!important;color:#087a4c!important;box-shadow:none!important;cursor:pointer!important;line-height:1!important}
+.tracker-copy-btn i{font-size:10px!important;pointer-events:none!important}.tracker-copy-btn.copied{background:#07955a!important;color:#fff!important;border-color:#07955a!important}
+.utr-stack{align-items:flex-start!important}.tracker-copy-row .utr-value{width:auto!important;max-width:calc(100% - 28px)!important}.tracker-copy-row .utr-value::after{content:none!important}
+html.krp-dark-theme .tracker-copy-btn{background:#123127!important;color:#70d7a6!important;border-color:#285947!important}
+@media(max-width:520px){
+  body.tracker-view #trackerTab .tracker-container{padding-left:4px!important;padding-right:4px!important}
+  #tableContainer.mobile-card-view{width:calc(100% + 4px)!important;margin-left:-2px!important;margin-right:-2px!important;padding-left:0!important;padding-right:0!important;border:0!important;outline:0!important;box-shadow:none!important}
+  #tableContainer.mobile-card-view #dataTable,#tableContainer.mobile-card-view #tableBody{border:0!important;outline:0!important;box-shadow:none!important}
+  #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){border:0!important;border-left:0!important;border-right:0!important;outline:0!important;box-sizing:border-box!important}
+  #tableContainer.mobile-card-view #dataTable td{border-left:0!important;border-right:0!important;outline:0!important}
+  #tableContainer.mobile-card-view .tracker-login-subline{display:flex!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+  #tableContainer.mobile-card-view .tracker-login-subline>span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  #tableContainer.mobile-card-view .tracker-copy-btn{flex-basis:22px!important;width:22px!important;height:22px!important;min-width:22px!important}
+}
