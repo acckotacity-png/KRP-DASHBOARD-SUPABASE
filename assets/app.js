@@ -3034,7 +3034,7 @@
             const contactLinkHtml = contactText !== '-' ?
                 `<button type="button" class="contact-ledger-link${contactIsPhone ? ' phone-contact-link' : ''}" onclick="openContactLedger(${originalIdx})" title="View full ledger">${escapeHtml(contactText)}</button>` : '-';
             const loginIdText = idxLogin !== -1 ? showSheetText(row[idxLogin]).trim() : '';
-            const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}${loginIdText ? `<small class="tracker-login-subline"><span>Login ID: ${escapeHtml(loginIdText)}</span><button type="button" class="tracker-copy-btn" data-copy-value="${escapeHtml(loginIdText)}" onclick="copyTrackerValue(this)" title="Copy Login ID" aria-label="Copy Login ID"><i class="far fa-copy"></i></button></small>` : ''}</div>`;
+            const contactHtml = `<div class="tracker-contact-stack">${contactLinkHtml}</div>`;
             const customerNameText = (idxCustomerName !== -1 ? showSheetText(row[idxCustomerName]).trim() : '') || getKnownCustomerNameForContact(contactText);
             let statusVal  = row[idxStatus]?.toString().trim().toUpperCase() || 'PENDING';
             const isSupportingPayment = idxPurpose !== -1 && showSheetText(row[idxPurpose]).trim().toUpperCase().startsWith('PAYMENT AGAINST');
@@ -3088,8 +3088,7 @@
                 <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeNames ? `<small class="id-purpose-preview" title="${escapeHtml(purposeNames)}">${escapeHtml(purposeNames)}</small>` : ''}<small class="id-purpose-preview">Login ID: ${escapeHtml(idxLogin !== -1 ? showSheetText(row[idxLogin]) : '-')}</small></td>
                 <td data-label="Received / Login Amt"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><small>Received</small><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong><small>Login ID Amt</small><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></span></td>
                 <td data-label="Contact / Name"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;">${contactHtml}<strong>${escapeHtml(customerNameText || '-')}</strong></span></td>
-                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}${defaulterHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
-                <td data-label="Bank / UTR"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><strong>${row[idxBank] || '-'}</strong><span>${formatUtrDisplay(row[idxUtr])}</span><small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></span></td>
+                <td data-label="Bank / UTR"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><strong>${row[idxBank] || '-'}</strong><span>${formatUtrDisplay(row[idxUtr])}</span></span></td>\n                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}${defaulterHtml}` : '<span aria-label="Supporting payment entry">—</span>'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></div></td>
                 <td data-label="Actions">
                     <div class="action-icons">
                         <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share QR on WhatsApp"><i class="fas fa-qrcode"></i><span class="action-text">QR Share</span></button>
@@ -6365,6 +6364,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
