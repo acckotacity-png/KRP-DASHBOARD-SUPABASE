@@ -3085,14 +3085,11 @@
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
                 </div></td>
-                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeNames ? `<small class="id-purpose-preview" title="${escapeHtml(purposeNames)}">${escapeHtml(purposeNames)}</small>` : ''}</td>
-                <td data-label="Received Amt"><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong></td>
-                <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
-                <td data-label="Contact / Login ID">${contactHtml}</td>
-                <td data-label="Name">${escapeHtml(customerNameText || '-')}</td>
+                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeNames ? `<small class="id-purpose-preview" title="${escapeHtml(purposeNames)}">${escapeHtml(purposeNames)}</small>` : ''}<small class="id-purpose-preview">Login ID: ${escapeHtml(idxLogin !== -1 ? showSheetText(row[idxLogin]) : '-')}</small></td>
+                <td data-label="Received / Login Amt"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><small>Received</small><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong><small>Login ID Amt</small><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></span></td>
+                <td data-label="Contact / Name"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;">${contactHtml}<strong>${escapeHtml(customerNameText || '-')}</strong></span></td>
                 <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}${defaulterHtml}` : '<span aria-label="Supporting payment entry">—</span>'}</div></td>
-                <td data-label="Bank">${row[idxBank] || '-'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></td>
-                <td data-label="UTR">${formatUtrDisplay(row[idxUtr])}</td>
+                <td data-label="Bank / UTR"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><strong>${row[idxBank] || '-'}</strong><span>${formatUtrDisplay(row[idxUtr])}</span><small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></span></td>
                 <td data-label="Actions">
                     <div class="action-icons">
                         <button type="button" class="action-btn btn-whatsapp" onclick="openQRAndShare(${originalIdx})" title="Share QR on WhatsApp"><i class="fas fa-qrcode"></i><span class="action-text">QR Share</span></button>
@@ -6368,6 +6365,8 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
+
 
 
 
