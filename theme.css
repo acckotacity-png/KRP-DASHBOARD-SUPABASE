@@ -856,3 +856,22 @@ html.krp-dark-theme .tracker-pagination{color:#91a7b8}html.krp-dark-theme .track
   #tableContainer.mobile-card-view .tracker-copy-row .utr-value{display:block!important;flex:0 1 auto!important;width:auto!important;max-width:calc(100% - 27px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;overflow-wrap:normal!important;word-break:normal!important;font-size:clamp(11px,3.4vw,13px)!important;line-height:1.2!important}
   .tracker-pagination{padding-top:8px!important}
 }
+/* Theme-identical mobile tracker geometry and compact per-list dropdown management. */
+#purposeManagerModal .purpose-manager-section{padding:0!important;overflow:hidden!important}
+#purposeManagerModal .purpose-manager-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:8px 10px;cursor:pointer;user-select:none}
+#purposeManagerModal .purpose-manager-section-head>div{display:flex;align-items:center;gap:9px}#purposeManagerModal .purpose-manager-section-head strong{font-size:12px!important}
+#purposeManagerModal .purpose-section-update{min-height:30px;padding:5px 9px;border:1px solid #82b9a1;border-radius:7px;background:#e4f6ed;color:#087848;font-size:9px;font-weight:850;cursor:pointer}
+#purposeManagerModal .purpose-section-chevron{font-size:10px;transition:transform .18s ease}#purposeManagerModal .purpose-manager-section.open .purpose-section-chevron{transform:rotate(180deg)}
+#purposeManagerModal .purpose-manager-body{display:none;padding:0 9px 9px}#purposeManagerModal .purpose-manager-section.open .purpose-manager-body{display:block}
+#purposeManagerModal .purpose-manager-row.is-hidden{opacity:.46!important;filter:saturate(.35)!important;background:repeating-linear-gradient(135deg,#eef1ef,#eef1ef 7px,#e5eae7 7px,#e5eae7 14px)!important}
+#purposeManagerModal .purpose-manager-row.is-hidden .purpose-manager-name{text-decoration:line-through;text-decoration-thickness:1px}
+html.krp-dark-theme #purposeManagerModal .purpose-section-update{background:#12392d;color:#78dbac;border-color:#2b6851}
+html.krp-dark-theme #purposeManagerModal .purpose-manager-row.is-hidden{opacity:.42!important;background:repeating-linear-gradient(135deg,#10212b,#10212b 7px,#0b1a23 7px,#0b1a23 14px)!important}
+@media(max-width:520px){
+  #tableContainer.mobile-card-view #dataTable td,#tableContainer.mobile-card-view .tracker-head-item{box-sizing:border-box!important}
+  #tableContainer.mobile-card-view #dataTable td[data-label="ID Count"],#tableContainer.mobile-card-view #dataTable td[data-label="Received Amt"],#tableContainer.mobile-card-view #dataTable td[data-label="Login ID Amt"],#tableContainer.mobile-card-view #dataTable td[data-label="Bank"]{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;overflow-wrap:normal!important;word-break:normal!important}
+  #tableContainer.mobile-card-view #dataTable td[data-label="ID Count"] strong,#tableContainer.mobile-card-view #dataTable td[data-label="Received Amt"] strong,#tableContainer.mobile-card-view #dataTable td[data-label="Login ID Amt"] strong{white-space:nowrap!important;font-size:clamp(11px,3.35vw,13px)!important}
+  #tableContainer.mobile-card-view .tracker-head-value,#tableContainer.mobile-card-view .tracker-invoice-date{word-break:normal!important;overflow-wrap:normal!important}
+  html:not(.krp-dark-theme) #tableContainer.mobile-card-view #tableBody tr:not(.empty-row),html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)!important}
+  #purposeManagerModal .modal-content{padding-left:8px!important;padding-right:8px!important}
+}

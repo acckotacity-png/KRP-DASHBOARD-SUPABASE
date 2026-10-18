@@ -23,7 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=49">
+    <link rel="stylesheet" href="theme.css?v=50">
     <script src="theme.js?v=3"></script>
 </head>
 <body class="form-view">
@@ -663,27 +663,22 @@
             <span><i class="fas fa-list-check"></i> Dropdown Settings Manager</span>
             <i class="fas fa-times close-modal" onclick="closePurposeManager()"></i>
         </div>
-        <div class="purpose-manager-section">
-            <strong style="font-size:12px;">Purpose List</strong>
-            <div class="purpose-manager-add"><input id="newPurposeSetting" type="text" placeholder="New purpose name"><button type="button" onclick="addPurposeSetting()"><i class="fas fa-plus"></i> Add</button></div>
-            <div id="purposeManagerList" class="purpose-manager-list"></div>
+        <div class="purpose-manager-section open" id="purposeManagerSection-purpose">
+            <div class="purpose-manager-section-head" onclick="togglePurposeManagerSection('purpose')"><strong>Purpose List</strong><div><button type="button" class="purpose-section-update" onclick="event.stopPropagation();savePurposeManagerSettings('purpose')"><i class="fas fa-save"></i> Update</button><i class="fas fa-chevron-down purpose-section-chevron"></i></div></div>
+            <div class="purpose-manager-body"><div class="purpose-manager-add"><input id="newPurposeSetting" type="text" placeholder="New purpose name"><button type="button" onclick="addPurposeSetting()"><i class="fas fa-plus"></i> Add</button></div><div id="purposeManagerList" class="purpose-manager-list"></div></div>
         </div>
-        <div class="purpose-manager-section">
-            <strong style="font-size:12px;">Financial Year List</strong>
-            <div class="purpose-manager-add"><input id="newYearSetting" type="text" placeholder="Example: 26-27"><button type="button" onclick="addFinancialYearSetting()"><i class="fas fa-plus"></i> Add</button></div>
-            <div id="yearManagerList" class="purpose-manager-list"></div>
+        <div class="purpose-manager-section" id="purposeManagerSection-year">
+            <div class="purpose-manager-section-head" onclick="togglePurposeManagerSection('year')"><strong>Financial Year List</strong><div><button type="button" class="purpose-section-update" onclick="event.stopPropagation();savePurposeManagerSettings('year')"><i class="fas fa-save"></i> Update</button><i class="fas fa-chevron-down purpose-section-chevron"></i></div></div>
+            <div class="purpose-manager-body"><div class="purpose-manager-add"><input id="newYearSetting" type="text" placeholder="Example: 26-27"><button type="button" onclick="addFinancialYearSetting()"><i class="fas fa-plus"></i> Add</button></div><div id="yearManagerList" class="purpose-manager-list"></div></div>
         </div>
-        <div class="purpose-manager-section">
-            <strong style="font-size:12px;">State List</strong>
-            <div class="purpose-manager-add"><input id="newStateSetting" type="text" placeholder="New state name"><button type="button" onclick="addStateSetting()"><i class="fas fa-plus"></i> Add</button></div>
-            <div id="stateManagerList" class="purpose-manager-list"></div>
+        <div class="purpose-manager-section" id="purposeManagerSection-state">
+            <div class="purpose-manager-section-head" onclick="togglePurposeManagerSection('state')"><strong>State List</strong><div><button type="button" class="purpose-section-update" onclick="event.stopPropagation();savePurposeManagerSettings('state')"><i class="fas fa-save"></i> Update</button><i class="fas fa-chevron-down purpose-section-chevron"></i></div></div>
+            <div class="purpose-manager-body"><div class="purpose-manager-add"><input id="newStateSetting" type="text" placeholder="New state name"><button type="button" onclick="addStateSetting()"><i class="fas fa-plus"></i> Add</button></div><div id="stateManagerList" class="purpose-manager-list"></div></div>
         </div>
-        <div class="purpose-manager-section">
-            <strong style="font-size:12px;">Bank List</strong>
-            <div class="purpose-manager-add"><input id="newBankSetting" type="text" placeholder="New bank name"><button type="button" onclick="addBankSetting()"><i class="fas fa-plus"></i> Add</button></div>
-            <div id="bankManagerList" class="purpose-manager-list"></div>
+        <div class="purpose-manager-section" id="purposeManagerSection-bank">
+            <div class="purpose-manager-section-head" onclick="togglePurposeManagerSection('bank')"><strong>Bank List</strong><div><button type="button" class="purpose-section-update" onclick="event.stopPropagation();savePurposeManagerSettings('bank')"><i class="fas fa-save"></i> Update</button><i class="fas fa-chevron-down purpose-section-chevron"></i></div></div>
+            <div class="purpose-manager-body"><div class="purpose-manager-add"><input id="newBankSetting" type="text" placeholder="New bank name"><button type="button" onclick="addBankSetting()"><i class="fas fa-plus"></i> Add</button></div><div id="bankManagerList" class="purpose-manager-list"></div></div>
         </div>
-        <button type="button" class="btn-submit" style="width:100%;max-width:none;margin-top:0;" onclick="savePurposeManagerSettings()"><i class="fas fa-save"></i> Save All Dropdown Settings</button>
     </div>
 </div>
 
@@ -842,7 +837,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20261018-2" defer></script>
+<script src="assets/app.js?v=20261018-3" defer></script>
 </body>
 </html>
 

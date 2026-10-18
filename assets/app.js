@@ -388,7 +388,7 @@
         return dropdownSettingsSyncPromise;
     }
     function renderPurposeManagerRows(items, type) {
-        return items.map(item => `<div class="purpose-manager-row">
+        return items.map(item => `<div class="purpose-manager-row ${item.active ? '' : 'is-hidden'}">
             <div class="purpose-manager-name">${escapeHtml(item.name)}<small>${item.active ? 'Visible in dropdown' : 'Hidden from dropdown'}</small></div>
             <div class="purpose-manager-actions">
                 <button type="button" style="background:#e6f2ff;color:#4318ff;" onclick="editPurposeManagerItem('${type}','${item.id}')" title="Edit"><i class="fas fa-edit"></i></button>
@@ -463,7 +463,13 @@
         if (type === 'year') purposeSettingsState.years = filtered; else if (type === 'state') purposeSettingsState.states = filtered; else if (type === 'bank') purposeSettingsState.banks = filtered; else purposeSettingsState.purposes = filtered;
         renderPurposeDropdownOptions(); populatePurposeYears(); renderStateDropdownOptions(); renderBankDropdownOptions(); renderPurposeManagerLists();
     }
-    async function savePurposeManagerSettings() {
+    function togglePurposeManagerSection(type) {
+        ['purpose','year','state','bank'].forEach(name => {
+            const section = document.getElementById(`purposeManagerSection-${name}`);
+            if (section) section.classList.toggle('open', name === type && !section.classList.contains('open'));
+        });
+    }
+    async function savePurposeManagerSettings(sectionType = '') {
         try {
             showMessage('Purpose settings saving...', 'pending');
             const payload = new URLSearchParams({ action:'savePurposeSettings', purposes:JSON.stringify(purposeSettingsState.purposes), years:JSON.stringify(purposeSettingsState.years), states:JSON.stringify(purposeSettingsState.states), banks:JSON.stringify(purposeSettingsState.banks) });
@@ -471,8 +477,8 @@
             const result = await response.json();
             if (!result?.success) throw new Error(result?.error || 'Save failed');
             applyPurposeSettings(result);
-            closePurposeManager();
-            showMessage('Purpose, Financial Year, State & Bank settings saved', 'success');
+            const labels = { purpose:'Purpose', year:'Financial Year', state:'State', bank:'Bank' };
+            showMessage(sectionType ? `${labels[sectionType]} list updated` : 'Dropdown settings saved', 'success');
         } catch (error) { showMessage(error.message || 'Purpose settings save failed', 'error'); }
     }
 
