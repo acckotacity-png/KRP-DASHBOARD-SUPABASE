@@ -1006,7 +1006,7 @@
             document.querySelector('[data-tab="udhari"]').classList.add('active');
             const udhariFrame = document.getElementById('udhariFrame');
             if (udhariFrame && !udhariFrame.getAttribute('src')) {
-                udhariFrame.src = `udhari.html?v=20261018-7&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
+                udhariFrame.src = `udhari.html?v=20261018-8&api=${encodeURIComponent(APPS_SCRIPT_URL)}`;
             }
         } else if (tab === 'transaction') {
             document.body.classList.remove('form-view');
@@ -6368,3 +6368,4 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
