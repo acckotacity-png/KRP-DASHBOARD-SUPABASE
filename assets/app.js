@@ -3085,7 +3085,7 @@
                     <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
                     <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
                 </div></td>
-                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong></td>
+                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeNames ? `<small class="id-purpose-preview" title="${escapeHtml(purposeNames)}">${escapeHtml(purposeNames)}</small>` : ''}</td>
                 <td data-label="Received Amt"><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Login ID Amt"><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></td>
                 <td data-label="Contact / Login ID">${contactHtml}</td>
@@ -6368,6 +6368,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
