@@ -3075,6 +3075,7 @@
             const hasIdEntry = statusVal !== 'REFUND' && idxLogin !== -1 && showSheetText(row[idxLogin]).trim() !== '';
             const rowIdCount = hasIdEntry ? getIdActivationPurposeCount(rawPurpose) : 0;
             const purposeNames = getPurposeValidationParts(rawPurpose).purposes.join(', ');
+            const purposeLabel = getPurposeYearForMessage(rawPurpose);
             const idDetailsHtml = rowIdCount
                 ? `<span class="id-count-badge"><i class="fas fa-id-card"></i>ID No. ${escapeHtml(idActivationSerialNo || '-')}</span><small class="id-purpose-preview">${rowIdCount} ${rowIdCount === 1 ? 'ID' : 'IDs'}${purposeNames ? ` · ${escapeHtml(purposeNames)}` : ''}</small>`
                 : '<span style="color:#a3aed1;">-</span>';
@@ -3082,10 +3083,10 @@
             html += `<tr>
                 <td data-label="Invoice"><div class="tracker-card-head">
                     <div class="tracker-head-item tracker-head-invoice"><span class="tracker-head-label">Invoice No.</span><span class="tracker-head-value emphasis">${escapeHtml(row[idxInv] || '-')}</span>${invoiceSerialHtml}</div>
-                    <div class="tracker-head-item"><span class="tracker-head-label">ID Number</span><span class="tracker-head-value emphasis">${escapeHtml(idActivationSerialNo || '-')}</span></div>
+
                     <div class="tracker-head-item"><span class="tracker-head-label">Date</span><span class="tracker-head-value emphasis tracker-invoice-date">${dateDisplay}</span></div>
                 </div></td>
-                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeNames ? `<small class="id-purpose-preview" title="${escapeHtml(purposeNames)}">${escapeHtml(purposeNames)}</small>` : ''}<small class="id-purpose-preview">Login ID: ${escapeHtml(idxLogin !== -1 ? showSheetText(row[idxLogin]) : '-')}</small></td>
+                <td data-label="ID Count"><strong>${rowIdCount || 0} ${rowIdCount === 1 ? 'ID' : 'IDs'}</strong>${purposeLabel ? `<small class="id-purpose-preview" title="${escapeHtml(purposeLabel)}">${escapeHtml(purposeLabel)}</small>` : ''}<small class="id-purpose-preview">Login ID: ${escapeHtml(idxLogin !== -1 ? showSheetText(row[idxLogin]) : '-')} ${idxLogin !== -1 && showSheetText(row[idxLogin]).trim() ? `<button type="button" class="tracker-copy-btn" data-copy-value="${escapeHtml(showSheetText(row[idxLogin]).trim())}" onclick="copyTrackerValue(this)" title="Copy Login ID" aria-label="Copy Login ID"><i class="far fa-copy"></i></button>` : ''}</small></td>
                 <td data-label="Received / Login Amt"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><small>Received</small><strong>₹${parseFloat(idxReceived !== -1 ? row[idxReceived] : 0).toLocaleString('en-IN')}</strong><small>Login ID Amt</small><strong>₹${parseFloat(idxIdActivationAmt !== -1 ? row[idxIdActivationAmt] : 0).toLocaleString('en-IN')}</strong></span></td>
                 <td data-label="Contact / Name"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;">${contactHtml}<strong>${escapeHtml(customerNameText || '-')}</strong></span></td>
                 <td data-label="Bank / UTR"><span class="compact-pair" style="display:flex;flex-direction:column;gap:2px;white-space:nowrap;"><strong>${row[idxBank] || '-'}</strong><span>${formatUtrDisplay(row[idxUtr])}</span></span></td>\n                <td data-label="Status"><div class="tracker-status-with-amount ${pendingAmountHtml ? 'tracker-pending-alert' : ''}">${statusVal ? `<span class="badge ${badgeClass}">${statusVal}</span>${pendingAmountHtml}${defaulterHtml}` : '<span aria-label="Supporting payment entry">—</span>'}<small class="entry-owner">By ${escapeHtml(idxCreatedBy !== -1 ? row[idxCreatedBy] || '-' : '-')} · ${formatEntryDateTime(idxTimestamp !== -1 ? row[idxTimestamp] : '')}</small></div></td>
@@ -6364,6 +6365,8 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
+
 
 
 
