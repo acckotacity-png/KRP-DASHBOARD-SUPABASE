@@ -686,6 +686,55 @@
     html.krp-dark-theme #dataTable .remarks-meta{color:#9eb2bd!important;font-weight:700!important}
     html.krp-dark-theme .ledger-search input{color:#f2f6f8!important}
     html.krp-dark-theme .ledger-search input::placeholder{color:#899da9!important;opacity:1!important}
+
+    /* Responsive hybrid ledger: fitted desktop sheet, touch-friendly cards on tablet/phone. */
+    .mobile-ledger-cards{display:none}
+    @media(min-width:901px){
+      .app-container{max-width:1500px!important}
+      .app-container>#mainLedgerScroll{overflow-x:hidden!important}
+      #dataTable{width:100%!important;min-width:0!important;table-layout:fixed!important;font-size:9px!important}
+      #dataTable thead th{padding:6px 4px!important;font-size:7.5px!important}
+      #dataTable tbody td{padding:6px 4px!important;font-size:9px!important}
+      #dataTable th:nth-child(1){width:4%!important} #dataTable th:nth-child(2){width:8%!important}
+      #dataTable th:nth-child(3){width:9%!important} #dataTable th:nth-child(4){width:6%!important}
+      #dataTable th:nth-child(5),#dataTable th:nth-child(6),#dataTable th:nth-child(7){width:9%!important}
+      #dataTable th:nth-child(8){width:8%!important} #dataTable th:nth-child(9),#dataTable th:nth-child(10){width:9%!important}
+      #dataTable th:nth-child(11){width:14%!important} #dataTable th:nth-child(12){width:7%!important}
+      #dataTable .remarks-cell{min-width:0!important;overflow-wrap:anywhere!important}
+    }
+    @media(max-width:900px){
+      .app-container>#mainLedgerScroll{display:none!important}
+      .mobile-ledger-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:7px}
+      .txn-mobile-empty{grid-column:1/-1;padding:28px 12px;text-align:center;border:1px dashed #b9cbc4;border-radius:12px;color:#60756e;background:#f7faf8}
+      .txn-mobile-card{min-width:0;border:1px solid #cbd9d3;border-radius:13px;background:linear-gradient(145deg,#f9fbfa,#edf3f0);box-shadow:0 7px 18px rgba(25,55,47,.08);overflow:hidden}
+      .txn-mobile-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;padding:10px 11px;border-bottom:1px solid #d6e1dc;background:rgba(207,221,215,.5)}
+      .txn-mobile-serial{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 7px;border-radius:9px;background:#e7f8ed;color:#14783a;font-size:11px;font-weight:900}
+      .txn-mobile-title{min-width:0}.txn-mobile-month{display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;font-family:inherit;color:#126bbb;font-size:12px;font-weight:900;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+      .txn-mobile-date{display:block;margin-top:2px;color:#60736d;font-size:9px;font-weight:750}
+      .txn-mobile-actions{display:flex;gap:5px}.txn-mobile-actions button{display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border:0;border-radius:8px;cursor:pointer}
+      .txn-mobile-actions .edit-btn{background:#e6efff;color:#175fc2}.txn-mobile-actions .delete-btn{background:#ffe8e7;color:#bd261f}
+      .txn-mobile-primary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#d7e2dd}
+      .txn-mobile-metric{min-width:0;background:#f8fbf9;padding:10px 8px}.txn-mobile-label{display:block;color:#657b73;font-size:7px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+      .txn-mobile-value{display:block;margin-top:4px;color:#17332d;font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+      .txn-mobile-metric.due .txn-mobile-value{color:#c22931}.txn-mobile-details{border-top:1px solid #d7e2dd}
+      .txn-mobile-details summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;color:#176b50;font-size:10px;font-weight:900;cursor:pointer;list-style:none;user-select:none}
+      .txn-mobile-details summary::-webkit-details-marker{display:none}.txn-mobile-details summary::after{content:'+';font-size:16px;line-height:1}.txn-mobile-details[open] summary::after{content:'−'}
+      .txn-mobile-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 10px 10px}
+      .txn-mobile-detail-item{min-width:0;padding:7px 8px;border:1px solid #d9e4df;border-radius:8px;background:#fff}.txn-mobile-detail-item.wide{grid-column:1/-1}
+      .txn-mobile-detail-item .txn-mobile-value{font-size:10px}.txn-mobile-remarks{white-space:normal!important;overflow-wrap:anywhere;color:#243b34!important}
+      .txn-mobile-meta{display:block;margin-top:4px;color:#71847e;font-size:8px;font-weight:700}
+      html.krp-dark-theme .txn-mobile-card{border-color:#294a55;background:linear-gradient(145deg,#0d2932,#0a2028);box-shadow:0 8px 20px rgba(0,0,0,.22)}
+      html.krp-dark-theme .txn-mobile-head{border-bottom-color:#294a55;background:rgba(21,55,67,.78)}
+      html.krp-dark-theme .txn-mobile-serial{background:#173d31;color:#92e6ad} html.krp-dark-theme .txn-mobile-month{color:#83bdff}
+      html.krp-dark-theme .txn-mobile-date,html.krp-dark-theme .txn-mobile-label{color:#9eb4ad} html.krp-dark-theme .txn-mobile-primary{background:#29444b}
+      html.krp-dark-theme .txn-mobile-metric{background:#0b242c} html.krp-dark-theme .txn-mobile-value{color:#f0f7f4}
+      html.krp-dark-theme .txn-mobile-metric.due .txn-mobile-value{color:#ff969d} html.krp-dark-theme .txn-mobile-details{border-top-color:#294a55}
+      html.krp-dark-theme .txn-mobile-details summary{color:#8ce3b1} html.krp-dark-theme .txn-mobile-detail-item{border-color:#294a55;background:#102b34}
+      html.krp-dark-theme .txn-mobile-remarks{color:#f3f8f7!important} html.krp-dark-theme .txn-mobile-meta{color:#97aaa5}
+      html.krp-dark-theme .txn-mobile-actions .edit-btn{background:#174c8c;color:#fff} html.krp-dark-theme .txn-mobile-actions .delete-btn{background:#7d2528;color:#fff}
+      html.krp-dark-theme .txn-mobile-empty{border-color:#294a55;background:#0c242c;color:#a9bdb6}
+    }
+    @media(max-width:639px){.mobile-ledger-cards{grid-template-columns:1fr;gap:8px}.txn-mobile-head{padding:9px}.txn-mobile-primary .txn-mobile-metric{padding:9px 7px}.txn-mobile-value{font-size:11px}}
   </style>
 </head>
 <body>
@@ -820,6 +869,7 @@
       <tbody id="tableBody"></tbody>
     </table>
   </div>
+  <div id="mobileLedgerCards" class="mobile-ledger-cards" aria-live="polite"></div>
   <div id="showMoreWrap" class="show-more-wrap">
     <button type="button" id="showMoreBtn" class="show-more-btn" onclick="toggleMoreRecords()"><i class="fas fa-chevron-down"></i> Show 10 More</button>
   </div>
@@ -1207,6 +1257,53 @@
   // ============================================================
   // DOM RENDERING
   // ============================================================
+  function escapeTxnHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
+  }
+
+  function renderMobileLedgerCards(list) {
+    const container = document.getElementById('mobileLedgerCards');
+    if (!container) return;
+    if (!list.length) {
+      container.innerHTML = '<div class="txn-mobile-empty"><i class="fas fa-receipt"></i> No matching records found.</div>';
+      return;
+    }
+    container.innerHTML = list.map((rec, idx) => {
+      const recordId = JSON.stringify(String(rec.id));
+      const monthArg = JSON.stringify(String(rec.month || ''));
+      return `<article class="txn-mobile-card">
+        <div class="txn-mobile-head">
+          <span class="txn-mobile-serial">${idx + 1}</span>
+          <div class="txn-mobile-title">
+            <button type="button" class="txn-mobile-month" onclick='openMonthLedger(${monthArg})'><i class="far fa-folder-open"></i> ${escapeTxnHtml(rec.month)}</button>
+            <span class="txn-mobile-date"><i class="far fa-calendar"></i> ${escapeTxnHtml(rec.date)}</span>
+          </div>
+          <div class="txn-mobile-actions">
+            <button type="button" class="edit-btn" onclick='editRecord(${recordId})' title="Edit entry" aria-label="Edit entry"><i class="fas fa-pen"></i></button>
+            <button type="button" class="delete-btn" onclick='deleteRecord(${recordId})' title="Delete entry" aria-label="Delete entry"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="txn-mobile-primary">
+          <div class="txn-mobile-metric"><span class="txn-mobile-label">Total ID</span><span class="txn-mobile-value">${rec.totalId}</span></div>
+          <div class="txn-mobile-metric"><span class="txn-mobile-label">Total Pending</span><span class="txn-mobile-value">₹${rec.totalPending.toFixed(2)}</span></div>
+          <div class="txn-mobile-metric due"><span class="txn-mobile-label">Remaining</span><span class="txn-mobile-value">₹${rec.remainingAmt.toFixed(2)}</span></div>
+        </div>
+        <details class="txn-mobile-details">
+          <summary><span><i class="fas fa-circle-info"></i> More Details</span></summary>
+          <div class="txn-mobile-detail-grid">
+            <div class="txn-mobile-detail-item"><span class="txn-mobile-label">Working Amount</span><span class="txn-mobile-value">₹${rec.workingAmt.toFixed(2)}</span></div>
+            <div class="txn-mobile-detail-item"><span class="txn-mobile-label">Transfer Amount</span><span class="txn-mobile-value">₹${rec.transferAmt.toFixed(2)}</span></div>
+            <div class="txn-mobile-detail-item"><span class="txn-mobile-label">Monthly Paid</span><span class="txn-mobile-value">₹${rec.monthlyPaid.toFixed(2)}</span></div>
+            <div class="txn-mobile-detail-item"><span class="txn-mobile-label">Other Amount</span><span class="txn-mobile-value">₹${rec.otherAmt.toFixed(2)}</span></div>
+            <div class="txn-mobile-detail-item wide"><span class="txn-mobile-label">Remarks</span><span class="txn-mobile-value txn-mobile-remarks">${escapeTxnHtml(rec.remarks || '-')}</span><span class="txn-mobile-meta">By ${escapeTxnHtml(rec.createdBy || '-')} · ${escapeTxnHtml(rec.timestamp || '-')}</span></div>
+          </div>
+        </details>
+      </article>`;
+    }).join('');
+  }
+
   function renderTable(silent = false) {
     const sorted = sortByDateAsc(records).reverse();
     const search = ledgerSearchTerm.trim().toLowerCase();
@@ -1222,6 +1319,7 @@
     const showMoreWrap = document.getElementById('showMoreWrap');
     if (!filtered.length) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="12">No matching records found.</td></tr>`;
+      renderMobileLedgerCards([]);
       document.getElementById('rowCount').textContent = search ? `0 / ${records.length}` : '0';
       showMoreWrap.classList.remove('visible');
       updateDashboard(); return;
@@ -1249,6 +1347,7 @@
       </tr>`;
     });
     tbody.innerHTML = html;
+    renderMobileLedgerCards(visible);
     document.getElementById('rowCount').textContent = `${visible.length} / ${filtered.length}`;
     showMoreWrap.classList.toggle('visible', filtered.length > 10);
     const showMoreBtn = document.getElementById('showMoreBtn');
