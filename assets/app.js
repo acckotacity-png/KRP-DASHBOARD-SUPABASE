@@ -14,6 +14,9 @@
     const RECORDS_TRACKER_ARCHIVE_KEY = userCacheKey('krp_records_tracker_archive_v1');
     const LEDGER_HISTORY_KEY = userCacheKey('krp_ledger_history_v1');
     const externalScriptPromises = new Map();
+    const TRACKER_PAGE_SIZE = 25;
+    let trackerVisibleRows = TRACKER_PAGE_SIZE;
+    let trackerRenderFilterSignature = '';
 
     function loadExternalScript(src, globalName) {
         if (globalName && window[globalName]) return Promise.resolve();
@@ -2992,17 +2995,33 @@
             return currentData.indexOf(b) - currentData.indexOf(a);
         });
 
+        const filterSignature = JSON.stringify(filters);
+        if (filterSignature !== trackerRenderFilterSignature) {
+            trackerRenderFilterSignature = filterSignature;
+            trackerVisibleRows = TRACKER_PAGE_SIZE;
+        }
+        const totalFilteredRows = filtered.length;
+        const visibleRows = filtered.slice(0, trackerVisibleRows);
+        const paginationWrap = document.getElementById('trackerPagination');
+        const paginationButton = document.getElementById('trackerShowMoreBtn');
+        const paginationCount = document.getElementById('trackerPaginationCount');
+        if (paginationWrap) paginationWrap.hidden = totalFilteredRows <= TRACKER_PAGE_SIZE;
+        if (paginationButton) paginationButton.hidden = visibleRows.length >= totalFilteredRows;
+        if (paginationCount) paginationCount.textContent = `${visibleRows.length} / ${totalFilteredRows} entries`;
+
         currentIdActivationSerialMap = buildIdActivationSerialMap(currentData);
 
         updateStats(filtered, invoicePendingByIndex);
 
         if (!filtered.length) {
             document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">📭 No records found</td></tr>';
+            const paginationWrap = document.getElementById('trackerPagination');
+            if (paginationWrap) paginationWrap.hidden = true;
             return;
         }
 
         let html = '';
-        filtered.forEach((row) => {
+        visibleRows.forEach((row) => {
             const originalIdx = currentData.indexOf(row);
             const contactText = showSheetText(row[idxContact]).trim() || '-';
             const contactIsPhone = /^\+?[\d\s()-]{10,22}$/.test(contactText);
@@ -3084,6 +3103,11 @@
             </tr>`;
         });
         document.getElementById('tableBody').innerHTML = html;
+    }
+
+    function showMoreTrackerRows() {
+        trackerVisibleRows += TRACKER_PAGE_SIZE;
+        renderTable(getTrackerFilters());
     }
 
     function formatMoney(value) {

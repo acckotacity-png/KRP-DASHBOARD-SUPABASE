@@ -846,3 +846,13 @@ html.krp-dark-theme .tracker-copy-btn{background:#123127!important;color:#70d7a6
   #tableContainer.mobile-card-view .tracker-login-subline>span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
   #tableContainer.mobile-card-view .tracker-copy-btn{flex-basis:22px!important;width:22px!important;height:22px!important;min-width:22px!important}
 }
+/* Tracker 25-row batching and single-line mobile UTR. */
+.tracker-pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 4px 2px;color:#64748b;font-size:10px;font-weight:800}.tracker-pagination[hidden]{display:none!important}.tracker-pagination button{min-height:34px;padding:7px 13px;border:1px solid #7bb6df;border-radius:9px;background:#eff8ff;color:#1769a4;font-size:10px;font-weight:850;cursor:pointer}.tracker-pagination button[hidden]{display:none!important}
+html.krp-dark-theme .tracker-pagination{color:#91a7b8}html.krp-dark-theme .tracker-pagination button{background:#102b3b;color:#80c9f2;border-color:#285975}
+@media(max-width:520px){
+  #tableContainer.mobile-card-view #dataTable td[data-label="UTR"]{overflow:hidden!important;white-space:nowrap!important}
+  #tableContainer.mobile-card-view .utr-stack{display:flex!important;flex-direction:column!important;align-items:flex-start!important;width:100%!important;min-width:0!important;overflow:hidden!important}
+  #tableContainer.mobile-card-view .tracker-copy-row{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;width:100%!important;min-width:0!important;overflow:hidden!important}
+  #tableContainer.mobile-card-view .tracker-copy-row .utr-value{display:block!important;flex:0 1 auto!important;width:auto!important;max-width:calc(100% - 27px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;overflow-wrap:normal!important;word-break:normal!important;font-size:clamp(11px,3.4vw,13px)!important;line-height:1.2!important}
+  .tracker-pagination{padding-top:8px!important}
+}

@@ -23,7 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/app.css?v=20260809-7">
-    <link rel="stylesheet" href="theme.css?v=48">
+    <link rel="stylesheet" href="theme.css?v=49">
     <script src="theme.js?v=3"></script>
 </head>
 <body class="form-view">
@@ -301,6 +301,10 @@
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+            </div>
+            <div id="trackerPagination" class="tracker-pagination" hidden>
+                <span id="trackerPaginationCount">0 / 0 entries</span>
+                <button type="button" id="trackerShowMoreBtn" onclick="showMoreTrackerRows()"><i class="fas fa-chevron-down"></i> Show 25 More</button>
             </div>
         </div>
     </div>
@@ -838,7 +842,7 @@
     </div>
 </div>
 
-<script src="assets/app.js?v=20261018-1" defer></script>
+<script src="assets/app.js?v=20261018-2" defer></script>
 </body>
 </html>
 
