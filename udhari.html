@@ -6,7 +6,7 @@
   <title>Udhari Bahi Khata</title>
   <style id="auth-guard-style">html { visibility: hidden; }</style>
   <script src="api-gate.js?v=1"></script>
-  <script type="module" src="auth-guard.js?v=25"></script>
+  <script type="module" src="auth-guard.js?v=26"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="theme.css?v=47"><script src="theme.js?v=3"></script>
   <style>
@@ -266,7 +266,7 @@
       .ledger-command-row{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important;scrollbar-width:thin!important}
       .ledger-command-row button{flex:0 0 auto!important;white-space:nowrap!important}
     }
-  </style>
+    .type-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}.type-option{min-height:40px;padding:8px 10px;border:1px solid #d8deef;border-radius:10px;background:#fff;color:#31415d;font:inherit;font-weight:750;cursor:pointer;transition:.15s}.type-option i{margin-right:5px}.type-option.active-give{background:#08a870;color:#fff;border-color:#08a870}.type-option.active-got{background:#e7efff;color:#1e4e93;border-color:#9bbbea}.type-option.active-payment{background:#e52b32;color:#fff;border-color:#e52b32}.transaction-type-field select{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}html.krp-dark-theme .type-option{background:#142b3a;color:#d9e7ef;border-color:#3a566a}html.krp-dark-theme .type-option.active-give{background:#087b54;color:#fff;border-color:#22a878}html.krp-dark-theme .type-option.active-got{background:#174c8c;color:#fff;border-color:#5594d9}html.krp-dark-theme .type-option.active-payment{background:#b72b32;color:#fff;border-color:#f06d73}@media(max-width:600px){.type-switch{gap:5px}.type-option{min-height:38px;padding:7px 4px;font-size:10px}.type-option i{margin-right:2px}}  </style>
 </head>
 <body>
 <main class="app">
@@ -343,7 +343,7 @@
         <div class="field"><label>Mobile No. *</label><input id="mobileNo" inputmode="numeric" maxlength="15" oninput="lookupCustomer()" required><small id="customerLookup" class="status"></small></div>
         <div class="field"><label>Customer Name *</label><input id="customerName" required></div>
         <div class="field"><label>Address / State</label><input id="address"></div>
-        <div class="field"><label>Transaction Type</label><select id="transactionType" onchange="applyType()"><option>UDHAR DIYA</option><option>UDHAR LIYA</option><option>PAYMENT MILA</option></select></div>
+        <div class="field wide transaction-type-field"><label>Transaction Type</label><div class="type-switch" role="group" aria-label="Transaction type"><button type="button" class="type-option active-give" data-type="UDHAR DIYA" onclick="setTransactionType('UDHAR DIYA')"><i class="fas fa-arrow-up-right"></i> I Gave</button><button type="button" class="type-option" data-type="UDHAR LIYA" onclick="setTransactionType('UDHAR LIYA')"><i class="fas fa-arrow-down-left"></i> I Got</button><button type="button" class="type-option" data-type="PAYMENT MILA" onclick="setTransactionType('PAYMENT MILA')"><i class="fas fa-indian-rupee-sign"></i> Payment</button></div><select id="transactionType" onchange="applyType()"><option>UDHAR DIYA</option><option>UDHAR LIYA</option><option>PAYMENT MILA</option></select></div>
         <div class="field"><label>Description</label><input id="description"></div>
         <div class="field credit-only"><label id="udharAmountLabel">Udhari Diya Amount</label><input type="number" step="0.01" id="udharAmount"></div>
         <div class="field payment-only" hidden><label>Payment Mila Amount</label><input type="number" step="0.01" id="paymentAmount"></div>
@@ -536,8 +536,11 @@
   function handleSearch(value) { query=value;visible=10;document.getElementById('clearSearch').style.display=value?'block':'none';render(); }
   function clearSearch() { const el=document.getElementById('searchInput');el.value='';query='';visible=10;document.getElementById('clearSearch').style.display='none';render();el.focus(); }
   function toggleMore() { visible=visible>=filteredCount?10:visible+10;render(); }
+  function setTransactionType(type) { document.getElementById("transactionType").value=type; applyType(); }
+
   function applyType(updateDescription=true) {
     const type=document.getElementById('transactionType').value;
+    document.querySelectorAll(".type-option").forEach(button => { button.classList.remove("active-give","active-got","active-payment"); const kind=button.dataset.type; if(kind===type) button.classList.add(kind==="UDHAR DIYA"?"active-give":kind==="UDHAR LIYA"?"active-got":"active-payment"); });
     const description=document.getElementById('description');
     const rate=document.getElementById('interestRate');
     const interestType=document.getElementById('interestType');
