@@ -266,7 +266,7 @@
       .ledger-command-row{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important;scrollbar-width:thin!important}
       .ledger-command-row button{flex:0 0 auto!important;white-space:nowrap!important}
     }
-    .type-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}.type-option{min-height:40px;padding:8px 10px;border:1px solid #d8deef;border-radius:10px;background:#fff;color:#31415d;font:inherit;font-weight:750;cursor:pointer;transition:.15s}.type-option i{margin-right:5px}.type-option.active-give{background:#08a870;color:#fff;border-color:#08a870}.type-option.active-got{background:#e7efff;color:#1e4e93;border-color:#9bbbea}.type-option.active-payment{background:#e52b32;color:#fff;border-color:#e52b32}.transaction-type-field select{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}html.krp-dark-theme .type-option{background:#142b3a;color:#d9e7ef;border-color:#3a566a}html.krp-dark-theme .type-option.active-give{background:#087b54;color:#fff;border-color:#22a878}html.krp-dark-theme .type-option.active-got{background:#174c8c;color:#fff;border-color:#5594d9}html.krp-dark-theme .type-option.active-payment{background:#b72b32;color:#fff;border-color:#f06d73}@media(max-width:600px){.type-switch{gap:5px}.type-option{min-height:38px;padding:7px 4px;font-size:10px}.type-option i{margin-right:2px}}    .interest-toggle-wrap{grid-column:1/-1}.interest-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px dashed #8bc9ae;border-radius:9px;background:#effaf4;color:#087b50;font:inherit;font-weight:800;cursor:pointer}.interest-toggle span{font-size:18px;line-height:1}.interest-fields{display:grid;grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px;border:1px solid #d7e8de;border-radius:10px;background:#f8fcf9}.interest-fields[hidden]{display:none!important}html.krp-dark-theme .interest-toggle{background:#12392f;color:#8ce3b1;border-color:#3b8066}html.krp-dark-theme .interest-fields{background:#102d2a;border-color:#315c50}@media(max-width:600px){.interest-fields{grid-template-columns:1fr;gap:7px}}  </style>
+    .type-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}.type-option{min-height:40px;padding:8px 10px;border:1px solid #d8deef;border-radius:10px;background:#fff;color:#31415d;font:inherit;font-weight:750;cursor:pointer;transition:.15s}.type-option i{margin-right:5px}.type-option.active-give{background:#08a870;color:#fff;border-color:#08a870}.type-option.active-got{background:#e7efff;color:#1e4e93;border-color:#9bbbea}.type-option.active-payment{background:#e52b32;color:#fff;border-color:#e52b32}.transaction-type-field select{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}html.krp-dark-theme .type-option{background:#142b3a;color:#d9e7ef;border-color:#3a566a}html.krp-dark-theme .type-option.active-give{background:#087b54;color:#fff;border-color:#22a878}html.krp-dark-theme .type-option.active-got{background:#174c8c;color:#fff;border-color:#5594d9}html.krp-dark-theme .type-option.active-payment{background:#b72b32;color:#fff;border-color:#f06d73}@media(max-width:600px){.type-switch{gap:5px}.type-option{min-height:38px;padding:7px 4px;font-size:10px}.type-option i{margin-right:2px}}    .interest-toggle-wrap{grid-column:1/-1}.interest-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px dashed #8bc9ae;border-radius:9px;background:#effaf4;color:#087b50;font:inherit;font-weight:800;cursor:pointer}.interest-toggle span{font-size:18px;line-height:1}.interest-fields{display:grid;grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px;border:1px solid #d7e8de;border-radius:10px;background:#f8fcf9}.interest-fields[hidden]{display:none!important}html.krp-dark-theme .interest-toggle{background:#12392f;color:#8ce3b1;border-color:#3b8066}html.krp-dark-theme .interest-fields{background:#102d2a;border-color:#315c50}@media(max-width:600px){.interest-fields{grid-template-columns:1fr;gap:7px}}    .customer-context-field{transition:none}.customer-context .customer-context-field{display:none!important}.customer-context .transaction-type-field{grid-column:span 2}@media(max-width:600px){.customer-context .transaction-type-field{grid-column:span 1}}  </style>
 </head>
 <body>
 <main class="app">
@@ -340,9 +340,9 @@
       <input type="hidden" id="entryId">
       <div class="grid">
         <div class="field"><label>Date *</label><input type="date" id="date" onchange="syncInterestDate()" required></div>
-        <div class="field"><label>Mobile No. *</label><input id="mobileNo" inputmode="numeric" maxlength="15" oninput="lookupCustomer()" required><small id="customerLookup" class="status"></small></div>
-        <div class="field"><label>Customer Name *</label><input id="customerName" required></div>
-        <div class="field"><label>Address / State</label><input id="address"></div>
+        <div class="field customer-context-field"><label>Mobile No. *</label><input id="mobileNo" inputmode="numeric" maxlength="15" oninput="lookupCustomer()" required><small id="customerLookup" class="status"></small></div>
+        <div class="field customer-context-field"><label>Customer Name *</label><input id="customerName" required></div>
+        <div class="field customer-context-field"><label>Address / State</label><input id="address"></div>
         <div class="field wide transaction-type-field"><label>Transaction Type</label><div class="type-switch" role="group" aria-label="Transaction type"><button type="button" class="type-option active-give" data-type="UDHAR DIYA" onclick="setTransactionType('UDHAR DIYA')"><i class="fas fa-arrow-up-right"></i> I Gave</button><button type="button" class="type-option" data-type="UDHAR LIYA" onclick="setTransactionType('UDHAR LIYA')"><i class="fas fa-arrow-down-left"></i> I Got</button><button type="button" class="type-option" data-type="PAYMENT MILA" onclick="setTransactionType('PAYMENT MILA')"><i class="fas fa-indian-rupee-sign"></i> Payment</button></div><select id="transactionType" onchange="applyType()"><option>UDHAR DIYA</option><option>UDHAR LIYA</option><option>PAYMENT MILA</option></select></div>
         <div class="field"><label>Description</label><input id="description"></div>
         <div class="field credit-only"><label id="udharAmountLabel">Udhari Diya Amount</label><input type="number" step="0.01" id="udharAmount"></div>
@@ -366,6 +366,12 @@
   const API_URL = new URLSearchParams(location.search).get('api') || '';
   const CACHE_KEY = 'krp_udhari_cache_v1_' + (localStorage.getItem('krp_cache_user_uid') || 'signed_out');
   const COL = { id:0,date:1,name:2,mobile:3,address:4,type:5,description:6,udhar:7,payment:8,balance:9,due:10,mode:11,ref:12,status:13,reminder:14,remarks:15,createdBy:16,timestamp:17,rate:18,interestType:19,interestStart:20,interestTill:21,interest:22,total:23 };
+  let entryCustomerContext=false;
+  function setEntryCustomerContext(enabled) {
+    entryCustomerContext=Boolean(enabled);
+    document.getElementById('entryModal')?.classList.toggle('customer-context',entryCustomerContext);
+  }
+
   let records = [];
   let customersMaster = [];
   let query = '';
@@ -637,7 +643,7 @@
     const customer=findCustomer(key);
     if(!customer)return;
     returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
-    openForm();
+    openForm(null,true);
     const latest=customer.latest;
     document.getElementById('customerName').value=customer.name||'';
     document.getElementById('mobileNo').value=customer.mobile||latest[COL.mobile];
@@ -656,7 +662,7 @@
     const customer=findCustomer(key);
     if(!customer)return;
     returnToLedgerKey=document.getElementById('ledgerModal').classList.contains('open')?customer.key:'';
-    openForm();
+    openForm(null,true);
     const latest=customer.latest;
     document.getElementById('customerName').value=customer.name||'';
     document.getElementById('mobileNo').value=customer.mobile||latest[COL.mobile];
@@ -758,8 +764,9 @@
     returnToLedgerKey='';
   }
 
-  function openForm(record=null) {
+  function openForm(record=null, customerContext=false) {
     if(!requireRight(record?'edit':'create'))return;
+    setEntryCustomerContext(customerContext);
     document.getElementById('entryForm').reset();
     document.getElementById('entryId').value='';
     document.getElementById('date').value=localTodayIso();
@@ -784,7 +791,7 @@
     }
     document.getElementById('entryModal').classList.add('open');
   }
-  function closeForm(){document.getElementById('entryModal').classList.remove('open');}
+  function closeForm(){document.getElementById('entryModal').classList.remove('open');setEntryCustomerContext(false);}
   function editEntry(id){if(!requireRight('edit'))return;const r=records.find(x=>String(x[COL.id])===String(id));if(r)openForm(r);}
 
   async function saveEntry(event) {
