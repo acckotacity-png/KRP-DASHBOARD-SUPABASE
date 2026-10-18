@@ -1,6 +1,6 @@
-﻿import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, AUTH_OPTIONS } from "./supabase-config.js?v=3";
-import { installSupabaseApiAdapter } from "./supabase-api.js?v=13";
+import { installSupabaseApiAdapter } from "./supabase-api.js?v=14";
 
 // Migrate the previous tab-only Supabase session once, then keep the PWA session
 // across Chrome restarts. localStorage is Supabase's standard browser persistence.

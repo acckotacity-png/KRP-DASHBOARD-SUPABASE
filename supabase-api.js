@@ -47,7 +47,7 @@ function noteRow(r) { const remaining=Math.max(0,n(r.dealing_amount)-n(r.receive
 function notePayload(p) { return {task_date:s(p.taskDate),contact_no:s(p.contactNo),state:s(p.state),customer_name:s(p.name),login_id:s(p.loginId),password_text:s(p.password),task_description:s(p.taskDescription),task_status:s(p.taskStatus||"PENDING"),payment_date:s(p.paymentDate),dealing_amount:n(p.dealingAmount),received_amount:n(p.receivedAmount),reminder_date:s(p.reminderDate)}; }
 
 function recalcTransactions(rows) {
-  let prev=0; return [...rows].sort((a,b)=>(isoDate(a.entry_date)?.getTime()||9e15)-(isoDate(b.entry_date)?.getTime()||9e15)).map((r,i)=>{const total=n(r.working_amount)+prev; prev=total-n(r.transfer_amount)-n(r.monthly_paid); return {id:i,date:r.entry_date,month:r.month,totalId:n(r.total_id),workingAmt:n(r.working_amount),transferAmt:n(r.transfer_amount),monthlyPaid:n(r.monthly_paid),otherAmt:n(r.other_amount),remarks:r.remarks,totalPending:round(total),remainingAmt:round(prev),createdBy:r.created_by_name||'',timestamp:stampText(r.created_at)};});
+  let prev=0; return [...rows].sort((a,b)=>(isoDate(a.entry_date)?.getTime()||9e15)-(isoDate(b.entry_date)?.getTime()||9e15)||(n(a.sequence_no)-n(b.sequence_no))).map(r=>{const total=n(r.working_amount)+prev; prev=total-n(r.transfer_amount)-n(r.monthly_paid); return {id:String(r.id),date:r.entry_date,month:r.month,totalId:n(r.total_id),workingAmt:n(r.working_amount),transferAmt:n(r.transfer_amount),monthlyPaid:n(r.monthly_paid),otherAmt:n(r.other_amount),remarks:r.remarks,totalPending:round(total),remainingAmt:round(prev),createdBy:r.created_by_name||'',timestamp:stampText(r.created_at)};});
 }
 function recalcUdhari(rows) {
   const today=new Date(); today.setHours(0,0,0,0); const accounts={};
@@ -62,9 +62,9 @@ function expenseData(expenses,budgets){const names=["JANUARY","FEBRUARY","MARCH"
 
 async function route(client,user,p){
   const action=s(p.action);
-  const createActions=new Set(["add","addRecord","addNotepad","saveRecord","saveUdhariRecord","saveUdhariCustomer","saveExpense","saveExpenseBudget"]);
-  const editActions=new Set(["update","updateStatusUtr","updateRecordField","updateRecord","updateNotepad","updateUdhariRecord","updateExpense"]);
-  const deleteActions=new Set(["delete","deleteRecord","deleteNotepad","deleteUdhariRecord","deleteExpense"]);
+  const createActions=new Set(["add","addRecord","addNotepad","saveRecord","saveTransactionRecord","saveUdhariRecord","saveUdhariCustomer","saveExpense","saveExpenseBudget"]);
+  const editActions=new Set(["update","updateStatusUtr","updateRecordField","updateRecord","updateTransactionRecord","updateNotepad","updateUdhariRecord","updateExpense"]);
+  const deleteActions=new Set(["delete","deleteRecord","deleteTransactionRecord","deleteNotepad","deleteUdhariRecord","deleteExpense"]);
   const settingsActions=new Set(["saveSettings","savePurposeSettings","saveDefaulterSettings"]);
   const requiredPermission=createActions.has(action)?"create":editActions.has(action)?"edit":deleteActions.has(action)?"delete":settingsActions.has(action)?"settings":"view";
   if(settingsActions.has(action)&&user.role!=="admin")throw Error("ADMIN permission required");
@@ -131,8 +131,27 @@ async function route(client,user,p){
     rows.forEach(r=>{const login=s(r.login_id).trim(),raw=s(r.payment_status||"PENDING").toUpperCase(),required=r.activation_required!==false,status=(required&&!login)?"PENDING":raw==="REFUND"?"REFUND":raw==="SUCCESS"?"SUCCESS":"PENDING";const ids=login?Math.max(1,login.split(/[,&\n]+/).map(x=>x.trim()).filter(Boolean).length):0;const amount=status==="PENDING"?Math.max(0,n(r.dealing_amount)-n(r.received_amount)):n(r.received_amount);summary[status].ids+=ids;summary[status].amount=round(summary[status].amount+amount);});
     return {status:"success",summary};
   }
-  if(action==="getRecords"){return {status:"success",data:recalcTransactions(await all(client,"transactions"))};}
-  if(["saveRecord","updateRecord","deleteRecord"].includes(action)){const table="transactions";if(action==="saveRecord"){const d=parseJson(p.data),{error}=await client.from(table).insert({entry_date:s(d.date),month:s(d.month),total_id:n(d.totalId),working_amount:n(d.workingAmt),transfer_amount:n(d.transferAmt),monthly_paid:n(d.monthlyPaid),other_amount:n(d.otherAmt),remarks:s(d.remarks)});if(error)throw error;}else{const id=await idAt(client,table,p.rowIndex);if(action==="deleteRecord"){const {error}=await client.from(table).delete().eq("id",id);if(error)throw error;}else{const d=parseJson(p.data),{error}=await client.from(table).update({entry_date:s(d.date),month:s(d.month),total_id:n(d.totalId),working_amount:n(d.workingAmt),transfer_amount:n(d.transferAmt),monthly_paid:n(d.monthlyPaid),other_amount:n(d.otherAmt),remarks:s(d.remarks)}).eq("id",id);if(error)throw error;}}return {status:"success"};}
+  if(action==="getTransactionRecords"){return {status:"success",data:recalcTransactions(await all(client,"transactions"))};}
+  if(["saveTransactionRecord","updateTransactionRecord","deleteTransactionRecord"].includes(action)){
+    const table="transactions";
+    if(action==="saveTransactionRecord"){
+      const d=parseJson(p.data),{data,error}=await client.from(table).insert({entry_date:s(d.date),month:s(d.month),total_id:n(d.totalId),working_amount:n(d.workingAmt),transfer_amount:n(d.transferAmt),monthly_paid:n(d.monthlyPaid),other_amount:n(d.otherAmt),remarks:s(d.remarks)}).select("id").single();
+      if(error)throw error;
+      return {status:"success",recordId:data.id};
+    }
+    const recordId=s(p.recordId).trim();
+    if(!recordId)throw Error("Transaction record ID missing");
+    if(action==="deleteTransactionRecord"){
+      const {data,error}=await client.from(table).delete().eq("id",recordId).select("id");
+      if(error)throw error;
+      if(!data?.length)throw Error("Transaction record not found; nothing was deleted");
+    }else{
+      const d=parseJson(p.data),{data,error}=await client.from(table).update({entry_date:s(d.date),month:s(d.month),total_id:n(d.totalId),working_amount:n(d.workingAmt),transfer_amount:n(d.transferAmt),monthly_paid:n(d.monthlyPaid),other_amount:n(d.otherAmt),remarks:s(d.remarks)}).eq("id",recordId).select("id");
+      if(error)throw error;
+      if(!data?.length)throw Error("Transaction record not found; nothing was updated");
+    }
+    return {status:"success",recordId};
+  }
   if(action==="getUdhariData"){const customers=await all(client,"udhari_customers");return {success:true,headers:UDHARI_HEADERS,data:recalcUdhari(await all(client,"udhari_records")),customers:customers.map(x=>({id:x.id,mobileNo:x.mobile_no,customerName:x.customer_name,address:x.address,createdBy:x.created_by_name||x.created_by_email,createdAt:stampText(x.created_at)}))};}
   if(action==="saveUdhariCustomer"){const d=parseJson(p.data),phone=mobile(d.mobileNo);if(phone.length!==10)throw Error("Valid 10-digit mobile number required");if(!s(d.customerName).trim())throw Error("Customer name required");const {error}=await client.from("udhari_customers").insert({mobile_no:phone,customer_name:s(d.customerName).trim(),address:s(d.address).trim(),created_by_email:user.email||""});if(error){if(error.code==="23505")throw Error("Is mobile number ka customer pehle se bana hua hai");throw error;}const customers=await all(client,"udhari_customers");return {success:true,data:recalcUdhari(await all(client,"udhari_records")),customers:customers.map(x=>({id:x.id,mobileNo:x.mobile_no,customerName:x.customer_name,address:x.address,createdBy:x.created_by_name||x.created_by_email,createdAt:stampText(x.created_at)}))};}
   if(["saveUdhariRecord","updateUdhariRecord","deleteUdhariRecord"].includes(action)){if(action==="deleteUdhariRecord"){const {error}=await client.from("udhari_records").delete().eq("id",p.entryId);if(error)throw error;}else{const d=parseJson(p.data),payload={entry_date:s(d.date),customer_name:s(d.customerName),mobile_no:mobile(d.mobileNo),address:s(d.address),transaction_type:s(d.transactionType||"UDHAR DIYA"),description:s(d.description),udhar_amount:n(d.udharAmount),payment_amount:n(d.paymentAmount),due_date:s(d.dueDate),payment_mode:s(d.paymentMode),reference_no:s(d.referenceNo),reminder_date:s(d.reminderDate),remarks:s(d.remarks),interest_rate:s(d.transactionType).toUpperCase()==="PAYMENT MILA"?0:n(d.interestRate),interest_type:s(d.transactionType).toUpperCase()==="PAYMENT MILA"?"":s(d.interestType||"MONTHLY"),interest_start_date:s(d.transactionType).toUpperCase()==="PAYMENT MILA"?"":s(d.interestStartDate||d.date),created_by_email:user.email||""};const q=action==="saveUdhariRecord"?client.from("udhari_records").insert({...payload,id:d.entryId||crypto.randomUUID()}):client.from("udhari_records").update(payload).eq("id",d.entryId||p.entryId);const {error}=await q;if(error)throw error;}const customers=await all(client,"udhari_customers");return {success:true,data:recalcUdhari(await all(client,"udhari_records")),customers:customers.map(x=>({id:x.id,mobileNo:x.mobile_no,customerName:x.customer_name,address:x.address,createdBy:x.created_by_name||x.created_by_email,createdAt:stampText(x.created_at)}))};}
@@ -144,6 +163,6 @@ async function route(client,user,p){
 export function installSupabaseApiAdapter(client,user){
   if(window.__krpSupabaseAdapterInstalled)return; window.__krpSupabaseAdapterInstalled=true;
   const nativeFetch=window.fetch.bind(window);
-  window.fetch=async(input,init={})=>{const url=typeof input==="string"?input:input.url;if(!url.includes(API_MARKER))return nativeFetch(input,init);try{return response(await route(client,user,paramsFrom(input,init)));}catch(error){console.error("Supabase API:",error);const transaction=["getRecords","saveRecord","updateRecord","deleteRecord"].includes(paramsFrom(input,init).action);return response(transaction?{status:"error",message:error.message}:{success:false,error:error.message});}};
+  window.fetch=async(input,init={})=>{const url=typeof input==="string"?input:input.url;if(!url.includes(API_MARKER))return nativeFetch(input,init);try{return response(await route(client,user,paramsFrom(input,init)));}catch(error){console.error("Supabase API:",error);const transaction=["getTransactionRecords","saveTransactionRecord","updateTransactionRecord","deleteTransactionRecord"].includes(paramsFrom(input,init).action);return response(transaction?{status:"error",message:error.message}:{success:false,error:error.message});}};
   window.__krpResolveApiGate?.();
 }
