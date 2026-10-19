@@ -935,3 +935,13 @@ html.krp-dark-theme #tableContainer .action-icons .btn-bell i,html.krp-dark-them
 html.krp-dark-theme #tableContainer .action-icons .btn-sms i,html.krp-dark-theme #tableContainer .action-icons .btn-config i{color:#38BDF8!important}
 html.krp-dark-theme #tableContainer .action-icons .btn-print i{color:#F1F5F9!important}
 html.krp-dark-theme #tableContainer .action-icons .btn-edit i{color:#93C5FD!important}
+/* QR payment-share modal dark readability */
+html.krp-dark-theme #qrShareModal .modal-content{background:#111827!important;color:#F9FAFB!important;border:1px solid #1F2937!important}
+html.krp-dark-theme #qrShareModal .modal-header,html.krp-dark-theme #qrShareModal .modal-header span,html.krp-dark-theme #qrShareModal label{color:#F9FAFB!important}
+html.krp-dark-theme #qrShareModal .qr-info-text,html.krp-dark-theme #qrShareModal .wa-target-box{background:#1F2937!important;border-color:#475569!important;color:#F9FAFB!important}
+html.krp-dark-theme #qrShareModal .remarks-input textarea,html.krp-dark-theme #qrShareModal input{background:#0A0E17!important;border-color:#475569!important;color:#F9FAFB!important}
+html.krp-dark-theme #qrShareModal .remarks-input textarea::placeholder,html.krp-dark-theme #qrShareModal input::placeholder{color:#9CA3AF!important}
+html.krp-dark-theme #qrShareModal .wa-target-options label{background:#111827!important;border-color:#475569!important;color:#F9FAFB!important}
+html.krp-dark-theme #qrShareModal .btn-copy-link{background:#4F46E5!important;color:#fff!important}
+html.krp-dark-theme #qrShareModal .btn-share-wa{background:#22C55E!important;color:#06111a!important}
+html.krp-dark-theme #qrShareModal .close-modal{color:#FB7185!important}
