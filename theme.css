@@ -910,3 +910,12 @@ html.krp-dark-theme a,html.krp-dark-theme .icon,html.krp-dark-theme .accent{colo
 html.krp-dark-theme .success,html.krp-dark-theme .receivable,.krp-dark-theme .status-success{color:#22C55E!important}
 html.krp-dark-theme .danger,html.krp-dark-theme .payable,.krp-dark-theme .status-pending{color:#FB7185!important}
 html.krp-dark-theme button{border-color:#1F2937!important}
+/* Refined dark action icons: navy buttons with bright glyphs */
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn,html.krp-dark-theme .action-btn{background:#111827!important;border:1px solid #1F2937!important;color:#F9FAFB!important;box-shadow:0 2px 6px rgba(0,0,0,.28)!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn:hover,html.krp-dark-theme .action-btn:hover{background:#172033!important;border-color:#38BDF8!important}
+html.krp-dark-theme .action-btn i{filter:none!important;text-shadow:0 0 5px currentColor!important}
+html.krp-dark-theme .btn-whatsapp i,html.krp-dark-theme .btn-wa-direct i,html.krp-dark-theme .btn-activation-done i{color:#22C55E!important}
+html.krp-dark-theme .btn-bell i,html.krp-dark-theme .btn-delete i{color:#FB7185!important}
+html.krp-dark-theme .btn-sms i,html.krp-dark-theme .btn-config i{color:#38BDF8!important}
+html.krp-dark-theme .btn-print i{color:#CBD5E1!important}
+html.krp-dark-theme .btn-edit i{color:#60A5FA!important}
