@@ -694,6 +694,9 @@
         element.style.background = '#fff';
         element.style.color = '#1b2559';
         element.style.overflow = 'visible';
+                const invoiceLightStyle = document.createElement('style');
+        invoiceLightStyle.textContent = '.invoice-box,.invoice-box *{background-color:#fff!important;color:#1b2559!important;border-color:#d8deef!important}.invoice-box tr.heading td{background-color:#f4f7fe!important}.invoice-box .invoice-status.success{background-color:#e6fcf5!important;color:#05a77d!important}.invoice-box .invoice-status.pending{background-color:#fff5e6!important;color:#c56d00!important}';
+        captureSurface.appendChild(invoiceLightStyle);
         captureSurface.appendChild(element);
         renderHost.appendChild(captureSurface);
         document.body.appendChild(renderHost);
@@ -2633,7 +2636,8 @@
         const mobile = normalizeMobile10(value);
         if (mobile) return `mobile:${mobile}`;
         const name = normalizeLookupText(value);
-        return name ? `name:${name}` : '';
+        return name ? 
+ame:${name}` : '';
     }
 
     function getLatestMatchingContactRecord(contactValue) {
@@ -6365,6 +6369,8 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
+
 
 
 
