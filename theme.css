@@ -919,3 +919,11 @@ html.krp-dark-theme .btn-bell i,html.krp-dark-theme .btn-delete i{color:#FB7185!
 html.krp-dark-theme .btn-sms i,html.krp-dark-theme .btn-config i{color:#38BDF8!important}
 html.krp-dark-theme .btn-print i{color:#CBD5E1!important}
 html.krp-dark-theme .btn-edit i{color:#60A5FA!important}
+/* Improve dark icon visibility */
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn,html.krp-dark-theme .action-btn{background:#1F2937!important;border:1px solid #475569!important;min-height:36px!important;opacity:1!important}
+html.krp-dark-theme .action-btn i{font-size:15px!important;font-weight:900!important;opacity:1!important;text-shadow:0 0 8px currentColor,0 1px 2px #000!important}
+html.krp-dark-theme .btn-whatsapp i,html.krp-dark-theme .btn-wa-direct i,html.krp-dark-theme .btn-activation-done i{color:#4ADE80!important}
+html.krp-dark-theme .btn-bell i,html.krp-dark-theme .btn-delete i{color:#FB7185!important}
+html.krp-dark-theme .btn-sms i,html.krp-dark-theme .btn-config i{color:#38BDF8!important}
+html.krp-dark-theme .btn-print i{color:#E2E8F0!important}
+html.krp-dark-theme .btn-edit i{color:#93C5FD!important}
