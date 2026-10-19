@@ -994,3 +994,8 @@ body:has(.profile-header) .profile-header ~ .tab-content,body:has(.profile-heade
 /* Opaque locked header: content must never show through while scrolling */
 .profile-header{background:#fff!important;opacity:1!important;isolation:isolate!important;backdrop-filter:none!important;overflow:hidden!important}
 html.krp-dark-theme .profile-header{background:#111827!important;opacity:1!important}
+/* Full-width mask behind fixed profile header prevents any scrolled data bleed-through */
+body:has(.profile-header)::before{content:"";position:fixed;z-index:4999;top:0;left:0;right:0;height:182px;background:#fff;pointer-events:none}
+body:has(.profile-header) .profile-header{z-index:5000!important}
+html.krp-dark-theme body:has(.profile-header)::before{background:#111827}
+@media(max-width:600px){body:has(.profile-header)::before{height:168px}}
