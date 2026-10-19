@@ -1256,3 +1256,11 @@ body.krp-no-settings #mainSettingsBtn{display:none!important}
 .payment-only-option{align-self:end}.payment-only-option label{display:flex;align-items:center;gap:8px;font-weight:700}.payment-only-option input{width:17px;height:17px}.payment-only-option small{display:block;margin-top:5px;color:#64748b}
 .krp-role-user .profile-header{grid-template-columns:minmax(220px,1fr) auto}.krp-role-user .view-filter{display:flex;flex-wrap:nowrap;width:auto;max-width:none!important}.krp-role-user .view-filter>button{flex:0 0 auto;width:auto;min-width:105px}.krp-role-user .view-filter .tracker-dashboard-controls{grid-column:auto;width:145px}
 @media(max-width:600px){.krp-role-user .profile-header{grid-template-columns:1fr}.krp-role-user .view-filter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.krp-role-user .view-filter>button{width:100%;min-width:0}.krp-role-user .view-filter .tracker-dashboard-controls{width:100%}}
+/* FINAL: invoice document must remain a light readable document in dark mode */
+html.krp-dark-theme #invoicePreviewModal #previewContainer,
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box{background:#fff!important;color:#1b2559!important;border-color:#d8deef!important}
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box *{color:#1b2559!important}
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box table tr.heading td{background:#f4f7fe!important;color:#1b2559!important;border-color:#d8deef!important}
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box table tr.item td{background:#fff!important;color:#1b2559!important;border-color:#e0e5f2!important}
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box .invoice-status.success{background:#e6fcf5!important;color:#05a77d!important}
+html.krp-dark-theme #invoicePreviewModal #previewContainer .invoice-box .invoice-status.pending{background:#fff5e6!important;color:#c56d00!important}
