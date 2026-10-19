@@ -952,3 +952,10 @@ html.krp-dark-theme #previewContainer .invoice-box table tr.heading td{backgroun
 html.krp-dark-theme #previewContainer .invoice-box table tr.item td{background:#FFFFFF!important;color:#1B2559!important;border-color:#E0E5F2!important}
 html.krp-dark-theme #previewContainer .invoice-box .invoice-status.success{background:#E6FCF5!important;color:#05A77D!important}
 html.krp-dark-theme #previewContainer .invoice-box .invoice-status.pending{background:#FFF5E6!important;color:#C56D00!important}
+/* KRP Ledger invoice header: remove empty third column after ID header removal */
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-card-head{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)!important;background:#111827!important;border-color:#1F2937!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item{background:#111827!important;border-color:#1F2937!important;color:#F9FAFB!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item:last-child{display:none!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-label{color:#9CA3AF!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-value{color:#F9FAFB!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item:last-child{display:block!important}
