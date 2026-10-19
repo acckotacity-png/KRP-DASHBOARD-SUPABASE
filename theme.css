@@ -887,3 +887,15 @@ html.krp-dark-theme .btn-config{background:#0E7490!important;color:#F9FAFB!impor
 html.krp-dark-theme .btn-delete{background:#9F1239!important;color:#F9FAFB!important}
 html.krp-dark-theme .tracker-copy-btn{background:#1F2937!important;color:#38BDF8!important;border-color:#38BDF8!important}
 
+/* KRP action icon glyph colors */
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn i,
+html.krp-dark-theme .action-btn i{color:#F9FAFB!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-whatsapp i,html.krp-dark-theme .btn-whatsapp i{color:#22C55E!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-wa-direct i,html.krp-dark-theme .btn-wa-direct i{color:#22C55E!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-activation-done i,html.krp-dark-theme .btn-activation-done i{color:#22C55E!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-bell i,html.krp-dark-theme .btn-bell i{color:#FB7185!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-sms i,html.krp-dark-theme .btn-sms i{color:#38BDF8!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-print i,html.krp-dark-theme .btn-print i{color:#CBD5E1!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-edit i,html.krp-dark-theme .btn-edit i{color:#60A5FA!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-config i,html.krp-dark-theme .btn-config i{color:#38BDF8!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .btn-delete i,html.krp-dark-theme .btn-delete i{color:#FB7185!important}
