@@ -4386,7 +4386,7 @@
               `<strong>Purpose:</strong> ${escapeHtml(purpose)}`;
 
         const contactText = document.getElementById('waTargetContactText');
-        contactText.textContent = contactPhone ? `Saved contact (${formatWhatsAppPhone(contactPhone)})` : 'Saved contact number not found';
+        contactText.textContent = contactPhone ? `Direct WhatsApp chat: ${formatWhatsAppPhone(contactPhone)}` : 'Customer WhatsApp number not found';
 
         document.getElementById('whatsappRemarks').value = recordRemarks;
 
@@ -6365,6 +6365,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
