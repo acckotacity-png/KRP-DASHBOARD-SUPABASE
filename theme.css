@@ -874,4 +874,16 @@ html.krp-dark-theme #purposeManagerModal .purpose-manager-row.is-hidden{opacity:
   #tableContainer.mobile-card-view .tracker-head-value,#tableContainer.mobile-card-view .tracker-invoice-date{word-break:normal!important;overflow-wrap:normal!important}
   html:not(.krp-dark-theme) #tableContainer.mobile-card-view #tableBody tr:not(.empty-row),html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row){grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)!important}
   #purposeManagerModal .modal-content{padding-left:8px!important;padding-right:8px!important}
-}
+}/* KRP Ledger Deep Midnight icon palette */
+html.krp-dark-theme #tableContainer.mobile-card-view .action-btn,
+html.krp-dark-theme .action-btn,
+html.krp-dark-theme .tracker-copy-btn{color:#F9FAFB!important;border-color:#1F2937!important}
+html.krp-dark-theme .btn-whatsapp,html.krp-dark-theme .btn-wa-direct,html.krp-dark-theme .btn-activation-done{background:#15803D!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-bell{background:#BE123C!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-sms{background:#0369A1!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-print{background:#334155!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-edit{background:#2563EB!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-config{background:#0E7490!important;color:#F9FAFB!important}
+html.krp-dark-theme .btn-delete{background:#9F1239!important;color:#F9FAFB!important}
+html.krp-dark-theme .tracker-copy-btn{background:#1F2937!important;color:#38BDF8!important;border-color:#38BDF8!important}
+
