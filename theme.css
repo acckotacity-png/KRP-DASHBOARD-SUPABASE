@@ -959,3 +959,9 @@ html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item:last-chi
 html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-label{color:#9CA3AF!important}
 html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-value{color:#F9FAFB!important}
 html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-item:last-child{display:block!important}
+/* KRP Ledger invoice header fix for light theme too */
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-card-head{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)!important;background:#fff!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item{background:#fff!important;border-color:#dfe7ed!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item:last-child{display:block!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-label{color:#64748B!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-value{color:#111827!important}
