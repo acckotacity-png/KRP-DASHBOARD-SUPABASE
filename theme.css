@@ -927,3 +927,11 @@ html.krp-dark-theme .btn-bell i,html.krp-dark-theme .btn-delete i{color:#FB7185!
 html.krp-dark-theme .btn-sms i,html.krp-dark-theme .btn-config i{color:#38BDF8!important}
 html.krp-dark-theme .btn-print i{color:#E2E8F0!important}
 html.krp-dark-theme .btn-edit i{color:#93C5FD!important}
+/* Main KRP Ledger card actions (index page) */
+html.krp-dark-theme #tableContainer .action-icons .action-btn{background:#243244!important;border:1px solid #64748B!important;color:#F9FAFB!important;opacity:1!important;min-height:38px!important}
+html.krp-dark-theme #tableContainer .action-icons .action-btn i{font-size:17px!important;font-weight:900!important;opacity:1!important;filter:brightness(1.4) saturate(1.3)!important;text-shadow:0 0 9px currentColor!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-whatsapp i,html.krp-dark-theme #tableContainer .action-icons .btn-wa-direct i,html.krp-dark-theme #tableContainer .action-icons .btn-activation-done i{color:#4ADE80!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-bell i,html.krp-dark-theme #tableContainer .action-icons .btn-delete i{color:#FF6B81!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-sms i,html.krp-dark-theme #tableContainer .action-icons .btn-config i{color:#38BDF8!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-print i{color:#F1F5F9!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-edit i{color:#93C5FD!important}
