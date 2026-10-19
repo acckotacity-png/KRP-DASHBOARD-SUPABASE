@@ -945,3 +945,10 @@ html.krp-dark-theme #qrShareModal .wa-target-options label{background:#111827!im
 html.krp-dark-theme #qrShareModal .btn-copy-link{background:#4F46E5!important;color:#fff!important}
 html.krp-dark-theme #qrShareModal .btn-share-wa{background:#22C55E!important;color:#06111a!important}
 html.krp-dark-theme #qrShareModal .close-modal{color:#FB7185!important}
+/* Invoice preview stays white/readable in dark mode */
+html.krp-dark-theme #previewContainer,html.krp-dark-theme #previewContainer .invoice-box{background:#FFFFFF!important;color:#1B2559!important;border-color:#D8DEEF!important}
+html.krp-dark-theme #previewContainer .invoice-box h1,html.krp-dark-theme #previewContainer .invoice-box h2,html.krp-dark-theme #previewContainer .invoice-box h3,html.krp-dark-theme #previewContainer .invoice-box p,html.krp-dark-theme #previewContainer .invoice-box span,html.krp-dark-theme #previewContainer .invoice-box td,html.krp-dark-theme #previewContainer .invoice-box strong{color:#1B2559!important}
+html.krp-dark-theme #previewContainer .invoice-box table tr.heading td{background:#F4F7FE!important;color:#1B2559!important;border-color:#D8DEEF!important}
+html.krp-dark-theme #previewContainer .invoice-box table tr.item td{background:#FFFFFF!important;color:#1B2559!important;border-color:#E0E5F2!important}
+html.krp-dark-theme #previewContainer .invoice-box .invoice-status.success{background:#E6FCF5!important;color:#05A77D!important}
+html.krp-dark-theme #previewContainer .invoice-box .invoice-status.pending{background:#FFF5E6!important;color:#C56D00!important}
