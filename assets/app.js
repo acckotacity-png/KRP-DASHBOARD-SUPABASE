@@ -2636,8 +2636,7 @@
         const mobile = normalizeMobile10(value);
         if (mobile) return `mobile:${mobile}`;
         const name = normalizeLookupText(value);
-        return name ? 
-ame:${name}` : '';
+        return name ? `name:${name}` : '';
     }
 
     function getLatestMatchingContactRecord(contactValue) {
@@ -6369,6 +6368,7 @@ ame:${name}` : '';
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
