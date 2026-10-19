@@ -978,3 +978,7 @@ html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-value{c
 /* Keep the top profile section fixed; lower content remains scrollable */
 .profile-header{position:sticky!important;top:0!important;z-index:1200!important;background:var(--simple-card,#111827)!important;box-shadow:0 6px 14px rgba(0,0,0,.18)!important}
 html.krp-dark-theme .profile-header{background:#111827!important;border-color:#1F2937!important}
+/* Fully lock profile header in viewport */
+body:has(.profile-header){padding-top:170px!important}
+.profile-header{position:fixed!important;top:8px!important;left:10px!important;right:10px!important;width:auto!important;margin:0!important;z-index:5000!important}
+@media(max-width:600px){body:has(.profile-header){padding-top:158px!important}.profile-header{top:6px!important;left:6px!important;right:6px!important}}
