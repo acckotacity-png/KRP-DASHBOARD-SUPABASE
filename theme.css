@@ -989,3 +989,5 @@ body:has(.profile-header){padding-top:170px!important}
 body:has(.profile-header) .profile-header ~ .tab-content{margin-top:165px!important}
 body:has(.profile-header) .profile-header ~ .stats-grid{margin-top:165px!important}
 @media(max-width:600px){body:has(.profile-header) .profile-header ~ .tab-content{margin-top:155px!important}body:has(.profile-header) .profile-header ~ .stats-grid{margin-top:155px!important}}
+/* Remove duplicate spacing; body offset alone reserves the locked header area */
+body:has(.profile-header) .profile-header ~ .tab-content,body:has(.profile-header) .profile-header ~ .stats-grid{margin-top:0!important}
