@@ -965,3 +965,13 @@ html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item{ba
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item:last-child{display:block!important}
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-label{color:#64748B!important}
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-value{color:#111827!important}
+/* Keep KRP Ledger card text inside its boxes */
+#tableContainer.mobile-card-view .tracker-card-head,
+#tableContainer.mobile-card-view #dataTable td,
+#tableContainer.mobile-card-view .compact-pair,
+#tableContainer.mobile-card-view .tracker-contact-stack{min-width:0!important;max-width:100%!important;overflow:hidden!important;word-break:break-word!important;overflow-wrap:anywhere!important}
+#tableContainer.mobile-card-view .tracker-head-value,
+#tableContainer.mobile-card-view .compact-pair strong,
+#tableContainer.mobile-card-view .compact-pair span,
+#tableContainer.mobile-card-view .contact-ledger-link{display:block!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+#tableContainer.mobile-card-view .tracker-head-value{line-height:1.15!important}
