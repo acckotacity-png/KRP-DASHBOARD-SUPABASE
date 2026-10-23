@@ -485,7 +485,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       grouped[key].address=r[COL.address]||grouped[key].address;
       grouped[key].latest=r;
     });
-    return Object.values(grouped).sort((a,b)=>dateTime(b.latest[COL.date])-dateTime(a.latest[COL.date]));
+    Object.values(grouped).forEach(group=>{ const udhar=group.entries.reduce((s,row)=>s+num(row[COL.udhar]),0); const payment=group.entries.reduce((s,row)=>s+num(row[COL.payment]),0); const interest=group.entries.reduce((s,row)=>s+num(row[COL.interest]),0); const balance=Math.max(udhar-payment,0); group.latest[COL.balance]=balance; group.latest[COL.interest]=interest; group.latest[COL.total]=balance+interest; group.latest[COL.status]=balance>0?"OVERDUE":"PAID"; });\n    return Object.values(grouped).sort((a,b)=>dateTime(b.latest[COL.date])-dateTime(a.latest[COL.date]));
   }
 
   function render() {
@@ -869,5 +869,6 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 
 
 button[title="New Ledger Entry"]{display:none!important}
+
 
 
