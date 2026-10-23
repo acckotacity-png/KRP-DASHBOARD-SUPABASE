@@ -999,3 +999,15 @@ body:has(.profile-header)::before{content:"";position:fixed;z-index:4999;top:0;l
 body:has(.profile-header) .profile-header{z-index:5000!important}
 html.krp-dark-theme body:has(.profile-header)::before{background:#111827}
 @media(max-width:600px){body:has(.profile-header)::before{height:168px}}
+/* GitHub-inspired dark theme across the complete app */
+html.krp-dark-theme body,html.krp-dark-theme main,html.krp-dark-theme #app,html.krp-dark-theme .app-shell{background:#0D1117!important;color:#F0F6FC!important}
+html.krp-dark-theme .profile-header,html.krp-dark-theme .top,html.krp-dark-theme .tools,html.krp-dark-theme .card,html.krp-dark-theme .panel,html.krp-dark-theme .content-card,html.krp-dark-theme .customer-card,html.krp-dark-theme .modal-content,html.krp-dark-theme .dialog,html.krp-dark-theme .ledger-dialog{background:#161B22!important;border-color:#30363D!important;color:#F0F6FC!important;box-shadow:0 4px 12px rgba(0,0,0,.35)!important}
+html.krp-dark-theme h1,html.krp-dark-theme h2,html.krp-dark-theme h3,html.krp-dark-theme h4,html.krp-dark-theme strong,html.krp-dark-theme th,html.krp-dark-theme td{color:#F0F6FC!important}
+html.krp-dark-theme p,html.krp-dark-theme small,html.krp-dark-theme label,html.krp-dark-theme .muted,html.krp-dark-theme .secondary-text{color:#8B949E!important}
+html.krp-dark-theme input,html.krp-dark-theme select,html.krp-dark-theme textarea{background:#0D1117!important;color:#F0F6FC!important;border-color:#30363D!important}
+html.krp-dark-theme input::placeholder,html.krp-dark-theme textarea::placeholder{color:#8B949E!important}
+html.krp-dark-theme a,html.krp-dark-theme .icon,html.krp-dark-theme .accent{color:#58A6FF!important}
+html.krp-dark-theme .success,html.krp-dark-theme .receivable,.krp-dark-theme .status-success{color:#3FB950!important}
+html.krp-dark-theme .danger,html.krp-dark-theme .payable,.krp-dark-theme .status-pending{color:#F85149!important}
+html.krp-dark-theme .btn-primary,html.krp-dark-theme .primary{background:#238636!important;border-color:#2EA043!important;color:#fff!important}
+html.krp-dark-theme .btn-settings,html.krp-dark-theme .outline,html.krp-dark-theme .btn-outline{background:#21262D!important;border-color:#30363D!important;color:#F0F6FC!important}
