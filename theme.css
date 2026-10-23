@@ -1017,3 +1017,8 @@ html.krp-dark-theme .customer-card,html.krp-dark-theme .ledger-dialog,html.krp-d
 html.krp-dark-theme .customer-card::before,html.krp-dark-theme .tracker-container::before,.krp-dark-theme .green-accent{background:#238636!important;box-shadow:none!important}
 html.krp-dark-theme .action-btn.btn-whatsapp,html.krp-dark-theme .action-btn.btn-wa-direct,html.krp-dark-theme .action-btn.btn-activation-done{border-color:#238636!important}
 html.krp-dark-theme .action-btn.btn-whatsapp i,html.krp-dark-theme .action-btn.btn-wa-direct i,html.krp-dark-theme .action-btn.btn-activation-done i{color:#3FB950!important}
+/* KRP invoice header: keep Invoice No. and Date fully inside card */
+#tableContainer .tracker-card-head{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(110px,1fr)!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
+#tableContainer .tracker-head-item{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+#tableContainer .tracker-head-value,#tableContainer .tracker-head-label{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#tableContainer .tracker-head-invoice{min-width:0!important}
