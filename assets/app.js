@@ -660,6 +660,7 @@
 
         closePrintChoiceModal();
         document.getElementById('previewContainer').innerHTML = document.querySelector('.invoice-box').outerHTML;
+        const preview=document.querySelector('#previewContainer .invoice-box'); if(preview){ preview.style.setProperty('background','#fff','important'); preview.style.setProperty('color','#1b2559','important'); preview.querySelectorAll('*').forEach(el=>{ el.style.setProperty('color','#1b2559','important'); if(!el.classList.contains('invoice-status')) el.style.setProperty('background-color','#fff','important'); }); preview.querySelectorAll('tr.heading td').forEach(el=>el.style.setProperty('background-color','#f4f7fe','important')); }
         document.getElementById('invoicePreviewModal').classList.add('active');
         // Start loading the PDF engine while the user reviews the invoice.
         ensurePdfLibrary().catch(error => console.warn('PDF library preload failed:', error));
@@ -6368,6 +6369,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
