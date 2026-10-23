@@ -492,7 +492,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
   function render() {
     const q=query.trim().toLowerCase();
     const customers=getCustomers();
-    const visibleCustomers=showZeroCustomers?customers:customers.filter(c=>num(c.latest?.[COL.balance])!==0);
+    const visibleCustomers=customers;
     const filtered=q?visibleCustomers.filter(c=>
       `${c.name} ${c.mobile} ${c.address}`.toLowerCase().includes(q) ||
       c.entries.some(r=>r.some(v=>String(v||'').toLowerCase().includes(q)))
@@ -864,6 +864,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 </body>
 </html>
+
 
 
 
