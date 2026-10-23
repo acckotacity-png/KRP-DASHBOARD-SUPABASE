@@ -485,13 +485,13 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       grouped[key].address=r[COL.address]||grouped[key].address;
       grouped[key].latest=r;
     });
-    Object.values(grouped).forEach(group=>{ const udhar=group.entries.reduce((s,row)=>s+num(row[COL.udhar]),0); const payment=group.entries.reduce((s,row)=>s+num(row[COL.payment]),0); const interest=group.entries.reduce((s,row)=>s+num(row[COL.interest]),0); const balance=Math.max(udhar-payment,0); group.latest[COL.balance]=balance; group.latest[COL.interest]=interest; group.latest[COL.total]=balance+interest; group.latest[COL.status]=balance>0?"OVERDUE":"PAID"; });\n    return Object.values(grouped).sort((a,b)=>dateTime(b.latest[COL.date])-dateTime(a.latest[COL.date]));
+    Object.values(grouped).forEach(group=>{ const rawBalance=num(group.latest?.[COL.balance]); const udhar=group.entries.reduce((s,row)=>s+num(row[COL.udhar]),0); const payment=group.entries.reduce((s,row)=>s+num(row[COL.payment]),0); const interest=group.entries.reduce((s,row)=>s+num(row[COL.interest]),0); const balance=rawBalance!==0?rawBalance:Math.max(udhar-payment,0); group.latest[COL.balance]=balance; group.latest[COL.interest]=interest; group.latest[COL.total]=balance+interest; group.latest[COL.status]=balance>0?"OVERDUE":"PAID"; });\n    return Object.values(grouped).sort((a,b)=>dateTime(b.latest[COL.date])-dateTime(a.latest[COL.date]));
   }
 
   function render() {
     const q=query.trim().toLowerCase();
     const customers=getCustomers();
-    const visibleCustomers=showZeroCustomers?customers:customers.filter(c=>{ const balance=num(c.latest?.[COL.balance]); const hasActivity=c.entries.some(row=>num(row[COL.udhar])!==0||num(row[COL.payment])!==0||num(row[COL.total])!==0); return balance!==0||hasActivity; });
+    const visibleCustomers=showZeroCustomers?customers:customers.filter(c=>num(c.latest?.[COL.balance])!==0);
     const filtered=q?visibleCustomers.filter(c=>
       `${c.name} ${c.mobile} ${c.address}`.toLowerCase().includes(q) ||
       c.entries.some(r=>r.some(v=>String(v||'').toLowerCase().includes(q)))
@@ -863,6 +863,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 </body>
 </html>
+
 
 
 
