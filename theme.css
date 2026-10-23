@@ -1011,3 +1011,9 @@ html.krp-dark-theme .success,html.krp-dark-theme .receivable,.krp-dark-theme .st
 html.krp-dark-theme .danger,html.krp-dark-theme .payable,.krp-dark-theme .status-pending{color:#F85149!important}
 html.krp-dark-theme .btn-primary,html.krp-dark-theme .primary{background:#238636!important;border-color:#2EA043!important;color:#fff!important}
 html.krp-dark-theme .btn-settings,html.krp-dark-theme .outline,html.krp-dark-theme .btn-outline{background:#21262D!important;border-color:#30363D!important;color:#F0F6FC!important}
+/* GitHub-style green accent cleanup */
+html.krp-dark-theme .success,html.krp-dark-theme .status-success,html.krp-dark-theme .badge-success{background:#1A3A24!important;border-color:#238636!important;color:#3FB950!important}
+html.krp-dark-theme .customer-card,html.krp-dark-theme .ledger-dialog,html.krp-dark-theme .tracker-container{border-color:#30363D!important}
+html.krp-dark-theme .customer-card::before,html.krp-dark-theme .tracker-container::before,.krp-dark-theme .green-accent{background:#238636!important;box-shadow:none!important}
+html.krp-dark-theme .action-btn.btn-whatsapp,html.krp-dark-theme .action-btn.btn-wa-direct,html.krp-dark-theme .action-btn.btn-activation-done{border-color:#238636!important}
+html.krp-dark-theme .action-btn.btn-whatsapp i,html.krp-dark-theme .action-btn.btn-wa-direct i,html.krp-dark-theme .action-btn.btn-activation-done i{color:#3FB950!important}
