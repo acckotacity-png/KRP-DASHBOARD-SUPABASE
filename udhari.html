@@ -276,7 +276,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     <h1><i class="fas fa-book-open"></i>Udhari Bahi Khata</h1>
     <div class="top-actions">
       <button class="outline icon-only" onclick="loadData(true)" title="Refresh" aria-label="Refresh"><i class="fas fa-rotate"></i></button>
-      <button class="success icon-only" data-right="create" onclick="openNewCustomerForm()" title="New Customer" aria-label="New Customer"><i class="fas fa-user-plus"></i></button>
+      <button class="success icon-only" data-right="create" onclick="openNewCustomerForm()" title="New Customer" aria-label="New Customer"><i class="fas fa-user-plus"></i></button><button class="outline icon-only" onclick="toggleZeroCustomers()" id="zeroCustomersBtn" title="Show zero-balance customers" aria-label="Show zero-balance customers"><i class="fas fa-eye"></i></button>
       <button class="primary icon-only" data-right="create" onclick="openForm()" title="New Ledger Entry" aria-label="New Ledger Entry"><i class="fas fa-file-circle-plus"></i></button>
     </div>
   </div>
@@ -491,7 +491,8 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
   function render() {
     const q=query.trim().toLowerCase();
     const customers=getCustomers();
-    const filtered=q?customers.filter(c=>
+    const visibleCustomers=showZeroCustomers?customers:customers.filter(c=>num(c.latest?.[COL.balance])!==0);
+    const filtered=q?visibleCustomers.filter(c=>
       `${c.name} ${c.mobile} ${c.address}`.toLowerCase().includes(q) ||
       c.entries.some(r=>r.some(v=>String(v||'').toLowerCase().includes(q)))
     ):customers;
@@ -540,6 +541,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     document.getElementById('totalReceivable').textContent=money(receivable);
   }
 
+  function toggleZeroCustomers(){ showZeroCustomers=!showZeroCustomers; const b=document.getElementById("zeroCustomersBtn"); if(b){ b.title=showZeroCustomers?"Hide zero-balance customers":"Show zero-balance customers"; b.setAttribute("aria-label",b.title); b.innerHTML=showZeroCustomers?"<i class=\"fas fa-eye-slash\"></i>":"<i class=\"fas fa-eye\"></i>"; } render(); }
   function handleSearch(value) { query=value;visible=10;document.getElementById('clearSearch').style.display=value?'block':'none';render(); }
   function clearSearch() { const el=document.getElementById('searchInput');el.value='';query='';visible=10;document.getElementById('clearSearch').style.display='none';render();el.focus(); }
   function toggleMore() { visible=visible>=filteredCount?10:visible+10;render(); }
@@ -864,3 +866,6 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 
 
 
+
+
+button[title="New Ledger Entry"]{display:none!important}
