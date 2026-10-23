@@ -1025,3 +1025,27 @@ html.krp-dark-theme .action-btn.btn-whatsapp i,html.krp-dark-theme .action-btn.b
 /* Reduce oversized green strips on KRP Ledger cards */
 html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row)::before{height:2px!important;background:#238636!important;opacity:.55!important}
 html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-invoice::before{background:#238636!important;opacity:.8!important}
+
+/* Compact activation serial pill: keep it fitted to its text */
+html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label,
+html.krp-dark-theme .activation-serial-label{
+  display:inline-flex!important;
+  width:max-content!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  align-items:center!important;
+  gap:4px!important;
+  padding:2px 7px!important;
+  margin-top:3px!important;
+  border:1px solid #238636!important;
+  border-radius:6px!important;
+  background:#1a3a24!important;
+  color:#3fb950!important;
+  font-size:8px!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label i,
+html.krp-dark-theme .activation-serial-label i{color:#3fb950!important}
