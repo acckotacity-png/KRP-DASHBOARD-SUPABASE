@@ -1022,3 +1022,6 @@ html.krp-dark-theme .action-btn.btn-whatsapp i,html.krp-dark-theme .action-btn.b
 #tableContainer .tracker-head-item{min-width:0!important;max-width:100%!important;overflow:hidden!important}
 #tableContainer .tracker-head-value,#tableContainer .tracker-head-label{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 #tableContainer .tracker-head-invoice{min-width:0!important}
+/* Reduce oversized green strips on KRP Ledger cards */
+html.krp-dark-theme #tableContainer.mobile-card-view #tableBody tr:not(.empty-row)::before{height:2px!important;background:#238636!important;opacity:.55!important}
+html.krp-dark-theme #tableContainer.mobile-card-view .tracker-head-invoice::before{background:#238636!important;opacity:.8!important}
