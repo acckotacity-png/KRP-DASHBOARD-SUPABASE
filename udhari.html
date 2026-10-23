@@ -495,7 +495,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     const filtered=q?visibleCustomers.filter(c=>
       `${c.name} ${c.mobile} ${c.address}`.toLowerCase().includes(q) ||
       c.entries.some(r=>r.some(v=>String(v||'').toLowerCase().includes(q)))
-    ):customers;
+    ):visibleCustomers;
     filteredCount=filtered.length;
     const shown=filtered.slice(0,visible);
     document.getElementById('customerCards').innerHTML=shown.length?shown.map(c=>{
@@ -869,3 +869,5 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 
 
 button[title="New Ledger Entry"]{display:none!important}
+
+
