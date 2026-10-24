@@ -526,7 +526,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       return `<article class="customer-card">
         <div class="customer-head">
           <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
-          <div class="customer-amounts"><div><span>Udhaar Lena</span><b class="amount-taken">${money(totalGiven)}</b></div><div><span>Udhaar Dena</span><b class="amount-given">${money(totalTaken)}</b></div></div>
+          <div class="customer-amounts"><div><span>Udhari Lena</span><b class="amount-taken">${money(totalGiven)}</b></div><div><span>Udhari Dena</span><b class="amount-given">${money(totalTaken)}</b></div></div>
         </div>
         <div class="customer-info">
           <div><span>Total Udhari</span><b>${money(totalUdhari)}</b></div>
@@ -759,7 +759,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     document.getElementById('ledgerSummary').innerHTML=`
       <div class="ledger-kpis">
         <div class="card"><span>Udhaar Dena (Pending)</span><strong>${money(ledgerGiven)}</strong></div>
-        <div class="card"><span>Udhaar Lena</span><strong>${money(ledgerTaken)}</strong></div><div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
+        <div class="card"><span>Udhari Lena</span><strong>${money(ledgerTaken)}</strong></div><div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
         <div class="card"><span>Remaining Principal</span><strong>${money(ledgerGiven)}</strong></div>
         <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
         <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
@@ -889,6 +889,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
 
 
 
