@@ -524,7 +524,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       return `<article class="customer-card">
         <div class="customer-head">
           <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
-          <div class="customer-amounts"><div><span>Udhaar Lena</span><b class="amount-taken">${money(totalPayment)}</b></div><div><span>Udhaar Dena</span><b class="amount-given">${money(totalUdhari)}</b></div></div>
+          <div class="customer-amounts"><div><span>Udhaar Lena</span><b class="amount-taken">${money(totalTaken)}</b></div><div><span>Udhaar Dena</span><b class="amount-given">${money(totalGiven)}</b></div></div>
         </div>
         <div class="customer-info">
           <div><span>Total Udhari</span><b>${money(totalUdhari)}</b></div>
@@ -775,7 +775,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     ledgerModal.hidden=false;
     ledgerModal.classList.add('open');
   }
-  function hideLedger(key){ const hidden=new Set(JSON.parse(localStorage.getItem("udhari_hidden_ledgers")||"[]")); hidden.add(key); localStorage.setItem("udhari_hidden_ledgers",JSON.stringify([...hidden])); window.showHiddenLedgers=false; closeLedger(); render(); } function toggleHiddenLedgers(){ window.showHiddenLedgers=!window.showHiddenLedgers; render(); }
+  function editCustomer(key){ const c=findCustomer(key); if(!c)return; openNewCustomerForm(); document.getElementById("newCustomerMobile").value=c.mobile||""; document.getElementById("newCustomerName").value=c.name||""; document.getElementById("newCustomerAddress").value=c.address||""; } function deleteCustomer(key){ if(confirm("Hide this customer ledger?")) hideLedger(key); } function hideLedger(key){ const hidden=new Set(JSON.parse(localStorage.getItem("udhari_hidden_ledgers")||"[]")); hidden.add(key); localStorage.setItem("udhari_hidden_ledgers",JSON.stringify([...hidden])); window.showHiddenLedgers=false; closeLedger(); render(); } function toggleHiddenLedgers(){ window.showHiddenLedgers=!window.showHiddenLedgers; render(); }
   function closeLedger(){
     const modal=document.getElementById('ledgerModal');
     modal.classList.remove('open');
@@ -881,6 +881,8 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
+
 
 
 
