@@ -551,15 +551,18 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
   }
 
   function renderStats(customers=getCustomers()) {
-    const current=customers.map(c=>c.latest);
-    document.getElementById('customerCount').textContent=customers.length;
-    const receivable=current.reduce((s,r)=>s+num(r[COL.balance]),0);
-    const payable=current.reduce((s,r)=>s+num(r[COL.total]),0);
-    document.getElementById('totalBalance').textContent=money(receivable);
-    document.getElementById('totalPayable').textContent=money(payable);
-    document.getElementById('totalReceivable').textContent=money(receivable); const given=customers.reduce((s,c)=>s+Math.max(c.entries.reduce((x,r)=>x+(/udhar\s*diya|i\s*gave/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0)-c.entries.reduce((x,r)=>x+num(r[COL.payment]),0),0),0); const taken=customers.reduce((s,c)=>s+c.entries.reduce((x,r)=>x+(/udhar\s*liya|i\s*got/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0),0); document.getElementById('totalGiven').textContent=money(given); document.getElementById('totalTaken').textContent=money(taken);
+    const balances=customers.map(c=>{
+      const gave=c.entries.reduce((s,r)=>s+(/udhar\s*diya|i\s*gave/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0);
+      const returned=c.entries.reduce((s,r)=>s+num(r[COL.payment]),0);
+      const got=c.entries.reduce((s,r)=>s+(/udhar\s*liya|i\s*got/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0);
+      return {receive:Math.max(gave-returned,0),pay:got};
+    });
+    const receive=balances.reduce((s,x)=>s+x.receive,0),pay=balances.reduce((s,x)=>s+x.pay,0);
+    document.getElementById('receiveCustomerCount').textContent=balances.filter(x=>x.receive>0).length;
+    document.getElementById('payCustomerCount').textContent=balances.filter(x=>x.pay>0).length;
+    document.getElementById('totalReceiveAmount').textContent=money(receive);
+    document.getElementById('totalPayAmount').textContent=money(pay);
   }
-
   function toggleZeroCustomers(){ showZeroCustomers=!showZeroCustomers; const b=document.getElementById("zeroCustomersBtn"); if(b){ b.title=showZeroCustomers?"Hide zero-balance customers":"Show zero-balance customers"; b.setAttribute("aria-label",b.title); b.innerHTML=showZeroCustomers?"<i class=\"fas fa-eye-slash\"></i>":"<i class=\"fas fa-eye\"></i>"; } render(); }
   function handleSearch(value) { query=value;visible=10;document.getElementById('clearSearch').style.display=value?'block':'none';render(); }
   function clearSearch() { const el=document.getElementById('searchInput');el.value='';query='';visible=10;document.getElementById('clearSearch').style.display='none';render();el.focus(); }
@@ -886,6 +889,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
 
 
 
