@@ -521,8 +521,8 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       const balanceClass=balance===0?'zero-balance':String(r[COL.status]).toUpperCase()==='OVERDUE'?'overdue-balance':'normal-balance';
       const totalUdhari=c.entries.reduce((s,x)=>s+num(x[COL.udhar]),0);
       const totalPayment=c.entries.reduce((s,x)=>s+num(x[COL.payment]),0);
-      const totalGiven=c.entries.reduce((s,x)=>s+(/udhar\s*diya|i\s*gave/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0);
-      const totalTaken=c.entries.reduce((s,x)=>s+(/udhar\s*liya|i\s*got/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0);
+      const totalGiven=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*diya|i\s*gave/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0)-totalPayment,0);
+      const totalTaken=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*liya|i\s*got/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0);
       return `<article class="customer-card">
         <div class="customer-head">
           <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
@@ -557,7 +557,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     const payable=current.reduce((s,r)=>s+num(r[COL.total]),0);
     document.getElementById('totalBalance').textContent=money(receivable);
     document.getElementById('totalPayable').textContent=money(payable);
-    document.getElementById('totalReceivable').textContent=money(receivable); const given=customers.reduce((s,c)=>s+c.entries.reduce((x,r)=>x+(/udhar\s*diya|i\s*gave/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0),0); const taken=customers.reduce((s,c)=>s+c.entries.reduce((x,r)=>x+(/udhar\s*liya|i\s*got/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0),0); document.getElementById('totalGiven').textContent=money(given); document.getElementById('totalTaken').textContent=money(taken);
+    document.getElementById('totalReceivable').textContent=money(receivable); const given=customers.reduce((s,c)=>s+Math.max(c.entries.reduce((x,r)=>x+(/udhar\s*diya|i\s*gave/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0)-c.entries.reduce((x,r)=>x+num(r[COL.payment]),0),0),0); const taken=customers.reduce((s,c)=>s+c.entries.reduce((x,r)=>x+(/udhar\s*liya|i\s*got/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0),0); document.getElementById('totalGiven').textContent=money(given); document.getElementById('totalTaken').textContent=money(taken);
   }
 
   function toggleZeroCustomers(){ showZeroCustomers=!showZeroCustomers; const b=document.getElementById("zeroCustomersBtn"); if(b){ b.title=showZeroCustomers?"Hide zero-balance customers":"Show zero-balance customers"; b.setAttribute("aria-label",b.title); b.innerHTML=showZeroCustomers?"<i class=\"fas fa-eye-slash\"></i>":"<i class=\"fas fa-eye\"></i>"; } render(); }
@@ -883,6 +883,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
 
 
 
