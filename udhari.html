@@ -750,11 +750,13 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     const latest=customer.latest;
     const totalUdhari=entries.reduce((s,r)=>s+num(r[COL.udhar]),0);
     const totalPayment=entries.reduce((s,r)=>s+num(r[COL.payment]),0);
+    const ledgerGiven=Math.max(entries.reduce((s,r)=>s+(/udhar\s*diya|i\s*gave/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0)-totalPayment,0);
+    const ledgerTaken=entries.reduce((s,r)=>s+(/udhar\s*liya|i\s*got/i.test(String(r[COL.type]||''))?num(r[COL.udhar]):0),0);
     document.getElementById('ledgerTitle').textContent=`${customer.name} · ${customer.mobile||latest[COL.mobile]} Ledger`;
     document.getElementById('ledgerSummary').innerHTML=`
       <div class="ledger-kpis">
-        <div class="card"><span>Total Udhari</span><strong>${money(totalUdhari)}</strong></div>
-        <div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
+        <div class="card"><span>Udhaar Dena (Pending)</span><strong>${money(ledgerGiven)}</strong></div>
+        <div class="card"><span>Udhaar Lena</span><strong>${money(ledgerTaken)}</strong></div><div class="card"><span>Payment Mila</span><strong>${money(totalPayment)}</strong></div>
         <div class="card"><span>Balance</span><strong>${money(latest[COL.balance])}</strong></div>
         <div class="card"><span>Remaining Interest</span><strong>${money(latest[COL.interest])}</strong></div>
         <div class="card"><span>Total Payable</span><strong>${money(latest[COL.total])}</strong></div>
@@ -883,6 +885,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
 
 
 
