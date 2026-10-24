@@ -522,7 +522,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       const totalUdhari=c.entries.reduce((s,x)=>s+num(x[COL.udhar]),0);
       const totalPayment=c.entries.reduce((s,x)=>s+num(x[COL.payment]),0);
       const totalGiven=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*diya|i\s*gave/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0)-totalPayment,0);
-      const totalTaken=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*liya|i\s*got/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0);
+      const totalTaken=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*liya|i\s*got/i.test(String(x[COL.type]||""))?num(x[COL.udhar]):0),0),0);
       return `<article class="customer-card">
         <div class="customer-head">
           <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
@@ -883,6 +883,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 </script>
 <style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
 </html>
+
 
 
 
