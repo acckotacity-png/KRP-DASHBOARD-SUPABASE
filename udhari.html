@@ -11,7 +11,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 .customer-card{padding:12px!important}
 .customer-card .customer-head{margin-bottom:8px!important}
 .customer-card .customer-actions{margin-top:6px!important}
-.customer-card .customer-balance-wrap{text-align:right}</style>
+.customer-card .customer-balance-wrap{text-align:right}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style>
   <script src="api-gate.js?v=1"></script>
   <script type="module" src="auth-guard.js?v=26"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -280,12 +280,12 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 .customer-card{padding:12px!important}
 .customer-card .customer-head{margin-bottom:8px!important}
 .customer-card .customer-actions{margin-top:6px!important}
-.customer-card .customer-balance-wrap{text-align:right}</style>
+.customer-card .customer-balance-wrap{text-align:right}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style>
 <style id="udhari-lend-borrow-summary">
 .summary-given strong{color:#16a36d!important}.summary-taken strong{color:#d65b5b!important}
-</style><style id="customer-card-basic-fields">
+    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style><style id="customer-card-basic-fields">
 .customer-address{font-size:10px;color:#718797;margin-top:3px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-amounts{display:flex;gap:8px;text-align:right}.customer-amounts>div{display:flex;flex-direction:column}.customer-amounts span{font-size:8px;color:#78909c;text-transform:uppercase}.customer-amounts b{font-size:12px}.amount-taken{color:#ff6b81}.amount-given{color:#62d19b}
-</style></head>
+    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style></head>
 <body>
 <main class="app">
   <div class="top">
@@ -540,7 +540,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
           <button class="icon-only add-credit" data-right="create" onclick="addCustomerUdhari('${escapeHtml(c.key)}')" title="Add Udhari" aria-label="Add Udhari"><i class="fas fa-hand-holding-dollar"></i></button>
           <button class="icon-only add-payment" data-right="create" onclick="addCustomerPayment('${escapeHtml(c.key)}')" title="Add Payment" aria-label="Add Payment"><i class="fas fa-indian-rupee-sign"></i></button>
           <button class="icon-only open-ledger" onclick="openLedger('${escapeHtml(c.key)}')" title="Full Ledger" aria-label="Full Ledger"><i class="fas fa-book-open"></i></button>
-          <button class="icon-only due-reminder" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="WhatsApp Due Reminder" aria-label="WhatsApp Due Reminder"><i class="fab fa-whatsapp"></i></button>
+          <button class="icon-only due-reminder" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="WhatsApp Due Reminder" aria-label="WhatsApp Due Reminder"><i class="fab fa-whatsapp"></i></button><button class="icon-only sms-reminder" onclick="shareSms('${escapeHtml(c.key)}')" title="SMS Reminder" aria-label="SMS Reminder"><i class="fas fa-sms"></i></button>
         </div>
       </article>`;
     }).join(''):'<div class="empty-state"><i class="fas fa-user-slash"></i><br><br>No customer found</div>';
@@ -724,6 +724,27 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`,'_blank','noopener');
   }
 
+  function shareSms(key) {
+    const customer=findCustomer(key);
+    if(!customer)return;
+    const latest=customer.latest;
+    const mobile=normalizeMobile(customer.mobile||latest[COL.mobile]);
+    if(mobile.length!==10)return alert('Customer ka sahi 10-digit mobile number nahi mila');
+    const dueEntry=[...customer.entries].reverse().find(r=>r[COL.due]);
+    const dueDate=dueEntry?.[COL.due]||'Date available nahi hai';
+    const message=[
+      `Namaste ${(customer.name||'Customer').trim()} Ji,`,
+      '',
+      'Yeh aapke udhari payment ka reminder hai.',
+      `Baki amount: ${money(latest[COL.balance])}`,
+      `Total payable: ${money(latest[COL.total])}`,
+      `Due Date: ${dueDate}`,
+      '',
+      'Kripya payment karke confirmation share karein. Dhanyavaad.'
+    ].join('\n');
+    const separator=/iPhone|iPad|iPod/i.test(navigator.userAgent)?'&':'?';
+    window.location.href=`sms:+91${mobile}${separator}body=${encodeURIComponent(message)}`;
+  }
   function exportCustomerLedger(key) {
     const customer=findCustomer(key);
     if(!customer)return;
@@ -769,7 +790,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
         <button class="primary" data-right="create" onclick="addCustomerUdhari('${escapeHtml(customer.key)}')"><i class="fas fa-plus"></i> Add Udhari</button>
         <button class="success" data-right="create" onclick="addCustomerPayment('${escapeHtml(customer.key)}')"><i class="fas fa-indian-rupee-sign"></i> Add Payment</button>
         <button class="excel" onclick="exportCustomerLedger('${escapeHtml(customer.key)}')"><i class="fas fa-file-excel"></i> Excel</button>
-        <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> Due Reminder</button>
+        <button class="whatsapp" onclick="shareWhatsApp('${escapeHtml(customer.key)}')"><i class="fab fa-whatsapp"></i> WhatsApp Reminder</button><button class="sms-reminder ledger-sms" onclick="shareSms('${escapeHtml(customer.key)}')"><i class="fas fa-sms"></i> SMS Reminder</button>
       </div>`;
     document.getElementById('ledgerRows').innerHTML=entries.length?entries.map(r=>`<tr>
       <td data-label="Date">${escapeHtml(r[COL.date])}</td><td data-label="Type">${escapeHtml(r[COL.type])}</td><td data-label="Description">${escapeHtml(r[COL.description])}</td>
@@ -887,8 +908,9 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     setInterval(()=>loadData(false),120000);
   });
 </script>
-<style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}</style></body>
+<style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style></body>
 </html>
+
 
 
 
