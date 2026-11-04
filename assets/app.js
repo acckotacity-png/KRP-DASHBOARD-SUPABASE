@@ -3985,13 +3985,36 @@
     }
 
     // ─── SUBMIT NEW ENTRY ─────────────────────────────────────────
+    function setEntrySaveFeedback(text, type = 'pending') {
+        const feedback = document.getElementById('entrySaveFeedback');
+        if (!feedback) return;
+        feedback.textContent = text || '';
+        feedback.style.display = text ? 'block' : 'none';
+        const styles = { pending: ['#eef5ff', '#2355a4'], success: ['#e8f8ef', '#087b50'], error: ['#fff0f1', '#b4232a'] };
+        const [background, color] = styles[type] || styles.pending;
+        feedback.style.background = background;
+        feedback.style.color = color;
+        feedback.style.border = `1px solid ${color}`;
+    }
+
     async function submitNewEntry(event) {
         event.preventDefault();
-        if (!validateAndNotifyRecordEntry('')) return;
-        const btn = event.target.querySelector('.btn-submit');
+        const form = event.currentTarget;
+        if (!form.reportValidity()) {
+            setEntrySaveFeedback('Required field complete karein, phir Save New Record dabayein.', 'error');
+            return;
+        }
+        const validation = validateRecordEntry('');
+        if (!validation.ok) {
+            notifyValidationResult(validation, '');
+            setEntrySaveFeedback(validation.message, 'error');
+            return;
+        }
+        const btn = form.querySelector('.btn-submit');
         const ogText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         btn.disabled = true;
+        setEntrySaveFeedback('Record securely save ho raha hai...', 'pending');
 
         const formData = new URLSearchParams();
         formData.append('action',            'add');
@@ -4016,24 +4039,28 @@
 
         try {
             const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
-            const result   = await response.json();
-            if (result.success) {
-                showMessage(result.message, 'success');
-                document.getElementById('entryForm').reset();
-                document.getElementById('date').value = getLocalISODate(new Date());
-                resetNewFormMultiSelect();
-                activeDefaulterMatch = null;
-                dismissedDefaulterLookupKey = '';
-                renderNewEntryDefaulterChip(null);
-                switchTab('tracker');
-                const applied = applySavedTrackerRow(result);
-                if (!applied) loadTrackerData(true);
-                else scheduleTrackerBackgroundSync();
-            } else showMessage('Error saving data', 'error');
-        } catch (error) { showMessage('Network error', 'error'); }
-        finally { btn.innerHTML = ogText; btn.disabled = false; }
+            const raw = await response.text();
+            let result;
+            try { result = JSON.parse(raw); } catch { throw new Error(`Server se valid response nahi mila (HTTP ${response.status}).`); }
+            if (!response.ok || !result.success) throw new Error(result.error || result.message || `Record save nahi hua (HTTP ${response.status}).`);
+            setEntrySaveFeedback(result.message || 'Record successfully save ho gaya.', 'success');
+            showMessage(result.message || 'Record successfully save ho gaya.', 'success');
+            form.reset();
+            document.getElementById('date').value = getLocalISODate(new Date());
+            resetNewFormMultiSelect();
+            activeDefaulterMatch = null;
+            dismissedDefaulterLookupKey = '';
+            renderNewEntryDefaulterChip(null);
+            switchTab('tracker');
+            const applied = applySavedTrackerRow(result);
+            if (!applied) loadTrackerData(true);
+            else scheduleTrackerBackgroundSync();
+        } catch (error) {
+            const detail = error?.message || 'Unknown save error';
+            setEntrySaveFeedback(`Save nahi hua: ${detail}`, 'error');
+            showMessage(`Save nahi hua: ${detail}`, 'error');
+        } finally { btn.innerHTML = ogText; btn.disabled = false; }
     }
-
     // ─── FULL EDIT MODAL ──────────────────────────────────────────
     function openFullEditModal(rowIndex) {
         const record = currentData[rowIndex];
@@ -6369,6 +6396,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
