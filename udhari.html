@@ -494,6 +494,13 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       .sort((a,b)=>dateTime(b.date)-dateTime(a.date))[0]||null;
   }
 
+  function customerLedgerKey(mobileValue, nameValue='', addressValue='', fallback='') {
+    const phone=normalizeMobile(mobileValue);
+    if(phone)return `phone:${phone}`;
+    const name=String(nameValue||'').trim().toLowerCase().replace(/\s+/g,' ');
+    const address=String(addressValue||'').trim().toLowerCase().replace(/\s+/g,' ');
+    return name?`profile:${name}|${address}`:`missing-${fallback}`;
+  }
   function getCustomers() {
     const grouped={};
     customersMaster.forEach(customer=>{
@@ -503,11 +510,12 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       latest[COL.name]=customer.customerName;latest[COL.mobile]=mobile;latest[COL.address]=customer.address;
       latest[COL.balance]=0;latest[COL.interest]=0;latest[COL.total]=0;latest[COL.status]='PAID';
       latest[COL.createdBy]=customer.createdBy||'';latest[COL.timestamp]=customer.createdAt||'';
-      grouped[mobile]={key:mobile,mobile,name:customer.customerName,address:customer.address,entries:[],latest};
+      const key=customerLedgerKey(mobile,customer.customerName,customer.address,customer.id);
+      grouped[key]={key,mobile,name:customer.customerName,address:customer.address,entries:[],latest};
     });
     records.slice().sort((a,b)=>dateTime(a[COL.date])-dateTime(b[COL.date])).forEach(r=>{
       const mobile=normalizeMobile(r[COL.mobile]);
-      const key=mobile||`missing-${r[COL.id]}`;
+      const key=customerLedgerKey(mobile,r[COL.name],r[COL.address],r[COL.id]);
       if(!grouped[key]) grouped[key]={key,mobile,name:r[COL.name],address:r[COL.address],entries:[]};
       grouped[key].entries.push(r);
       grouped[key].name=r[COL.name]||grouped[key].name;
@@ -943,6 +951,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
 .customer-name-row{display:flex;align-items:center;gap:7px;min-width:0}.customer-name-row .customer-name{margin:0}.due-alert-bell{display:inline-grid;place-items:center;flex:0 0 auto;width:25px;height:25px;border:1px solid #dc7b00;border-radius:50%;background:#fff1cf;color:#a65000;cursor:pointer;animation:udhari-bell-ring 1.15s ease-in-out infinite}.due-alert-bell i{font-size:12px}@keyframes udhari-bell-ring{0%,100%{transform:rotate(0);box-shadow:0 0 0 0 rgba(224,126,0,.42)}12%,36%{transform:rotate(-14deg)}24%,48%{transform:rotate(14deg)}60%{box-shadow:0 0 0 7px rgba(224,126,0,0)}}.customer-actions .customer-delete{background:#ffe4e6!important;color:#b4232a!important;border:1px solid #f29ba4!important}html.krp-dark-theme .due-alert-bell{background:#4a2600!important;color:#ffd38a!important;border-color:#f0a22e!important}html.krp-dark-theme .customer-actions .customer-delete{background:#5a1820!important;color:#ffb4bd!important;border-color:#d95b69!important}
 </style><style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style></body>
 </html>
+
 
 
 
