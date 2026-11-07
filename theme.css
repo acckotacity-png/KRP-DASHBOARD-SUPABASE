@@ -1085,3 +1085,71 @@ html:not(.krp-dark-theme) #tableContainer.mobile-card-view .id-purpose-preview,h
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view td[data-label="Received / Login Amt"] strong{color:#075e42!important;font-size:13px!important}
 html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-invoice-date{color:#102a43!important}
 html:not(.krp-dark-theme) th{color:#355267!important;background:#eef5f1!important}
+
+/* Entry form: high-clarity light mode controls */
+html:not(.krp-dark-theme) #entryForm,
+html:not(.krp-dark-theme) #fullEditForm{
+  background:#f8fcfa!important;
+  color:#102a43!important;
+  border:1px solid #b7cfc0!important;
+  border-radius:12px!important;
+  padding:14px!important;
+  box-shadow:0 5px 16px rgba(23,74,56,.08)!important;
+}
+html:not(.krp-dark-theme) #entryForm .form-group,
+html:not(.krp-dark-theme) #fullEditForm .form-group{
+  background:#ffffff!important;
+  border:1px solid #d2e2d8!important;
+  border-radius:9px!important;
+  padding:10px!important;
+}
+html:not(.krp-dark-theme) #entryForm .form-group label,
+html:not(.krp-dark-theme) #fullEditForm .form-group label{
+  color:#12354b!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  letter-spacing:.15px!important;
+  opacity:1!important;
+}
+html:not(.krp-dark-theme) #entryForm input,
+html:not(.krp-dark-theme) #entryForm select,
+html:not(.krp-dark-theme) #entryForm textarea,
+html:not(.krp-dark-theme) #entryForm .multi-select-display,
+html:not(.krp-dark-theme) #fullEditForm input,
+html:not(.krp-dark-theme) #fullEditForm select,
+html:not(.krp-dark-theme) #fullEditForm textarea,
+html:not(.krp-dark-theme) #fullEditForm .multi-select-display{
+  background:#fdfefe!important;
+  color:#102a43!important;
+  border:1.5px solid #7fa792!important;
+  border-radius:7px!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  min-height:40px!important;
+  opacity:1!important;
+}
+html:not(.krp-dark-theme) #entryForm select option,
+html:not(.krp-dark-theme) #fullEditForm select option{background:#fff!important;color:#102a43!important;font-weight:650!important}
+html:not(.krp-dark-theme) #entryForm input:focus,
+html:not(.krp-dark-theme) #entryForm select:focus,
+html:not(.krp-dark-theme) #entryForm textarea:focus,
+html:not(.krp-dark-theme) #entryForm .multi-select-display:focus,
+html:not(.krp-dark-theme) #fullEditForm input:focus,
+html:not(.krp-dark-theme) #fullEditForm select:focus,
+html:not(.krp-dark-theme) #fullEditForm textarea:focus{
+  outline:3px solid rgba(22,135,80,.20)!important;
+  border-color:#168750!important;
+  box-shadow:none!important;
+}
+html:not(.krp-dark-theme) #entryForm input[readonly],
+html:not(.krp-dark-theme) #fullEditForm input[readonly]{background:#edf6f0!important;color:#163d30!important}
+html:not(.krp-dark-theme) #entryForm select:disabled,
+html:not(.krp-dark-theme) #fullEditForm select:disabled{background:#e7eee9!important;color:#587064!important;border-color:#b9c9bf!important;cursor:not-allowed!important}
+html:not(.krp-dark-theme) #entryForm .multi-select-dropdown,
+html:not(.krp-dark-theme) #fullEditForm .multi-select-dropdown{background:#fff!important;border:1.5px solid #6f9f87!important;box-shadow:0 10px 22px rgba(18,53,43,.16)!important}
+html:not(.krp-dark-theme) #entryForm .multi-select-option,
+html:not(.krp-dark-theme) #fullEditForm .multi-select-option{color:#102a43!important;background:#fff!important;font-weight:700!important;opacity:1!important}
+html:not(.krp-dark-theme) #entryForm .multi-select-option:hover,
+html:not(.krp-dark-theme) #fullEditForm .multi-select-option:hover{background:#e6f5ec!important}
+html:not(.krp-dark-theme) #entryForm small,
+html:not(.krp-dark-theme) #fullEditForm small{color:#315b4b!important;font-weight:650!important;opacity:1!important}
