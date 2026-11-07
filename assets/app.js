@@ -3657,22 +3657,32 @@
         if (!rows.length) return alert('No records to export');
         const headers = ['Date', 'Month', 'Total ID', 'Working Amount', 'Transfer Amt', 'Remaining Amt', 'Monthly Amount', 'Other Data Setup & Uploading', 'Transfer Date / Details', 'Remarks'];
         const csvRows = rows.map(r => [r.date, r.month, r.totalId, r.working, r.transfer, r.remaining, r.monthly, r.setup, r.transferDetails || '', r.remarks || '']);
-        downloadCsvCustom(`KRP_Records_Tracker_${getLocalISODate(new Date())}.csv`, headers, csvRows);
+        downloadCsvCustom(`KRP_Records_Tracker_${getLocalISODate(new Date())}.xlsx`, headers, csvRows);
     }
 
-    function downloadCsvCustom(filename, headers, rows) {
-        let csv = headers.map(csvCell).join(',') + '\n';
-        rows.forEach(row => {
-            csv += row.map(csvCell).join(',') + '\n';
+    function downloadXlsxWorkbook(filename, headers, rows, sheetName = 'Report') {
+        const XLSX = window.XLSX;
+        if (!XLSX) {
+            showMessage('Excel library load नहीं हुई। Internet check करके page refresh करें।', 'error');
+            return false;
+        }
+        const safeFilename = String(filename || 'KRP_Report.xlsx').replace(/\.(csv|xlsx)$/i, '') + '.xlsx';
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        worksheet['!cols'] = headers.map((header, columnIndex) => {
+            const widest = Math.max(String(header || '').length, ...rows.map(row => String(row?.[columnIndex] ?? '').length));
+            return { wch: Math.min(Math.max(widest + 2, 12), 36) };
         });
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(a.href);
+        if (worksheet['!ref']) worksheet['!autofilter'] = { ref: worksheet['!ref'] };
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, String(sheetName || 'Report').slice(0, 31));
+        XLSX.writeFile(workbook, safeFilename, { compression: true });
+        return true;
     }
 
+    // Kept for existing button handlers; this now creates a genuine .xlsx file, not CSV.
+    function downloadCsvCustom(filename, headers, rows) {
+        return downloadXlsxWorkbook(filename, headers, rows, 'Report');
+    }
     function readCustomRecordsTrackerRows() {
         try {
             const rows = JSON.parse(localStorage.getItem(RECORDS_TRACKER_CUSTOM_KEY) || '[]');
@@ -4619,23 +4629,14 @@
         return `"${(value || '').toString().replace(/"/g, '""')}"`;
     }
 
+    // Kept for existing Export button; this now creates a genuine .xlsx file, not CSV.
     function downloadCsv(filename, rows) {
-        let csv = currentHeaders.map(csvCell).join(',') + '\n';
-        rows.forEach(row => {
-            csv += row.map(csvCell).join(',') + '\n';
-        });
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(a.href);
+        return downloadXlsxWorkbook(filename, currentHeaders, rows, 'KRP Ledger');
     }
-
     function exportToExcel() {
         const filteredRows = getTrackerFilteredRows();
         if (!filteredRows.length) return alert('No data to export');
-        downloadCsv('KRP_Transactions.csv', filteredRows);
+        downloadCsv('KRP_Transactions.xlsx', filteredRows);
     }
 
     function exportIdActivationData() {
@@ -4686,7 +4687,7 @@
             idxStatus !== -1 ? showSheetText(row[idxStatus]) : '',
             idxRemarks !== -1 ? showSheetText(row[idxRemarks]) : ''
         ]);
-        downloadCsvCustom(`KRP_ID_Activation_${scopeLabel}.csv`, exportHeaders, exportRows);
+        downloadCsvCustom(`KRP_ID_Activation_${scopeLabel}.xlsx`, exportHeaders, exportRows);
     }
 
     // ─── UPI UPDATE ───────────────────────────────────────────────
@@ -5154,7 +5155,7 @@
                 idxRemarks !== -1 ? row[idxRemarks] : ''
             ];
         });
-        downloadCsvCustom(`KRP_Records_Tracker_${getLocalISODate(new Date())}.csv`, headers, csvRows);
+        downloadCsvCustom(`KRP_Records_Tracker_${getLocalISODate(new Date())}.xlsx`, headers, csvRows);
     }
 
     function handleRecordsDateFilterChange() {
@@ -5805,7 +5806,7 @@
                 idxRemarks !== -1 ? row[idxRemarks] : ''
             ];
         });
-        downloadCsvCustom(`KRP_Records_Tracker_${formatRecordsDate_(new Date()) || getLocalISODate(new Date())}.csv`, headers, csvRows);
+        downloadCsvCustom(`KRP_Records_Tracker_${formatRecordsDate_(new Date()) || getLocalISODate(new Date())}.xlsx`, headers, csvRows);
     }
 
     function handleRecordsDateFilterChange() {
@@ -6396,6 +6397,8 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
+
 
 
 
