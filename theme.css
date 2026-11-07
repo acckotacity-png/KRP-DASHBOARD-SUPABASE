@@ -1051,27 +1051,37 @@ html.krp-dark-theme #tableContainer.mobile-card-view .activation-serial-label i,
 html.krp-dark-theme .activation-serial-label i{color:#3fb950!important}
 
 
-/* Dark theme contrast fixes for mixed light components */
-html.krp-dark-theme #tableContainer,
-html.krp-dark-theme #tableContainer .tracker-card,
-html.krp-dark-theme #tableContainer .tracker-card-body,
-html.krp-dark-theme #tableContainer .tracker-card-head,
-html.krp-dark-theme #tableContainer .tracker-field,
-html.krp-dark-theme #tableContainer .status-box{background:#0f1b26!important;color:#f0f6fc!important;border-color:#263b4d!important}
-html.krp-dark-theme #tableContainer .status-box{background:#102b2b!important}
-html.krp-dark-theme #tableContainer .tracker-head-invoice,
-html.krp-dark-theme #tableContainer .tracker-head-date{background:#111827!important;color:#e6edf3!important}
-html.krp-dark-theme .toolbar button,
-html.krp-dark-theme .filter-actions button,
-html.krp-dark-theme button.export-btn,
-html.krp-dark-theme button.refresh-btn,
-html.krp-dark-theme .btn-export,
-html.krp-dark-theme .btn-refresh{background:#172536!important;color:#e6edf3!important;border-color:#36516a!important}
-html.krp-dark-theme #tableContainer .action-btn{background:#18283a!important;color:#e6edf3!important;border-color:#526b82!important}
-html.krp-dark-theme #tableContainer .action-btn i{color:#58a6ff!important}
-html.krp-dark-theme #tableContainer .action-btn.btn-whatsapp i,html.krp-dark-theme #tableContainer .action-btn.btn-activation-done i{color:#3fb950!important}
-html.krp-dark-theme #tableContainer .action-btn.btn-delete i{color:#ff7b72!important}
-html.krp-dark-theme .profile-nav,.krp-dark-theme .header-nav{gap:7px!important;flex-wrap:wrap!important}
-html.krp-dark-theme .profile-nav button,html.krp-dark-theme .header-nav button{background:#142333!important;color:#b9c9d8!important;border-color:#294257!important;min-width:42px!important}
-html.krp-dark-theme .profile-nav button.active,html.krp-dark-theme .header-nav button.active{background:#123d3c!important;color:#58a6ff!important}
-html.krp-dark-theme .activation-serial-label{background:#174b36!important;color:#bbf7d0!important;border-color:#2f7d5a!important}
+/* Restore green dark palette on remaining light controls */
+html.krp-dark-theme .toolbar button,html.krp-dark-theme .filter-actions button,html.krp-dark-theme .btn-export,html.krp-dark-theme .btn-refresh,html.krp-dark-theme button.export-btn,html.krp-dark-theme button.refresh-btn{background:#102b35!important;color:#e8fff5!important;border:1px solid #2b5961!important}
+html.krp-dark-theme #tableContainer .tracker-card,html.krp-dark-theme #tableContainer .tracker-card-body{background:#0d2029!important;color:#e9fff5!important}
+html.krp-dark-theme #tableContainer .status-box{background:#10352f!important;color:#d8ffe8!important;border-color:#28644d!important}
+html.krp-dark-theme #tableContainer .tracker-card-head,html.krp-dark-theme #tableContainer .tracker-field{background:#102530!important;border-color:#244654!important}
+html.krp-dark-theme #tableContainer .action-btn{background:#142d3c!important;color:#e7f8ff!important;border-color:#527184!important}
+
+/* Transaction ledger page dark surface */
+html.krp-dark-theme body:has(.ledger-shell),html.krp-dark-theme .app-container,html.krp-dark-theme .dashboard,html.krp-dark-theme .ledger-shell,html.krp-dark-theme .ledger-page{background:#06111a!important;color:#d4dee7!important}
+html.krp-dark-theme .crm-header,html.krp-dark-theme .header-actions,html.krp-dark-theme .dash-card,html.krp-dark-theme .stats-card,html.krp-dark-theme .table-wrap,html.krp-dark-theme .ledger-row,html.krp-dark-theme .ledger-card{background:#0b1924!important;border-color:#2b3a47!important;color:#d4dee7!important}
+html.krp-dark-theme .header-actions button,html.krp-dark-theme .toolbar button,html.krp-dark-theme .form-actions button{background:#102b35!important;color:#e8fff5!important;border-color:#2b5961!important}
+html.krp-dark-theme .dash-label,html.krp-dark-theme .date-hint,html.krp-dark-theme .muted{color:#8fa6b5!important}
+
+/* KRP Transaction Ledger shell correction */
+body.krp-transaction-dark{background:#06111a!important;color:#d4dee7!important}
+body.krp-transaction-dark .app-container,body.krp-transaction-dark .dashboard,body.krp-transaction-dark .ledger-shell{background:#06111a!important;color:#d4dee7!important;border-color:#2b3a47!important}
+body.krp-transaction-dark .crm-header,body.krp-transaction-dark .dash-card,body.krp-transaction-dark .table-wrap,body.krp-transaction-dark .ledger-row,body.krp-transaction-dark .ledger-card{background:#0b1924!important;color:#d4dee7!important;border-color:#2b3a47!important}
+body.krp-transaction-dark h1,body.krp-transaction-dark h2,body.krp-transaction-dark h3,body.krp-transaction-dark .page-title{color:#d4dee7!important}
+body.krp-transaction-dark .header-actions button,body.krp-transaction-dark .toolbar button{background:#102b35!important;color:#e8fff5!important;border-color:#2b5961!important}
+
+/* Light mode accessibility: high contrast values in forms and KRP Ledger cards. */
+html:not(.krp-dark-theme) body{color:#102a43!important;background:#eef3f0!important}
+html:not(.krp-dark-theme) .tracker-container,html:not(.krp-dark-theme) .table-wrapper,html:not(.krp-dark-theme) .table-wrap,html:not(.krp-dark-theme) .modal-content,html:not(.krp-dark-theme) .ledger-summary-item{color:#102a43!important;background:#ffffff!important;border-color:#b8c9c0!important}
+html:not(.krp-dark-theme) input,html:not(.krp-dark-theme) select,html:not(.krp-dark-theme) textarea,html:not(.krp-dark-theme) .records-cell-input,html:not(.krp-dark-theme) .multi-select-display{color:#102a43!important;background:#ffffff!important;border-color:#9fb8aa!important;font-weight:650!important}
+html:not(.krp-dark-theme) input::placeholder,html:not(.krp-dark-theme) textarea::placeholder{color:#526a7b!important;opacity:1!important}
+html:not(.krp-dark-theme) .form-group label,html:not(.krp-dark-theme) .field-label{color:#17324a!important;font-weight:800!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view #tableBody tr:not(.empty-row),html:not(.krp-dark-theme) #tableContainer.mobile-card-view #dataTable td{background:#ffffff!important;color:#102a43!important;border-color:#b8c9c0!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view #dataTable td::before,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-label,html:not(.krp-dark-theme) #tableContainer.mobile-card-view small{color:#466178!important;opacity:1!important;font-weight:750!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-card-head,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-item{background:#f6faf8!important;border-color:#b8c9c0!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-head-value,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .compact-pair strong,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .contact-ledger-link,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-login-subline,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .entry-owner,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .utr-value,html:not(.krp-dark-theme) #tableContainer.mobile-card-view strong{color:#102a43!important;opacity:1!important;font-weight:800!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .id-purpose-preview,html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-pending-amount{color:#244e68!important;opacity:1!important;font-weight:800!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view td[data-label="Received / Login Amt"] strong{color:#075e42!important;font-size:13px!important}
+html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-invoice-date{color:#102a43!important}
+html:not(.krp-dark-theme) th{color:#355267!important;background:#eef5f1!important}
