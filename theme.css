@@ -1196,3 +1196,54 @@ html:not(.krp-dark-theme):has(#formTab.active) #formTab{
   background:#ffffff!important;
   background-image:none!important;
 }
+
+/* Dark KRP Ledger: high-visibility dashboard and action controls */
+html.krp-dark-theme #trackerTab .ledger-mini-dashboard{
+  background:#071923!important;
+  border:1px solid #274454!important;
+  box-shadow:0 6px 16px rgba(0,0,0,.30)!important;
+}
+html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-pair-card{
+  background:#102a38!important;
+  border:1px solid #31566a!important;
+  box-shadow:none!important;
+}
+html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-pair-item h4{
+  color:#b9d5e6!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  line-height:1.2!important;
+  opacity:1!important;
+}
+html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-count{
+  font-size:17px!important;
+  font-weight:900!important;
+  line-height:1.1!important;
+}
+html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-amount{
+  font-size:11px!important;
+  font-weight:850!important;
+  line-height:1.2!important;
+}
+html.krp-dark-theme #tableContainer .action-icons .action-btn{
+  min-height:42px!important;
+  background:#1c3346!important;
+  border:1px solid #6b8da6!important;
+  box-shadow:0 2px 7px rgba(0,0,0,.34)!important;
+}
+html.krp-dark-theme #tableContainer .action-icons .action-btn i{
+  font-size:18px!important;
+  opacity:1!important;
+  text-shadow:0 0 10px currentColor!important;
+}
+html.krp-dark-theme #tableContainer .action-icons .btn-whatsapp{background:#064e3b!important;border-color:#22c55e!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-print{background:#334155!important;border-color:#cbd5e1!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-edit{background:#1e3a8a!important;border-color:#60a5fa!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-config{background:#164e63!important;border-color:#22d3ee!important}
+html.krp-dark-theme #tableContainer .action-icons .btn-delete{background:#7f1d1d!important;border-color:#fb7185!important}
+html.krp-dark-theme #tableContainer .action-icons .action-btn:focus-visible{outline:3px solid #f8fafc!important;outline-offset:2px!important}
+@media(max-width:720px){
+  html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-pair-item h4{font-size:9px!important}
+  html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-count{font-size:16px!important}
+  html.krp-dark-theme #trackerTab .ledger-mini-dashboard .stat-amount{font-size:10px!important}
+}
