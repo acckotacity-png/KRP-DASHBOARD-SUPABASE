@@ -1168,3 +1168,16 @@ html:not(.krp-dark-theme) #formTab .section-title{
   background:#ffffff!important;
   color:#102a43!important;
 }
+
+/* Keep every non-field surface of Create New Entry pure white */
+html:not(.krp-dark-theme) #formTab,
+html:not(.krp-dark-theme) #formTab .tracker-container,
+html:not(.krp-dark-theme) #formTab #entryForm,
+html:not(.krp-dark-theme) #formTab #entryForm .form-grid{
+  background:#ffffff!important;
+  background-image:none!important;
+}
+html:not(.krp-dark-theme) #formTab #entryForm{
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
