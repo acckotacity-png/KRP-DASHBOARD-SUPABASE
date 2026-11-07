@@ -2358,12 +2358,24 @@
             document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
         }
     });
+    function syncPurposeYearAvailability(fieldId) {
+        if (fieldId !== 'purpose' && fieldId !== 'edit_purpose') return;
+        const dropdown = document.getElementById(fieldId + '-dropdown');
+        const yearSelectId = fieldId === 'edit_purpose' ? 'editPurposeYear' : 'purposeYear';
+        const yearSelect = document.getElementById(yearSelectId);
+        if (!dropdown || !yearSelect) return;
+        const hasPurpose = Array.from(dropdown.querySelectorAll('input[type="checkbox"]')).some(cb => cb.checked);
+        yearSelect.disabled = !hasPurpose;
+        yearSelect.closest('.purpose-year-row')?.classList.toggle('is-disabled', !hasPurpose);
+        if (!hasPurpose) yearSelect.value = '';
+    }
     function updateMultiSelect(fieldId) {
         const dropdown = document.getElementById(fieldId + '-dropdown');
         const values = Array.from(dropdown.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
         const yearSelectId = fieldId === 'purpose' ? 'purposeYear' : fieldId === 'edit_purpose' ? 'editPurposeYear' : null;
         const yearSelect = yearSelectId ? document.getElementById(yearSelectId) : null;
-        if (yearSelect && yearSelect.value) values.push('YEAR ' + yearSelect.value);
+        syncPurposeYearAvailability(fieldId);
+        if (yearSelect && !yearSelect.disabled && yearSelect.value) values.push('YEAR ' + yearSelect.value);
         document.getElementById(fieldId).value = values.join(', ');
         const display = document.getElementById(fieldId + '-display');
         if (values.length > 0) { display.textContent = values.join(', '); display.classList.add('has-value'); }
@@ -2404,7 +2416,8 @@
             }
         });
         dropdown.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = values.includes(cb.value); });
-        if (yearSelect) {
+        syncPurposeYearAvailability(fieldId);
+        if (yearSelect && !yearSelect.disabled) {
             const normalizedYear = selectedYear ? normalizePurposeYearValue(selectedYear) : '';
             if (normalizedYear && !Array.from(yearSelect.options).some(option => option.value === normalizedYear)) yearSelect.add(new Option(`${normalizedYear} (Hidden)`, normalizedYear));
             yearSelect.value = normalizedYear;
@@ -2750,6 +2763,7 @@
                     .join('');
             if (selected && !Array.from(select.options).some(option => option.value === selected)) select.add(new Option(`${selected} (Hidden)`, selected));
             select.value = selected;
+            syncPurposeYearAvailability(id === 'editPurposeYear' ? 'edit_purpose' : 'purpose');
         });
     }
 
@@ -6397,6 +6411,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
