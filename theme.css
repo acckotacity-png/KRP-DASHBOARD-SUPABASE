@@ -1181,3 +1181,18 @@ html:not(.krp-dark-theme) #formTab #entryForm{
   border-color:transparent!important;
   box-shadow:none!important;
 }
+
+/* Final light Entry tab canvas: all outer layers white, inputs remain boxed */
+html:not(.krp-dark-theme):has(#formTab.active),
+html:not(.krp-dark-theme):has(#formTab.active) body,
+html:not(.krp-dark-theme):has(#formTab.active) .container,
+html:not(.krp-dark-theme):has(#formTab.active) .app-container,
+html:not(.krp-dark-theme):has(#formTab.active) .app,
+html:not(.krp-dark-theme):has(#formTab.active) .wrap,
+html:not(.krp-dark-theme):has(#formTab.active) main,
+html:not(.krp-dark-theme):has(#formTab.active) #app,
+html:not(.krp-dark-theme):has(#formTab.active) .tab-content.active,
+html:not(.krp-dark-theme):has(#formTab.active) #formTab{
+  background:#ffffff!important;
+  background-image:none!important;
+}
