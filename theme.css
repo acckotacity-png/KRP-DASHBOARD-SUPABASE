@@ -1153,3 +1153,18 @@ html:not(.krp-dark-theme) #entryForm .multi-select-option:hover,
 html:not(.krp-dark-theme) #fullEditForm .multi-select-option:hover{background:#e6f5ec!important}
 html:not(.krp-dark-theme) #entryForm small,
 html:not(.krp-dark-theme) #fullEditForm small{color:#315b4b!important;font-weight:650!important;opacity:1!important}
+
+/* Create New Entry: use a clean white surface in light mode */
+html:not(.krp-dark-theme) #formTab,
+html:not(.krp-dark-theme) #formTab .tracker-container{
+  background:#ffffff!important;
+  background-image:none!important;
+}
+html:not(.krp-dark-theme) #formTab .tracker-container{
+  border-color:#c7d9cd!important;
+  box-shadow:none!important;
+}
+html:not(.krp-dark-theme) #formTab .section-title{
+  background:#ffffff!important;
+  color:#102a43!important;
+}
