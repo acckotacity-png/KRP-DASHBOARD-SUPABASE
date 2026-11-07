@@ -696,7 +696,7 @@
         element.style.color = '#1b2559';
         element.style.overflow = 'visible';
                 const invoiceLightStyle = document.createElement('style');
-        invoiceLightStyle.textContent = '.invoice-box,.invoice-box *{background-color:#fff!important;color:#1b2559!important;border-color:#d8deef!important}.invoice-box tr.heading td{background-color:#f4f7fe!important}.invoice-box .invoice-status.success{background-color:#e6fcf5!important;color:#05a77d!important}.invoice-box .invoice-status.pending{background-color:#fff5e6!important;color:#c56d00!important}';
+        invoiceLightStyle.textContent = '.invoice-box,.invoice-box *{background-color:#fff!important;color:#1b2559!important;border-color:#d8deef!important}.invoice-box tr.heading td{background-color:#f4f7fe!important}.invoice-box .invoice-status.success{background-color:#e6fcf5!important;color:#087a45!important}.invoice-box .invoice-status.pending{background-color:#fff5e6!important;color:#c56d00!important}';
         captureSurface.appendChild(invoiceLightStyle);
         captureSurface.appendChild(element);
         renderHost.appendChild(captureSurface);
@@ -934,7 +934,7 @@
         if (compact) {
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-layer-group"></i> Card View';
-                btn.style.background = '#05cd99';
+                btn.style.background = '#087a45';
             }
         } else {
             if (btn) {
@@ -3270,7 +3270,7 @@
             <div class="mini-kpi"><span>Dealing Amount</span><strong>${formatMoney(totalDeal)}</strong></div>
             <div class="mini-kpi"><span>Received</span><strong>${formatMoney(totalReceived)}</strong></div>
             <div class="mini-kpi"><span>Pending Due</span><strong style="color:#ee5d50;">${formatMoney(totalDue)}</strong></div>
-            <div class="mini-kpi"><span>ID Activation</span><strong style="color:#05cd99;">${totalIdCount} IDs | ${formatMoney(totalId)}</strong></div>
+            <div class="mini-kpi"><span>ID Activation</span><strong style="color:#087a45;">${totalIdCount} IDs | ${formatMoney(totalId)}</strong></div>
             <div class="mini-kpi"><span>Setup Amount</span><strong>${formatMoney(totalSetup)}</strong></div>
         `;
 
@@ -3284,7 +3284,7 @@
         donut.style.setProperty('--failedDeg', `${failedDeg}deg`);
         document.getElementById('donutTotal').innerText = data.length;
         document.getElementById('statusLegend').innerHTML = [
-            ['#05cd99', 'Success', statusMap.SUCCESS.count, formatMoney(statusMap.SUCCESS.amount)],
+            ['#087a45', 'Success', statusMap.SUCCESS.count, formatMoney(statusMap.SUCCESS.amount)],
             ['#ff9800', 'Pending / Partial', statusMap.PENDING.count + statusMap.PARTIAL.count, formatMoney(statusMap.PENDING.amount + statusMap.PARTIAL.amount)],
             ['#ee5d50', 'Failed', statusMap.FAILED.count, formatMoney(statusMap.FAILED.amount)],
             ['#4318ff', 'Refund / Advance', statusMap.REFUND.count + statusMap.ADVANCE.count, formatMoney(statusMap.REFUND.amount + statusMap.ADVANCE.amount)]
@@ -3998,11 +3998,11 @@
                 <div class="stat-pair-item"><h4 style="color:#4318ff;">Refund</h4><div class="stat-count" style="color:#4318ff;">${refCount}</div><div class="stat-amount" style="color:#4318ff;">₹${refAmt.toLocaleString('en-IN')}</div></div>
             </div>
             <div class="stat-pair-card">
-                <div class="stat-pair-item"><h4 style="color:#05a77d;">Success</h4><div class="stat-count" style="color:#05a77d;">${sCount}</div><div class="stat-amount" style="color:#05a77d;">₹${sAmt.toLocaleString('en-IN')}</div></div>
+                <div class="stat-pair-item"><h4 style="color:#087a45;">Success</h4><div class="stat-count" style="color:#087a45;">${sCount}</div><div class="stat-amount" style="color:#087a45;">₹${sAmt.toLocaleString('en-IN')}</div></div>
                 <div class="stat-pair-item"><h4>Total Records</h4><div class="stat-count">${totCount}</div><div class="stat-amount">₹${totAmt.toLocaleString('en-IN')}</div></div>
             </div>
             <div class="stat-pair-card">
-                <div class="stat-pair-item"><h4>Total IDs</h4><div class="stat-count">${idCount}</div><div class="stat-amount" style="color:#05cd99;">₹${idActAmt.toLocaleString('en-IN')}</div></div>
+                <div class="stat-pair-item"><h4>Total IDs</h4><div class="stat-count">${idCount}</div><div class="stat-amount" style="color:#087a45;">₹${idActAmt.toLocaleString('en-IN')}</div></div>
                 <div class="stat-pair-item"><h4>Setup Amt</h4><div class="stat-count">${setupCount}</div><div class="stat-amount">₹${setupAmt.toLocaleString('en-IN')}</div></div>
             </div>
         `;
@@ -6411,6 +6411,7 @@
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
     }
+
 
 
 
