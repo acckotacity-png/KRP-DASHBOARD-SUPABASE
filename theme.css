@@ -1294,3 +1294,34 @@ html:not(.krp-dark-theme) #tableContainer.mobile-card-view .tracker-copy-btn{
   html:not(.krp-dark-theme) #tableContainer.mobile-card-view #dataTable td[data-label="ID Count"] > strong{font-size:14px!important}
   html:not(.krp-dark-theme) #tableContainer.mobile-card-view #dataTable td[data-label="Received / Login Amt"] .compact-pair strong{font-size:15px!important}
 }
+
+/* Dashboard totals: maximum contrast for light theme */
+html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-amount{
+  color:#072f4f!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1.35!important;
+  text-shadow:none!important;
+  opacity:1!important;
+}
+html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-count{
+  color:#082f49!important;
+  font-size:17px!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  opacity:1!important;
+}
+html:not(.krp-dark-theme) #statsArea .stat-pair-item h4{
+  color:#24465d!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  opacity:1!important;
+}
+html:not(.krp-dark-theme) #statsArea .stat-pair-card:nth-child(2) .stat-pair-item:first-child .stat-count,
+html:not(.krp-dark-theme) #statsArea .stat-pair-card:nth-child(2) .stat-pair-item:first-child .stat-amount{
+  color:#075e42!important;
+}
+@media(max-width:520px){
+  html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-amount{font-size:12px!important}
+  html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-count{font-size:16px!important}
+}
