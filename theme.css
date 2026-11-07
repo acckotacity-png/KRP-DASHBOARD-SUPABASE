@@ -1325,3 +1325,42 @@ html:not(.krp-dark-theme) #statsArea .stat-pair-card:nth-child(2) .stat-pair-ite
   html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-amount{font-size:12px!important}
   html:not(.krp-dark-theme) #statsArea .stat-pair-item .stat-count{font-size:16px!important}
 }
+
+/* Dashboard totals: maximum contrast for dark theme */
+html.krp-dark-theme #statsArea .stat-pair-card{
+  background:#113543!important;
+  border:1px solid #3d7181!important;
+  box-shadow:none!important;
+}
+html.krp-dark-theme #statsArea .stat-pair-item h4{
+  color:#d7effa!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:1.25!important;
+  opacity:1!important;
+}
+html.krp-dark-theme #statsArea .stat-pair-item .stat-count{
+  color:#eaf8ff!important;
+  font-size:19px!important;
+  font-weight:900!important;
+  line-height:1.12!important;
+  opacity:1!important;
+}
+html.krp-dark-theme #statsArea .stat-pair-item .stat-amount{
+  color:#b9f7ce!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1.35!important;
+  opacity:1!important;
+}
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:first-child .stat-count,
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:first-child .stat-amount{color:#ff9caa!important}
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:last-child .stat-count,
+html.krp-dark-theme #statsArea .stat-pair-card:first-child .stat-pair-item:last-child .stat-amount{color:#d8c8ff!important}
+html.krp-dark-theme #statsArea .stat-pair-card:nth-child(2) .stat-pair-item:first-child .stat-count,
+html.krp-dark-theme #statsArea .stat-pair-card:nth-child(2) .stat-pair-item:first-child .stat-amount{color:#72f5ad!important}
+@media(max-width:520px){
+  html.krp-dark-theme #statsArea .stat-pair-item h4{font-size:10px!important}
+  html.krp-dark-theme #statsArea .stat-pair-item .stat-count{font-size:17px!important}
+  html.krp-dark-theme #statsArea .stat-pair-item .stat-amount{font-size:12px!important}
+}
