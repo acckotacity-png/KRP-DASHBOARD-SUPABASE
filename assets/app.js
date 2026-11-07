@@ -934,12 +934,12 @@
         if (compact) {
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-layer-group"></i> Card View';
-                btn.style.background = '#087a45';
+                btn.style.background = document.documentElement.classList.contains('krp-dark-theme') ? '#1f8f6a' : '#087a45';
             }
         } else {
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Mobile View';
-                btn.style.background = '#4318ff';
+                btn.style.background = document.documentElement.classList.contains('krp-dark-theme') ? '#4f8cff' : '#4318ff';
             }
         }
     }
@@ -4014,7 +4014,10 @@
         if (!feedback) return;
         feedback.textContent = text || '';
         feedback.style.display = text ? 'block' : 'none';
-        const styles = { pending: ['#eef5ff', '#2355a4'], success: ['#e8f8ef', '#087b50'], error: ['#fff0f1', '#b4232a'] };
+        const darkUi = document.documentElement.classList.contains('krp-dark-theme');
+        const styles = darkUi
+            ? { pending: ['rgba(96,165,250,.12)', '#60a5fa'], success: ['rgba(52,211,153,.12)', '#34d399'], error: ['rgba(248,113,113,.12)', '#f87171'] }
+            : { pending: ['#eef5ff', '#2355a4'], success: ['#e8f8ef', '#087b50'], error: ['#fff0f1', '#b4232a'] };
         const [background, color] = styles[type] || styles.pending;
         feedback.style.background = background;
         feedback.style.color = color;
