@@ -479,7 +479,20 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     }
   }
 
-  const normalizeMobile = value => String(value||'').replace(/\D/g,'').replace(/^91(?=\d{10}$)/,'');
+  const normalizeMobile = value => {
+    let digits=String(value||'').replace(/\D/g,'');
+    if(digits.length===12&&digits.startsWith('91'))digits=digits.slice(2);
+    else if(digits.length===11&&digits.startsWith('0'))digits=digits.slice(1);
+    return /^[6-9]\d{9}$/.test(digits)?digits:'';
+  };
+
+  function getActiveReminder(customer) {
+    const today=dateTime(localTodayIso());
+    if(num(customer?.latest?.[COL.total])<=0)return null;
+    return customer.entries.map(row=>({row,date:row[COL.reminder]||row[COL.due]}))
+      .filter(item=>item.date&&dateTime(item.date)&&dateTime(item.date)<=today)
+      .sort((a,b)=>dateTime(b.date)-dateTime(a.date))[0]||null;
+  }
 
   function getCustomers() {
     const grouped={};
@@ -523,9 +536,11 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       const totalPayment=c.entries.reduce((s,x)=>s+num(x[COL.payment]),0);
       const totalGiven=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*diya|i\s*gave/i.test(String(x[COL.type]||''))?num(x[COL.udhar]):0),0)-totalPayment,0);
       const totalTaken=Math.max(c.entries.reduce((s,x)=>s+(/udhar\s*liya|i\s*got/i.test(String(x[COL.type]||""))?num(x[COL.udhar]):0),0),0);
+      const activeReminder=getActiveReminder(c);
+      const reminderBell=activeReminder?`<button type="button" class="due-alert-bell" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="Reminder due: ${escapeHtml(activeReminder.date)}" aria-label="Reminder due for ${escapeHtml(c.name||'customer')}"><i class="fas fa-bell"></i></button>`:'';
       return `<article class="customer-card">
         <div class="customer-head">
-          <div><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
+          <div><div class="customer-name-row"><h3 class="customer-name">${escapeHtml(c.name||'Unnamed Customer')}</h3>${reminderBell}</div><div class="customer-mobile"><i class="fas fa-phone"></i> ${escapeHtml(c.mobile||r[COL.mobile])}</div><div class="customer-address"><i class="fas fa-location-dot"></i> ${escapeHtml(c.address||r[COL.address]||'-')}</div></div>
           <div class="customer-amounts"><div><span>Udhari Lena</span><b class="amount-taken">${money(totalGiven)}</b></div><div><span>Udhari Dena</span><b class="amount-given">${money(totalTaken)}</b></div></div>
         </div>
         <div class="customer-info">
@@ -540,7 +555,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
           <button class="icon-only add-credit" data-right="create" onclick="addCustomerUdhari('${escapeHtml(c.key)}')" title="Add Udhari" aria-label="Add Udhari"><i class="fas fa-hand-holding-dollar"></i></button>
           <button class="icon-only add-payment" data-right="create" onclick="addCustomerPayment('${escapeHtml(c.key)}')" title="Add Payment" aria-label="Add Payment"><i class="fas fa-indian-rupee-sign"></i></button>
           <button class="icon-only open-ledger" onclick="openLedger('${escapeHtml(c.key)}')" title="Full Ledger" aria-label="Full Ledger"><i class="fas fa-book-open"></i></button>
-          <button class="icon-only due-reminder" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="WhatsApp Due Reminder" aria-label="WhatsApp Due Reminder"><i class="fab fa-whatsapp"></i></button><button class="icon-only sms-reminder" onclick="shareSms('${escapeHtml(c.key)}')" title="SMS Reminder" aria-label="SMS Reminder"><i class="fas fa-sms"></i></button>
+          <button class="icon-only due-reminder" onclick="shareWhatsApp('${escapeHtml(c.key)}')" title="WhatsApp Due Reminder" aria-label="WhatsApp Due Reminder"><i class="fab fa-whatsapp"></i></button><button class="icon-only sms-reminder" onclick="shareSms('${escapeHtml(c.key)}')" title="SMS Reminder" aria-label="SMS Reminder"><i class="fas fa-sms"></i></button><button class="icon-only customer-delete" data-right="delete" onclick="deleteCustomer('${escapeHtml(c.key)}')" title="Delete customer profile and ledger" aria-label="Delete customer profile"><i class="fas fa-trash"></i></button>
         </div>
       </article>`;
     }).join(''):'<div class="empty-state"><i class="fas fa-user-slash"></i><br><br>No customer found</div>';
@@ -804,7 +819,23 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     ledgerModal.hidden=false;
     ledgerModal.classList.add('open');
   }
-  function editCustomer(key){ const c=findCustomer(key); if(!c)return; openNewCustomerForm(); document.getElementById("newCustomerMobile").value=c.mobile||""; document.getElementById("newCustomerName").value=c.name||""; document.getElementById("newCustomerAddress").value=c.address||""; } function deleteCustomer(key){ if(confirm("Hide this customer ledger?")) hideLedger(key); } function hideLedger(key){ const hidden=new Set(JSON.parse(localStorage.getItem("udhari_hidden_ledgers")||"[]")); hidden.add(key); localStorage.setItem("udhari_hidden_ledgers",JSON.stringify([...hidden])); window.showHiddenLedgers=false; closeLedger(); render(); } function toggleHiddenLedgers(){ window.showHiddenLedgers=!window.showHiddenLedgers; render(); }
+  function editCustomer(key){ const c=findCustomer(key); if(!c)return; openNewCustomerForm(); document.getElementById("newCustomerMobile").value=c.mobile||""; document.getElementById("newCustomerName").value=c.name||""; document.getElementById("newCustomerAddress").value=c.address||""; }
+  async function deleteCustomer(key){
+    if(!requireRight('delete'))return;
+    const customer=findCustomer(key);
+    if(!customer)return;
+    const confirmed=confirm(`Delete ${customer.name||'this customer'} ka profile aur uski saari ledger entries permanently? Yeh undo nahi hoga.`);
+    if(!confirmed)return;
+    setStatus('Customer profile deleting...');
+    try {
+      const result=await request({action:'deleteUdhariCustomer',mobileNo:customer.mobile});
+      if(!result.success)throw new Error(result.error||'Customer delete failed');
+      localStorage.removeItem('udhari_hidden_ledgers');
+      closeLedger();
+      if(!applyServerData(result,'Customer profile and ledger deleted'))await loadData(true);
+    } catch(error) { setStatus(error.message||'Customer delete failed',true); alert(error.message||'Customer delete failed'); }
+  }
+  function hideLedger(key){ const hidden=new Set(JSON.parse(localStorage.getItem("udhari_hidden_ledgers")||"[]")); hidden.add(key); localStorage.setItem("udhari_hidden_ledgers",JSON.stringify([...hidden])); window.showHiddenLedgers=false; closeLedger(); render(); } function toggleHiddenLedgers(){ window.showHiddenLedgers=!window.showHiddenLedgers; render(); }
   function closeLedger(){
     const modal=document.getElementById('ledgerModal');
     modal.classList.remove('open');
@@ -852,7 +883,7 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
       document.getElementById('interestStartDate').value=document.getElementById('date').value;
     }
     const data={entryId:document.getElementById('entryId').value,date:isoToDisplay(document.getElementById('date').value),customerName:document.getElementById('customerName').value.trim(),mobileNo:normalizeMobile(document.getElementById('mobileNo').value),address:document.getElementById('address').value.trim(),transactionType:document.getElementById('transactionType').value,description:document.getElementById('description').value.trim(),udharAmount:num(document.getElementById('udharAmount').value),paymentAmount:num(document.getElementById('paymentAmount').value),dueDate:isoToDisplay(document.getElementById('dueDate').value),paymentMode:document.getElementById('paymentMode').value,referenceNo:document.getElementById('referenceNo').value.trim(),reminderDate:isoToDisplay(document.getElementById('reminderDate').value),remarks:document.getElementById('remarks').value.trim(),interestRate:num(document.getElementById('interestRate').value),interestType:document.getElementById('interestType').value,interestStartDate:isoToDisplay(document.getElementById('interestStartDate').value),createdBy:window.parent.currentKrpUser?.email||''};
-    if(data.mobileNo.length<10)return alert('Sahi mobile number enter karein');
+    if(data.mobileNo.length!==10)return alert('Sahi 10-digit Indian mobile number enter karein');
     if(!findCustomer(data.mobileNo))return alert('Pehle New Customer button se customer ki basic details add karein');
     if(data.transactionType!=='PAYMENT MILA'&&data.udharAmount<=0)return alert('Udhari amount enter karein');
     if(data.transactionType==='PAYMENT MILA'&&data.paymentAmount<=0)return alert('Payment amount enter karein');
@@ -908,8 +939,11 @@ html.krp-dark-theme body,html.krp-dark-theme .app{background:#0A0E17!important;c
     setInterval(()=>loadData(false),120000);
   });
 </script>
-<style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style></body>
+<style id="udhari-reminder-profile-controls">
+.customer-name-row{display:flex;align-items:center;gap:7px;min-width:0}.customer-name-row .customer-name{margin:0}.due-alert-bell{display:inline-grid;place-items:center;flex:0 0 auto;width:25px;height:25px;border:1px solid #dc7b00;border-radius:50%;background:#fff1cf;color:#a65000;cursor:pointer;animation:udhari-bell-ring 1.15s ease-in-out infinite}.due-alert-bell i{font-size:12px}@keyframes udhari-bell-ring{0%,100%{transform:rotate(0);box-shadow:0 0 0 0 rgba(224,126,0,.42)}12%,36%{transform:rotate(-14deg)}24%,48%{transform:rotate(14deg)}60%{box-shadow:0 0 0 7px rgba(224,126,0,0)}}.customer-actions .customer-delete{background:#ffe4e6!important;color:#b4232a!important;border:1px solid #f29ba4!important}html.krp-dark-theme .due-alert-bell{background:#4a2600!important;color:#ffd38a!important;border-color:#f0a22e!important}html.krp-dark-theme .customer-actions .customer-delete{background:#5a1820!important;color:#ffb4bd!important;border-color:#d95b69!important}
+</style><style id="udhari-final-card-view">body .customer-card .customer-info{display:none!important}body .customer-card .customer-address{display:block!important}body .customer-card .customer-amounts{display:flex!important}    .customer-actions .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .customer-actions .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}.ledger-command-row .sms-reminder{background:#e8f1ff!important;color:#2252a3!important;border:1px solid #a7c3ef!important}html.krp-dark-theme .ledger-command-row .sms-reminder{background:#172f54!important;color:#a9ceff!important;border-color:#477ab8!important}</style></body>
 </html>
+
 
 
 
