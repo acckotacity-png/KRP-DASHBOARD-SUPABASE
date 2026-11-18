@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+  <title>Upload Licenses · KRP Dashboard</title>
+  <link rel="icon" href="favicon.svg"><link rel="preconnect" href="https://esm.sh"><link rel="stylesheet" href="theme.css?v=47"><script src="theme.js?v=3"></script>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#14213d;font-family:Arial,sans-serif}
+    .wrap{width:min(1180px,calc(100% - 20px));margin:14px auto}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#15245b;color:#fff;padding:14px 16px;border-radius:13px}
+    .top h1{font-size:19px;margin:0;color:#fff}.top p{font-size:11px;margin:4px 0 0;color:#cbd6ff}
+    .top-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .btn{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
+    .btn.light{background:#fff;color:#15245b}.btn.green{background:#11834a;color:#fff}.btn.orange{background:#ef941b;color:#fff}
+    .btn.red{background:#dc3a34;color:#fff}.btn.soft{background:#e8ecff;color:#273b9d}.btn.sm{padding:6px 9px;font-size:11px}
+    .tabs{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}
+    .tab{background:#fff;border:1px solid #dce3ee;color:#53617a}.tab.active{background:#168447;color:#fff;border-color:#168447}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+    .stat{background:#fff;border:1px solid #e0e6ee;border-radius:10px;padding:10px}.stat small{color:#68758b}.stat strong{display:block;font-size:20px;margin-top:3px}
+    .panel{background:#fff;border:1px solid #dce3ee;border-radius:12px;overflow:hidden}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-bottom:1px solid #e5eaf1;flex-wrap:wrap}
+    .filters{display:flex;gap:6px;flex-wrap:wrap}
+    .filters input,.filters select{padding:9px;border:1px solid #d9e0e9;border-radius:8px;background:#fff;color:#25322d}
+    .filters input{width:min(220px,60vw)}
+    .list{display:grid;gap:7px;padding:9px}
+    .card{display:grid;grid-template-columns:1.1fr .7fr .9fr .8fr .9fr auto;align-items:center;gap:9px;border:1px solid #e1e7ef;border-radius:10px;padding:10px}
+    .card strong,.card span{display:block}.muted{font-size:11px;color:#6f7b8f;margin-top:3px}
+    .pill{display:inline-flex;width:max-content;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase}
+    .pending{background:#fff2cd;color:#9a6800}.active{background:#dcf8e7;color:#08753b}.inactive{background:#252b38;color:#fff}.free{background:#e8ecff;color:#273b9d}
+    .purpose{font-weight:800;color:#15245b}
+    .actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+    .empty{text-align:center;padding:32px;color:#7a8598}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #e9eef4;text-align:left}th{background:#f5f7fb;color:#53617a;font-size:11px}
+    .ok{color:#08753b;font-weight:700}.bad{color:#b42720;font-weight:700}
+    .settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+    .box2{border:1px solid #e1e7ef;border-radius:10px;padding:12px}.box2 h3{margin:0 0 10px;font-size:15px}
+    .field{margin-bottom:9px}.field label{display:block;font-size:11px;font-weight:700;margin-bottom:4px}
+    .field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #d9e0e9;border-radius:7px;background:#eef2ef;color:#25322d}
+    .rate-row{display:grid;grid-template-columns:90px 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
+    .modal{position:fixed;inset:0;background:#0d153566;display:none;align-items:center;justify-content:center;padding:12px;z-index:10}.modal.open{display:flex}
+    .box{width:min(480px,100%);background:#fff;border-radius:14px;padding:16px;max-height:94vh;overflow:auto}.box h2{font-size:18px;margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
+    .qr{text-align:center}.qr img{width:230px;height:230px;border:1px solid #e1e7ef;border-radius:10px;padding:6px;background:#fff}
+    .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
+    .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
+    .hidden{display:none!important}
+    html body main.wrap header.top h1,html body main.wrap header.top #adminIdentity{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important}
+    html body main.wrap header.top #adminIdentity{opacity:.88!important}
+    @media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.card{grid-template-columns:1fr 1fr}.actions{grid-column:1/-1;justify-content:flex-start}.settings,.grid{grid-template-columns:1fr}.top h1{font-size:16px}}
+    html.krp-dark-theme body{background:#091721;color:#d8e2e8}html.krp-dark-theme .top{background:#102c3b}
+    html.krp-dark-theme .panel,html.krp-dark-theme .stat,html.krp-dark-theme .card,html.krp-dark-theme .box,html.krp-dark-theme .box2{background:#10232e;color:#dce8e2;border-color:#294652}
+    html.krp-dark-theme .toolbar,html.krp-dark-theme td{border-color:#294652}html.krp-dark-theme th{background:#0d1e28;color:#91a5b2}
+    html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
+    html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
+    html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div><h1>Admin · Upload Licenses</h1><p id="adminIdentity">Admin verification...</p></div>
+    <div class="top-actions">
+      <button class="btn light" type="button" onclick="toggleKrpTheme()" aria-label="Toggle theme">◐</button>
+      <button class="btn green" type="button" id="newLicenseBtn">+ Activate ID</button>
+      <button class="btn light" type="button" id="refreshBtn">↻</button>
+      <button class="btn light" type="button" onclick="location.href='admin.html'">Access Control</button>
+      <button class="btn light" type="button" onclick="location.href='index.html'">← Dashboard</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="btn tab active" data-tab="pending">Payment Pending</button>
+    <button class="btn tab" data-tab="all">All Users</button>
+    <button class="btn tab" data-tab="entries">Recent Entries</button>
+    <button class="btn tab" data-tab="settings">Rates · UPI · QR</button>
+  </div>
+
+  <section class="stats">
+    <div class="stat"><small>Payment Pending</small><strong id="sPending">0</strong></div>
+    <div class="stat"><small>Active IDs</small><strong id="sActive">0</strong></div>
+    <div class="stat"><small>Users (mobile)</small><strong id="sUsers">0</strong></div>
+    <div class="stat"><small>Successful Entries</small><strong id="sEntries">0</strong></div>
+  </section>
+
+  <section class="panel" id="listPanel">
+    <div class="toolbar">
+      <strong id="listTitle">Payment Pending</strong>
+      <div class="filters">
+        <input id="search" placeholder="Mobile No. खोजें" inputmode="numeric">
+        <select id="fPurpose"><option value="">All Purpose</option><option>IS</option><option>PRI</option><option>ROLLOVER</option></select>
+        <select id="fYear"><option value="">All Years</option></select>
+      </div>
+    </div>
+    <div id="list" class="list"><div class="empty">Loading...</div></div>
+  </section>
+
+  <section class="panel hidden" id="settingsPanel">
+    <div class="settings">
+      <form class="box2" id="settingsForm">
+        <h3>Payment Settings</h3>
+        <div class="field"><label>UPI ID (जिस पर payment आएगा)</label><input id="upiId" placeholder="name@bank" required></div>
+        <div class="field"><label>QR पर दिखने वाला नाम</label><input id="payeeName" placeholder="KRP Services" required></div>
+        <div class="field"><label>WhatsApp No. (user screenshot + mobile भेजेगा)</label><input id="whatsappNo" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}"></div>
+        <div class="field"><label>Free entries (हर mobile + purpose + year)</label><input id="freeLimit" type="number" min="0" max="10000" required></div>
+        <h3 style="margin-top:14px">Rates (₹ per ID per year)</h3>
+        <div id="rateRows"></div>
+        <div class="modal-actions"><button class="btn green" type="submit">Save Settings</button></div>
+      </form>
+      <div class="box2">
+        <h3>QR Preview</h3>
+        <div class="field"><label>Purpose</label><select id="previewPurpose"><option>IS</option><option>PRI</option><option>ROLLOVER</option></select></div>
+        <div class="qr" id="previewQr"><div class="empty">UPI ID aur rate save karein</div></div>
+        <p class="muted">User ke payment QR mein note ke saath purpose, year aur mobile bhi jata hai, taaki aap payment pehchaan sakein.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="licModal" class="modal"><form id="licForm" class="box">
+  <h2 id="licTitle">Activate ID</h2>
+  <div class="grid">
+    <div class="field"><label>Login Mobile No.</label><input id="mMobile" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" required></div>
+    <div class="field"><label>Financial Year</label><input id="mYear" list="yearList" placeholder="2024-2025" pattern="[0-9]{4}-[0-9]{4}" required></div>
+    <div class="field"><label>Purpose</label><select id="mPurpose"><option>IS</option><option>PRI</option><option>ROLLOVER</option></select></div>
+    <div class="field"><label>Status</label><select id="mStatus"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div>
+  </div>
+  <div class="field"><label>UTR / Payment Ref.</label><input id="mRef" maxlength="60"></div>
+  <div class="field"><label>Note</label><textarea id="mNote" rows="2" maxlength="300"></textarea></div>
+  <p class="muted" id="mRate"></p>
+  <div class="modal-actions"><button type="button" class="btn soft" data-close>Cancel</button><button class="btn green" type="submit">Save</button></div>
+</form></div>
+
+<div id="qrModal" class="modal"><div class="box">
+  <h2 id="qrTitle">Payment QR</h2>
+  <div class="qr" id="qrBody"></div>
+  <div class="modal-actions"><button type="button" class="btn soft" id="copyLink">Copy UPI Link</button><button type="button" class="btn green" data-close>Close</button></div>
+</div></div>
+<datalist id="yearList"></datalist>
+
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import QRCode from 'https://esm.sh/qrcode@1.5.4';
+import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,AUTH_OPTIONS} from './supabase-config.js';
+
+const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:localStorage,autoRefreshToken:true}});
+const PURPOSES=['IS','PRI','ROLLOVER'];
+const state={tab:'pending',summary:[],entries:[],settings:{},rates:{}};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
+const money=v=>v==null?'—':'₹'+Number(v).toLocaleString('en-IN');
+function msg(t){const e=document.createElement('div');e.className='message';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),3200)}
+function currentFY(){const d=new Date(),y=d.getMonth()>=3?d.getFullYear():d.getFullYear()-1;return `${y}-${y+1}`}
+
+function upiLink(mobile,purpose,year){
+  const s=state.settings,amt=state.rates[purpose];
+  if(!s.upi_id||!(Number(amt)>0))return '';
+  const enc=v=>encodeURIComponent(v);
+  return `upi://pay?pa=${s.upi_id.trim()}&pn=${enc(s.payee_name||'')}&am=${Number(amt).toFixed(2)}&cu=INR&tn=${enc([purpose,year,mobile].filter(Boolean).join(' '))}`;
+}
+async function qrHtml(link,amount,caption){
+  if(!link)return '<div class="empty">Settings mein UPI ID aur is purpose ka rate set karein.</div>';
+  const img=await QRCode.toDataURL(link,{width:460,margin:1});
+  return `<img src="${img}" alt="UPI QR"><div class="amt">${money(amount)}</div><div class="muted">${esc(state.settings.payee_name||'')} · ${esc(state.settings.upi_id||'')}</div><div class="muted">${esc(caption||'')}</div>`;
+}
+
+async function boot(){
+  let {data:{session}}=await client.auth.getSession();
+  if(!session?.user){location.replace(`${AUTH_OPTIONS.loginPage}?next=upload-licenses.html`);return}
+  let {data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle();
+  if(error){const {data:r}=await client.auth.refreshSession();if(r?.session)({data:me,error}=await client.from('app_users').select('*').eq('user_id',session.user.id).maybeSingle())}
+  if(error){msg('Session verify नहीं हुई। Page refresh करें।');return}
+  if(!me?.active||me.role!=='admin'||me.access_status==='blocked'){location.replace('index.html');return}
+  $('adminIdentity').textContent=`${me.full_name||'Admin'} · ${me.email}`;
+  const years=[];const y0=new Date().getFullYear()+1;for(let y=y0;y>=y0-6;y--)years.push(`${y-1}-${y}`);
+  $('yearList').innerHTML=years.map(y=>`<option value="${y}">`).join('');
+  await load();
+  setInterval(()=>{if(document.visibilityState==='visible'&&state.tab!=='settings')load(true)},30000);
+}
+
+async function load(silent=false){
+  const [sum,ent,set,rat]=await Promise.all([
+    client.from('upload_summary').select('*').order('last_upload',{ascending:false,nullsFirst:false}),
+    client.from('upload_entries').select('*').order('created_at',{ascending:false}).limit(300),
+    client.from('upload_settings').select('*').eq('id',1).maybeSingle(),
+    client.from('upload_rates').select('*')
+  ]);
+  const err=sum.error||ent.error||set.error||rat.error;
+  if(err){msg(/does not exist|schema cache/i.test(err.message)?'Pehle supabase-upload-licenses.sql run karein.':err.message);return}
+  state.summary=sum.data||[];state.entries=ent.data||[];state.settings=set.data||{};
+  state.rates=Object.fromEntries((rat.data||[]).map(r=>[r.purpose,r.amount]));
+  const yrs=[...new Set(state.summary.map(r=>r.fin_year))].sort().reverse(),cur=$('fYear').value;
+  $('fYear').innerHTML='<option value="">All Years</option>'+yrs.map(y=>`<option ${y===cur?'selected':''}>${esc(y)}</option>`).join('');
+  if(!silent)fillSettings();
+  render();
+}
+
+function filtered(rows){
+  const q=$('search').value.replace(/\D/g,''),p=$('fPurpose').value,y=$('fYear').value;
+  return rows.filter(r=>(!q||String(r.mobile).includes(q))&&(!p||r.purpose===p)&&(!y||r.fin_year===y));
+}
+
+function render(){
+  const s=state.summary;
+  $('sPending').textContent=s.filter(r=>r.license_status==='pending').length;
+  $('sActive').textContent=s.filter(r=>r.license_status==='active').length;
+  $('sUsers').textContent=new Set(s.map(r=>r.mobile)).size;
+  $('sEntries').textContent=s.reduce((a,r)=>a+Number(r.success_entries||0),0).toLocaleString('en-IN');
+  const settings=state.tab==='settings';
+  $('listPanel').classList.toggle('hidden',settings);$('settingsPanel').classList.toggle('hidden',!settings);
+  if(settings){renderPreview();return}
+  if(state.tab==='entries'){
+    $('listTitle').textContent='Recent Entries (last 300)';
+    const rows=filtered(state.entries);
+    $('list').innerHTML=rows.length?`<div style="overflow:auto"><table><thead><tr><th>Time</th><th>Mobile</th><th>Purpose</th><th>Year</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${fmt(r.created_at)}</td><td>${esc(r.mobile)}</td><td class="purpose">${esc(r.purpose)}</td><td>${esc(r.fin_year)}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">कोई entry नहीं मिली</div>';
+    return;
+  }
+  $('listTitle').textContent=state.tab==='pending'?'Payment Pending':'All Users';
+  const rows=filtered(state.tab==='pending'?s.filter(r=>r.license_status==='pending'):s);
+  $('list').innerHTML=rows.length?rows.map(card).join(''):`<div class="empty">${state.tab==='pending'?'कोई payment pending नहीं है':'कोई record नहीं मिला'}</div>`;
+}
+
+function card(r){
+  const free=Number(state.settings.free_limit??18),used=Number(r.success_entries||0);
+  const k=`'${esc(r.mobile)}','${esc(r.purpose)}','${esc(r.fin_year)}'`;
+  const act=r.license_status==='active'
+    ?`<button class="btn red sm" onclick="quickSet(${k},'inactive')">Deactivate</button>`
+    :`<button class="btn green sm" onclick="openLicense(${k},'active')">Activate</button>`;
+  return `<article class="card">
+    <div><strong>${esc(r.mobile)}</strong><span class="muted">Last upload: ${fmt(r.last_upload)}</span></div>
+    <div><span class="purpose">${esc(r.purpose)}</span><span class="muted">${esc(r.fin_year)}</span></div>
+    <div><strong>${used.toLocaleString('en-IN')} <small class="muted" style="display:inline">success</small></strong><span class="muted">${Number(r.failed_entries||0)} failed · free ${free}</span></div>
+    <div><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span><span class="muted">${r.activated_at?'Active: '+fmt(r.activated_at):r.requested_at?'Request: '+fmt(r.requested_at):''}</span></div>
+    <div class="muted">${money(r.amount??state.rates[r.purpose])}${r.payment_ref?'<br>UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
+    <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button></div>
+  </article>`;
+}
+
+window.openLicense=(mobile='',purpose='IS',year='',status='active')=>{
+  const row=state.summary.find(r=>r.mobile===mobile&&r.purpose===purpose&&r.fin_year===year)||{};
+  $('mMobile').value=mobile;$('mPurpose').value=purpose;$('mYear').value=year||currentFY();$('mStatus').value=status;
+  $('mRef').value=row.payment_ref||'';$('mNote').value=row.admin_note||'';
+  $('licTitle').textContent=mobile?`Manage · ${mobile}`:'Activate ID';updateRate();$('licModal').classList.add('open');
+};
+function updateRate(){const a=state.rates[$('mPurpose').value];$('mRate').textContent=`${$('mPurpose').value} rate: ${money(a)} · एक mobile + purpose + year की एक ही ID बनेगी।`}
+$('mPurpose').addEventListener('change',updateRate);
+
+async function setLicense(mobile,purpose,year,status,ref=null,note=null){
+  const {error}=await client.rpc('upload_set_license',{p_mobile:mobile,p_purpose:purpose,p_year:year,p_status:status,p_payment_ref:ref,p_note:note});
+  if(error){msg(error.message);return false}
+  msg(status==='active'?`${mobile} · ${purpose} · ${year} ACTIVE`:`Status: ${status}`);await load(true);return true;
+}
+window.quickSet=async(m,p,y,s)=>{if(s==='inactive'&&!confirm(`${m} · ${p} · ${y} ko deactivate karein?`))return;await setLicense(m,p,y,s)};
+$('licForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!e.currentTarget.reportValidity())return;
+  if(await setLicense($('mMobile').value.trim(),$('mPurpose').value,$('mYear').value.trim(),$('mStatus').value,$('mRef').value.trim(),$('mNote').value.trim()))$('licModal').classList.remove('open');
+});
+
+let lastLink='';
+window.showQr=async(m,p,y)=>{
+  lastLink=upiLink(m,p,y);
+  $('qrTitle').textContent=`Payment QR · ${p} · ${y}`;
+  $('qrBody').innerHTML=await qrHtml(lastLink,state.rates[p],`Mobile: ${m}`);
+  $('qrModal').classList.add('open');
+};
+$('copyLink').onclick=async()=>{if(!lastLink)return;try{await navigator.clipboard.writeText(lastLink);msg('UPI link copy ho gaya')}catch{prompt('UPI link',lastLink)}};
+
+function fillSettings(){
+  const s=state.settings;$('upiId').value=s.upi_id||'';$('payeeName').value=s.payee_name||'';$('whatsappNo').value=s.whatsapp_no||'';$('freeLimit').value=s.free_limit??18;
+  $('rateRows').innerHTML=PURPOSES.map(p=>`<div class="rate-row"><strong class="purpose">${p}</strong><div class="field" style="margin:0"><input type="number" min="0" step="1" id="rate_${p}" value="${state.rates[p]??0}" required></div><span class="muted">₹</span></div>`).join('');
+}
+async function renderPreview(){const p=$('previewPurpose').value;$('previewQr').innerHTML=await qrHtml(upiLink('',p,''),state.rates[p],'Preview (user QR mein uska mobile/year bhi hoga)')}
+$('previewPurpose').addEventListener('change',renderPreview);
+$('settingsForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!e.currentTarget.reportValidity())return;
+  const now=new Date().toISOString();
+  const {error:se}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),updated_at:now}).eq('id',1);
+  if(se){msg(se.message);return}
+  const {error:re}=await client.from('upload_rates').upsert(PURPOSES.map(p=>({purpose:p,amount:Number($(`rate_${p}`).value)||0,updated_at:now})));
+  if(re){msg(re.message);return}
+  msg('Settings save ho gayi');await load();
+});
+
+$('newLicenseBtn').onclick=()=>openLicense();
+$('refreshBtn').onclick=()=>load();
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+['search','fPurpose','fYear'].forEach(id=>$(id).addEventListener('input',render));
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.tab=b.dataset.tab;render()}));
+boot();
+</script>
+</body></html>

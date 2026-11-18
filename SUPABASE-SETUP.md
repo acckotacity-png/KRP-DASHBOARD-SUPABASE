@@ -73,3 +73,12 @@ Calculated fields (transaction remaining, Udhari interest/status, expense budget
 ## 7. Session timeout
 
 `supabase-config.js` me `idleLogoutMinutes: 5` ko required minutes se replace kar sakte hain.
+
+## 8. Upload Licenses (IS / PRI / Rollover Excel automation)
+
+1. SQL Editor mein `supabase-upload-licenses.sql` poora Run karein (dobara run karna safe hai).
+2. Site par admin login karke **Access Control > Upload Licenses** (`upload-licenses.html`) kholein.
+3. **Rates · UPI · QR** tab mein UPI ID, QR naam, WhatsApp no., free entries (default 18) aur IS/PRI/ROLLOVER ke rates save karein.
+4. Excel mein `KRP_License.bas` import karein. Upload macro start se pehle `KRP_LicenseAllowed("IS")` aur har row ke baad `KRP_LogEntry(...)` call karta hai.
+5. Free entries khatam hone par Excel `pay.html` (QR + WhatsApp button) kholta hai aur request **Payment Pending** tab mein aa jaati hai.
+6. Payment confirm karke **Activate** dabayein. Ek mobile + purpose + year ki ek hi ID banti hai.
