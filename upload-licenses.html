@@ -45,6 +45,16 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .tab .badge{display:inline-block;min-width:18px;margin-left:5px;padding:1px 6px;border-radius:10px;background:#dc3a34;color:#fff;font-size:11px}
+    .alert{display:grid;grid-template-columns:6px 1.6fr 1fr .9fr auto;gap:10px;align-items:center;border:1px solid #e1e7ef;border-radius:10px;padding:10px 10px 10px 0;overflow:hidden}
+    .alert .bar{align-self:stretch;border-radius:0 4px 4px 0}.alert.high .bar{background:#dc3a34}.alert.medium .bar{background:#ef941b}.alert.low .bar{background:#8a96a8}
+    .alert.acked{opacity:.55}.alert h4{margin:0 0 3px;font-size:14px}.alert p{margin:0;font-size:12px;color:#53617a;line-height:1.45}
+    .sev{font-size:10px;font-weight:800;text-transform:uppercase;padding:2px 7px;border-radius:10px;margin-left:6px}.sev.high{background:#fee8e7;color:#b42720}.sev.medium{background:#fff2cd;color:#9a6800}.sev.low{background:#eef1f5;color:#53617a}
+    .alertbox{width:min(560px,100%)}.alertbox li{margin:6px 0;font-size:13px}
+    .detailbox{width:min(900px,100%)}.detailbox h3{font-size:14px;margin:14px 0 6px}
+    .ackrow{display:flex;align-items:center;gap:6px;font-size:12px;color:#53617a}
+    .filters .ackrow input{width:auto}.alert strong,.alert span.muted{display:block}
+    @media(max-width:760px){.alert{grid-template-columns:6px 1fr 1fr}.alert .actions{grid-column:2/-1}}
     html body main.wrap header.top h1,html body main.wrap header.top #adminIdentity{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important}
     html body main.wrap header.top #adminIdentity{opacity:.88!important}
     @media(max-width:1000px){.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.card{grid-template-columns:1fr 1fr}.actions{grid-column:1/-1;justify-content:flex-start}.settings,.grid{grid-template-columns:1fr}.top h1{font-size:16px}}
@@ -53,7 +63,7 @@
     html.krp-dark-theme .toolbar,html.krp-dark-theme td{border-color:#294652}html.krp-dark-theme th{background:#0d1e28;color:#91a5b2}
     html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
     html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
-    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
+    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
   </style>
 </head>
 <body>
@@ -73,6 +83,7 @@
     <button class="btn tab active" data-tab="pending">Payment Pending</button>
     <button class="btn tab" data-tab="all">All Users</button>
     <button class="btn tab" data-tab="entries">Recent Entries</button>
+    <button class="btn tab" data-tab="alerts">⚠ Alerts<span class="badge hidden" id="alertBadge">0</span></button>
     <button class="btn tab" data-tab="settings">Rates · UPI · QR</button>
   </div>
 
@@ -92,6 +103,7 @@
         <input id="search" placeholder="Mobile No. खोजें" inputmode="numeric">
         <select id="fProduct"><option value="">All Products</option></select>
         <select id="fYear"><option value="">All Years</option></select>
+        <label class="ackrow hidden" id="ackToggle"><input type="checkbox" id="showAcked"> Purane (dekhe hue) bhi</label>
         <button class="btn green" type="button" id="exportBtn">⬇ Excel</button>
       </div>
     </div>
@@ -149,6 +161,18 @@
   <div class="qr" id="qrBody"></div>
   <div class="modal-actions"><button type="button" class="btn soft" id="copyLink">Copy UPI Link</button><button type="button" class="btn green" data-close>Close</button></div>
 </div></div>
+<div id="alertPopup" class="modal"><div class="box alertbox">
+  <h2>⚠ Suspicious Activity</h2>
+  <p class="muted" id="alertPopupText"></p>
+  <ul id="alertPopupList"></ul>
+  <div class="modal-actions"><button type="button" class="btn soft" data-close>Baad mein</button><button type="button" class="btn red" id="alertPopupGo">Alerts dekhein</button></div>
+</div></div>
+
+<div id="detailModal" class="modal"><div class="box detailbox">
+  <h2 id="detailTitle">Data</h2>
+  <div id="detailBody"></div>
+  <div class="modal-actions"><button type="button" class="btn green" data-close>Close</button></div>
+</div></div>
 <datalist id="yearList"></datalist>
 
 <script type="module">
@@ -158,7 +182,7 @@ import * as XLSX from 'https://esm.sh/xlsx@0.18.5';
 import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,AUTH_OPTIONS} from './supabase-config.js';
 
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:localStorage,autoRefreshToken:true}});
-const state={tab:'pending',summary:[],entries:[],settings:{},products:[]};
+const state={tab:'pending',summary:[],entries:[],settings:{},products:[],alerts:[]};let alertPopupShown=false;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
@@ -199,12 +223,14 @@ async function boot(){
 }
 
 async function load(silent=false){
-  const [sum,ent,set,pro]=await Promise.all([
+  const [sum,ent,set,pro,alr]=await Promise.all([
     client.from('upload_summary').select('*').order('last_upload',{ascending:false,nullsFirst:false}),
     client.from('upload_entries').select('*').order('created_at',{ascending:false}).limit(300),
     client.from('upload_settings').select('*').eq('id',1).maybeSingle(),
-    client.from('upload_products').select('*').order('sort_order').order('code')
+    client.from('upload_products').select('*').order('sort_order').order('code'),
+    client.rpc('upload_get_alerts')
   ]);
+  state.alerts=alr.error?[]:(alr.data||[]);
   const err=sum.error||ent.error||set.error||pro.error;
   if(err){msg(/does not exist|schema cache|column/i.test(err.message)?'Supabase mein naya supabase-upload-licenses.sql run karein.':err.message);return}
   state.summary=sum.data||[];state.entries=ent.data||[];state.settings=set.data||{};state.products=pro.data||[];
@@ -214,7 +240,10 @@ async function load(silent=false){
   const yrs=[...new Set(state.summary.map(r=>r.fin_year))].sort().reverse(),cur=$('fYear').value;
   $('fYear').innerHTML='<option value="">All Years</option>'+yrs.map(y=>`<option value="${esc(y)}" ${y===cur?'selected':''}>${esc(shortYear(y))}</option>`).join('');
   if(!silent)fillSettings();
+  const open=state.alerts.filter(a=>!a.acked);
+  $('alertBadge').textContent=open.length;$('alertBadge').classList.toggle('hidden',!open.length);
   render();
+  if(open.length&&!alertPopupShown&&state.tab!=='alerts'){alertPopupShown=true;showAlertPopup(open)}
 }
 
 function filtered(rows,isEntry=false){
@@ -233,6 +262,13 @@ function render(){
   const settings=state.tab==='settings';
   $('listPanel').classList.toggle('hidden',settings);$('settingsPanel').classList.toggle('hidden',!settings);
   if(settings){renderPreview();return}
+  $('ackToggle').classList.toggle('hidden',state.tab!=='alerts');
+  if(state.tab==='alerts'){
+    $('listTitle').textContent='Suspicious Activity (last 30 days)';
+    const rows=filtered(state.alerts.filter(a=>$('showAcked').checked||!a.acked));
+    $('list').innerHTML=rows.length?rows.map(alertCard).join(''):'<div class="empty">✓ Koi naya suspicious activity nahi</div>';
+    return;
+  }
   if(state.tab==='entries'){
     $('listTitle').textContent='Recent Entries (last 300)';
     const rows=filtered(state.entries,true);
@@ -259,6 +295,48 @@ function card(r){
     <div class="muted">${money(r.amount??prod(r.product).amount)}${r.user_utr&&r.license_status!=='active'?`<br><span class="utrtag">User UTR: ${esc(r.user_utr)}</span><br><small>${fmt(r.utr_submitted_at)}</small>`:''}${r.payment_ref?'<br>Paid UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
     <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button></div>
   </article>`;
+}
+
+function alertCard(a){
+  const k=`'${esc(a.mobile)}','${esc(a.product||'')}','${esc(a.fin_year||'')}'`;
+  return `<article class="alert ${esc(a.severity)} ${a.acked?'acked':''}"><div class="bar"></div>
+    <div><h4>${esc(a.title)}<span class="sev ${esc(a.severity)}">${esc(a.severity)}</span></h4><p>${esc(a.message)}</p>${a.detail?`<p><b>Detail:</b> ${esc(a.detail)}</p>`:''}</div>
+    <div><strong>${esc(a.mobile)}</strong><span class="muted">${esc(a.product?`${prod(a.product).label||a.product}: ${shortYear(a.fin_year)}`:'')}</span></div>
+    <div class="muted">${Number(a.cnt)} baar<br>Pehli: ${fmt(a.first_seen)}<br>Aakhri: ${fmt(a.last_seen)}</div>
+    <div class="actions"><button class="btn soft sm" onclick="showDetail(${k})">Data dekhein</button>${a.acked?'<span class="muted">✓ Dekha</span>':`<button class="btn green sm" onclick="ackAlert('${esc(a.alert_key)}')">✓ Dekh liya</button>`}</div>
+  </article>`;
+}
+function showAlertPopup(open){
+  const hi=open.filter(a=>a.severity==='high').length;
+  $('alertPopupText').textContent=`${open.length} naye suspicious alert${open.length>1?'s':''}${hi?` (${hi} high)`:''} - inhe check karein:`;
+  $('alertPopupList').innerHTML=open.slice(0,6).map(a=>`<li><span class="sev ${esc(a.severity)}">${esc(a.severity)}</span> <b>${esc(a.title)}</b> · ${esc(a.mobile)} <span class="muted">${fmt(a.last_seen)}</span></li>`).join('')+(open.length>6?`<li class="muted">...aur ${open.length-6}</li>`:'');
+  $('alertPopup').classList.add('open');
+}
+$('alertPopupGo').onclick=()=>{$('alertPopup').classList.remove('open');selectTab('alerts')};
+window.ackAlert=async key=>{
+  const {error}=await client.rpc('upload_ack_alert',{p_key:key,p_note:null});
+  if(error){msg(error.message);return}
+  msg('Alert ko dekha hua mark kiya');await load(true);
+};
+window.showDetail=async(mobile,product,year)=>{
+  $('detailTitle').textContent=`Data · ${mobile}`;$('detailBody').innerHTML='<div class="empty">Loading...</div>';$('detailModal').classList.add('open');
+  const p=prod(product),purposes=p.purposes||[];
+  const [en,evs]=await Promise.all([
+    client.from('upload_entries').select('*').eq('mobile',mobile).order('created_at',{ascending:false}).limit(200),
+    client.from('upload_events').select('*').eq('mobile',mobile).order('created_at',{ascending:false}).limit(100)]);
+  if(en.error||evs.error){$('detailBody').innerHTML=`<div class="empty">${esc((en.error||evs.error).message)}</div>`;return}
+  const lic=state.summary.filter(r=>r.mobile===mobile);
+  const entries=(en.data||[]).filter(r=>!purposes.length||purposes.includes(r.purpose));
+  const perDay={};entries.filter(r=>r.success).forEach(r=>{const d=new Date(r.created_at).toLocaleDateString('en-IN');perDay[d]=(perDay[d]||0)+1});
+  $('detailBody').innerHTML=`
+    <h3>License</h3>${lic.length?`<table><thead><tr><th>Product · Year</th><th>Status</th><th>Success</th><th>Failed</th><th>User UTR</th><th>Paid UTR</th><th>Last upload</th></tr></thead><tbody>${lic.map(r=>`<tr><td>${esc(r.title)}</td><td><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span></td><td>${r.success_entries}</td><td>${r.failed_entries}</td><td>${esc(r.user_utr||'')}</td><td>${esc(r.payment_ref||'')}</td><td>${fmt(r.last_upload)}</td></tr>`).join('')}</tbody></table>`:'<p class="muted">Koi license nahi</p>'}
+    <h3>Din-wise successful entries</h3><p class="muted">${Object.entries(perDay).slice(0,20).map(([d,n])=>`${d}: <b>${n}</b>`).join(' · ')||'—'}</p>
+    <h3>Suspicious events</h3>${(evs.data||[]).length?`<table><thead><tr><th>Time</th><th>Type</th><th>Detail</th></tr></thead><tbody>${evs.data.map(e=>`<tr><td>${fmt(e.created_at)}</td><td>${esc(e.kind)}</td><td>${esc(e.detail||'')}</td></tr>`).join('')}</tbody></table>`:'<p class="muted">Koi event nahi</p>'}
+    <h3>Recent entries (${entries.length})</h3><div style="max-height:320px;overflow:auto"><table><thead><tr><th>Time</th><th>Purpose</th><th>Year</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${entries.map(r=>`<tr><td>${fmt(r.created_at)}</td><td>${esc(r.purpose)}</td><td>${esc(shortYear(r.fin_year))}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table></div>`;
+};
+function alertRows(rows){
+  return rows.map(a=>({'Severity':String(a.severity).toUpperCase(),'Alert':a.title,'Mobile / Login ID':a.mobile,'Product':a.product?(prod(a.product).label||a.product):'','Year':a.fin_year||'',
+    'Kitni baar':Number(a.cnt),'Pehli baar':xdt(a.first_seen),'Aakhri baar':xdt(a.last_seen),'Detail':a.detail||'','Matlab':a.message,'Dekha':a.acked?'Haan':'Nahi'}));
 }
 
 function totals(){
@@ -296,7 +374,10 @@ async function exportExcel(){
     const wb=XLSX.utils.book_new(),stamp=new Date().toISOString().slice(0,10),t=totals();
     const filt=[$('fProduct').value&&('Product: '+(prod($('fProduct').value).label||$('fProduct').value)),$('fYear').value&&('Year: '+$('fYear').value),$('search').value&&('Mobile: '+$('search').value)].filter(Boolean).join(' · ')||'Sab';
     let name;
-    if(state.tab==='entries'){
+    if(state.tab==='alerts'){
+      const rows=filtered(state.alerts.filter(a=>$('showAcked').checked||!a.acked));
+      XLSX.utils.book_append_sheet(wb,sheet(alertRows(rows)),'Alerts');name=`KRP_Suspicious_${stamp}.xlsx`;
+    }else if(state.tab==='entries'){
       const rows=filtered(await fetchAllEntries(),true);
       XLSX.utils.book_append_sheet(wb,sheet(entryRows(rows)),'Entries');name=`KRP_Entries_${stamp}.xlsx`;
     }else{
@@ -382,7 +463,10 @@ $('refreshBtn').onclick=()=>load();
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 ['search','fProduct','fYear'].forEach(id=>$(id).addEventListener('input',render));
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.tab=b.dataset.tab;render()}));
+function selectTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));state.tab=t;render()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
+$('showAcked').addEventListener('change',render);
+{const t=new URLSearchParams(location.search).get('tab');if(t&&document.querySelector(`.tab[data-tab="${t}"]`)){state.tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t))}}
 boot();
 </script>
 </body></html>
