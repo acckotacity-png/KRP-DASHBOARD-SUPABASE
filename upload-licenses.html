@@ -16,7 +16,7 @@
     .btn.red{background:#dc3a34;color:#fff}.btn.soft{background:#e8ecff;color:#273b9d}.btn.sm{padding:6px 9px;font-size:11px}
     .tabs{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}
     .tab{background:#fff;border:1px solid #dce3ee;color:#53617a}.tab.active{background:#168447;color:#fff;border-color:#168447}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+    .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}.stat.money strong{color:#08753b}.stat.due strong{color:#9a6800}.utrtag{display:inline-block;margin-top:4px;padding:3px 7px;border-radius:6px;background:#fff2cd;color:#7a5200;font-size:11px;font-weight:800;letter-spacing:.3px}
     .stat{background:#fff;border:1px solid #e0e6ee;border-radius:10px;padding:10px}.stat small{color:#68758b}.stat strong{display:block;font-size:20px;margin-top:3px}
     .panel{background:#fff;border:1px solid #dce3ee;border-radius:12px;overflow:hidden}
     .toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-bottom:1px solid #e5eaf1;flex-wrap:wrap}
@@ -47,13 +47,13 @@
     .hidden{display:none!important}
     html body main.wrap header.top h1,html body main.wrap header.top #adminIdentity{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important}
     html body main.wrap header.top #adminIdentity{opacity:.88!important}
-    @media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.card{grid-template-columns:1fr 1fr}.actions{grid-column:1/-1;justify-content:flex-start}.settings,.grid{grid-template-columns:1fr}.top h1{font-size:16px}}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.card{grid-template-columns:1fr 1fr}.actions{grid-column:1/-1;justify-content:flex-start}.settings,.grid{grid-template-columns:1fr}.top h1{font-size:16px}}
     html.krp-dark-theme body{background:#091721;color:#d8e2e8}html.krp-dark-theme .top{background:#102c3b}
     html.krp-dark-theme .panel,html.krp-dark-theme .stat,html.krp-dark-theme .card,html.krp-dark-theme .box,html.krp-dark-theme .box2{background:#10232e;color:#dce8e2;border-color:#294652}
     html.krp-dark-theme .toolbar,html.krp-dark-theme td{border-color:#294652}html.krp-dark-theme th{background:#0d1e28;color:#91a5b2}
     html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
     html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
-    html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
+    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
   </style>
 </head>
 <body>
@@ -77,10 +77,12 @@
   </div>
 
   <section class="stats">
-    <div class="stat"><small>Payment Pending</small><strong id="sPending">0</strong></div>
+    <div class="stat"><small>Pending IDs</small><strong id="sPending">0</strong></div>
     <div class="stat"><small>Active IDs</small><strong id="sActive">0</strong></div>
     <div class="stat"><small>Users (mobile)</small><strong id="sUsers">0</strong></div>
     <div class="stat"><small>Successful Entries</small><strong id="sEntries">0</strong></div>
+    <div class="stat money"><small>Payment Received</small><strong id="sReceived">₹0</strong></div>
+    <div class="stat due"><small>Pending Amount</small><strong id="sDue">₹0</strong></div>
   </section>
 
   <section class="panel" id="listPanel">
@@ -90,6 +92,7 @@
         <input id="search" placeholder="Mobile No. खोजें" inputmode="numeric">
         <select id="fProduct"><option value="">All Products</option></select>
         <select id="fYear"><option value="">All Years</option></select>
+        <button class="btn green" type="button" id="exportBtn">⬇ Excel</button>
       </div>
     </div>
     <div id="list" class="list"><div class="empty">Loading...</div></div>
@@ -151,6 +154,7 @@
 <script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import QRCode from 'https://esm.sh/qrcode@1.5.4';
+import * as XLSX from 'https://esm.sh/xlsx@0.18.5';
 import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,AUTH_OPTIONS} from './supabase-config.js';
 
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,storage:localStorage,autoRefreshToken:true}});
@@ -224,6 +228,8 @@ function render(){
   $('sActive').textContent=s.filter(r=>r.license_status==='active').length;
   $('sUsers').textContent=new Set(s.map(r=>r.mobile)).size;
   $('sEntries').textContent=s.reduce((a,r)=>a+Number(r.success_entries||0),0).toLocaleString('en-IN');
+  $('sReceived').textContent=money(totals().received);$('sDue').textContent=money(totals().due);
+  $('exportBtn').classList.toggle('hidden',state.tab==='settings');
   const settings=state.tab==='settings';
   $('listPanel').classList.toggle('hidden',settings);$('settingsPanel').classList.toggle('hidden',!settings);
   if(settings){renderPreview();return}
@@ -234,7 +240,8 @@ function render(){
     return;
   }
   $('listTitle').textContent=state.tab==='pending'?'Payment Pending':'All Users';
-  const rows=filtered(state.tab==='pending'?s.filter(r=>r.license_status==='pending'):s);
+  let rows=filtered(state.tab==='pending'?s.filter(r=>r.license_status==='pending'):s);
+  if(state.tab==='pending')rows=[...rows].sort((a,b)=>(b.user_utr?1:0)-(a.user_utr?1:0)||new Date(b.utr_submitted_at||b.requested_at||0)-new Date(a.utr_submitted_at||a.requested_at||0));
   $('list').innerHTML=rows.length?rows.map(card).join(''):`<div class="empty">${state.tab==='pending'?'कोई payment pending नहीं है':'कोई record नहीं मिला'}</div>`;
 }
 
@@ -249,15 +256,70 @@ function card(r){
     <div><span class="purpose">${esc(r.title||`${r.product_label}: ${shortYear(r.fin_year)}`)}</span><span class="muted">${esc(r.breakdown||'')}</span></div>
     <div><strong>${used.toLocaleString('en-IN')} <small class="muted" style="display:inline">success</small></strong><span class="muted">${Number(r.failed_entries||0)} failed · free ${free}</span></div>
     <div><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span><span class="muted">${r.activated_at?'Active: '+fmt(r.activated_at):r.requested_at?'Request: '+fmt(r.requested_at):''}</span></div>
-    <div class="muted">${money(r.amount??prod(r.product).amount)}${r.payment_ref?'<br>UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
+    <div class="muted">${money(r.amount??prod(r.product).amount)}${r.user_utr&&r.license_status!=='active'?`<br><span class="utrtag">User UTR: ${esc(r.user_utr)}</span><br><small>${fmt(r.utr_submitted_at)}</small>`:''}${r.payment_ref?'<br>Paid UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
     <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button></div>
   </article>`;
 }
 
+function totals(){
+  const s=state.summary,amt=r=>Number(r.amount??prod(r.product).amount??0)||0;
+  return {received:s.filter(r=>r.license_status==='active').reduce((a,r)=>a+amt(r),0),
+          due:s.filter(r=>r.license_status==='pending').reduce((a,r)=>a+amt(r),0),
+          active:s.filter(r=>r.license_status==='active').length,
+          pending:s.filter(r=>r.license_status==='pending').length,
+          utrPending:s.filter(r=>r.license_status==='pending'&&r.user_utr).length};
+}
+const xdt=v=>v?new Date(v).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'}):'';
+function licenseRows(rows){
+  return rows.map(r=>({'Mobile / Login ID':r.mobile,'Product':r.product_label||prod(r.product).label||r.product,'Year':r.fin_year,
+    'Status':String(r.license_status||'').toUpperCase(),'Success Entries':Number(r.success_entries||0),'Failed Entries':Number(r.failed_entries||0),
+    'Breakdown':r.breakdown||'','Amount (₹)':Number(r.amount??prod(r.product).amount??0),'User UTR':r.user_utr||'','UTR Submitted':xdt(r.utr_submitted_at),
+    'Paid UTR / Ref':r.payment_ref||'','Activated At':xdt(r.activated_at),'Requested At':xdt(r.requested_at),'Last Upload':xdt(r.last_upload),'Note':r.admin_note||''}));
+}
+function entryRows(rows){
+  return rows.map(r=>({'Time':xdt(r.created_at),'Mobile / Login ID':r.mobile,'Purpose':r.purpose,'Year':r.fin_year,'Application No.':r.app_no||'',
+    'Result':r.success?'Success':'Failed','Claim ID':r.claim_id||'','Remark':r.remark||''}));
+}
+function sheet(rows){const ws=XLSX.utils.json_to_sheet(rows.length?rows:[{'':'Koi record nahi'}]);
+  const keys=Object.keys(rows[0]||{'':''});ws['!cols']=keys.map(k=>({wch:Math.min(45,Math.max(k.length,...rows.slice(0,300).map(r=>String(r[k]??'').length))+2)}));return ws}
+async function fetchAllEntries(){
+  const all=[];const size=1000;
+  for(let from=0;from<100000;from+=size){
+    const {data,error}=await client.from('upload_entries').select('*').order('created_at',{ascending:false}).range(from,from+size-1);
+    if(error)throw error;all.push(...(data||[]));if(!data||data.length<size)break;
+  }
+  return all;
+}
+async function exportExcel(){
+  const btn=$('exportBtn');btn.disabled=true;const old=btn.textContent;btn.textContent='Ban raha hai...';
+  try{
+    const wb=XLSX.utils.book_new(),stamp=new Date().toISOString().slice(0,10),t=totals();
+    const filt=[$('fProduct').value&&('Product: '+(prod($('fProduct').value).label||$('fProduct').value)),$('fYear').value&&('Year: '+$('fYear').value),$('search').value&&('Mobile: '+$('search').value)].filter(Boolean).join(' · ')||'Sab';
+    let name;
+    if(state.tab==='entries'){
+      const rows=filtered(await fetchAllEntries(),true);
+      XLSX.utils.book_append_sheet(wb,sheet(entryRows(rows)),'Entries');name=`KRP_Entries_${stamp}.xlsx`;
+    }else{
+      const base=state.tab==='pending'?state.summary.filter(r=>r.license_status==='pending'):state.summary;
+      const rows=filtered(base);
+      XLSX.utils.book_append_sheet(wb,sheet(licenseRows(rows)),state.tab==='pending'?'Payment Pending':'All Users');
+      XLSX.utils.book_append_sheet(wb,sheet([
+        {'Item':'Filter','Value':filt},
+        {'Item':'Active IDs (payment aaya)','Value':t.active},{'Item':'Payment Received (₹)','Value':t.received},
+        {'Item':'Pending IDs','Value':t.pending},{'Item':'Pending with User UTR','Value':t.utrPending},{'Item':'Payment Pending (₹)','Value':t.due},
+        {'Item':'Users (unique mobile)','Value':new Set(state.summary.map(r=>r.mobile)).size},{'Item':'Report time','Value':xdt(new Date())}]),'Summary');
+      name=`KRP_${state.tab==='pending'?'Payment_Pending':'All_Users'}_${stamp}.xlsx`;
+    }
+    XLSX.writeFile(wb,name);msg('Excel download ho gayi');
+  }catch(e){msg('Excel nahi bani: '+(e.message||e))}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+$('exportBtn').onclick=exportExcel;
+
 window.openLicense=(mobile='',product='',year='',status='active')=>{
   const row=state.summary.find(r=>r.mobile===mobile&&r.product===product&&r.fin_year===year)||{};
   $('mMobile').value=mobile;$('mProduct').value=product||state.products[0]?.code||'';$('mYear').value=year||currentFY();$('mStatus').value=status;
-  $('mRef').value=row.payment_ref||'';$('mNote').value=row.admin_note||'';
+  $('mRef').value=row.payment_ref||row.user_utr||'';$('mNote').value=row.admin_note||'';
   $('licTitle').textContent=mobile?`Manage · ${mobile}`:'Activate ID';updateRate();$('licModal').classList.add('open');
 };
 function updateRate(){const p=prod($('mProduct').value);$('mRate').textContent=`${p.label||''} (${(p.purposes||[]).join(', ')}) rate: ${money(p.amount)} · एक mobile + product + year की एक ही ID बनेगी।`}

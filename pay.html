@@ -20,6 +20,13 @@
     .steps{text-align:left;font-size:12.5px;line-height:1.6;background:#f6f4ee;border-radius:12px;padding:10px 12px 10px 28px;margin:14px 0 0}
     .ok{background:#dcf8e7;color:#08753b;border-radius:12px;padding:14px;font-weight:700}
     .err{background:#fee8e7;color:#b42720;border-radius:12px;padding:14px;font-weight:700}
+    .utr{text-align:left;margin-top:14px;padding:12px;border:1.5px solid #15245b33;border-radius:12px;background:#fff}
+    .utr label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
+    .utr input{width:100%;height:46px;padding:0 12px;border:1px solid #cfd6e0;border-radius:10px;font-size:17px;letter-spacing:1px}
+    .utr input:focus{outline:3px solid #15245b22;border-color:#15245b}
+    .utr .btn{margin-top:8px}
+    .okmsg{margin-top:8px;color:#08753b;font-size:12.5px;font-weight:700;line-height:1.5}
+    .errmsg{margin-top:8px;color:#b42720;font-size:12.5px;font-weight:700;line-height:1.5}
   </style>
 </head>
 <body>
@@ -71,10 +78,35 @@ async function load(){
         <a class="btn upi" href="${esc(d.upi_link)}">UPI App se Pay karein</a>`;
   }
   const payStep=d.upi_link?`QR scan karke <b>₹${Number(d.amount||0).toLocaleString('en-IN')}</b> pay karein.`:'Admin se payment details lekar pay karein.';
+  const utrBox=d.allowed?'':`<form class="utr" id="utrForm">
+      <label for="utr">Payment ke baad UTR / Reference No. (12 digit)</label>
+      <input id="utr" inputmode="numeric" autocomplete="off" maxlength="26" placeholder="जैसे 412345678901" required>
+      <button class="btn upi" id="utrBtn" type="submit">UTR Submit karein</button>
+      <div id="utrMsg" class="${d.utr_submitted?'okmsg':'muted'}">${d.utr_submitted?`✓ UTR ••••${esc(d.utr_last4)} mil chuka hai. Admin verify karke ID active karega. Galat ho to sahi UTR dobara bhejein.`:'UTR aapke UPI app mein payment details mein milta hai.'}</div>
+    </form>`;
   $('body').innerHTML=info+qr+
-    `<ol class="steps"><li>${payStep}</li><li>Payment ka screenshot + apna login mobile no. WhatsApp karein.</li><li>Admin ID active karega, phir Excel mein upload dobara start karein.</li></ol>`+
-    wa(d,`Payment kar diya hai.\nLogin Mobile: ${d.mobile}\nProduct: ${title}\nAmount: ₹${d.amount}\nUTR: `)+
+    `<ol class="steps"><li>${payStep}</li><li>Neeche UTR No. bharkar <b>Submit</b> karein.</li><li>Payment ka screenshot WhatsApp karein (verify ke liye).</li><li>Admin ID active karega, phir Excel mein upload dobara start karein.</li></ol>`+
+    utrBox+`<div id="waBox">${wa(d,waText(d,''))}</div>`+
     `<button class="btn light" onclick="location.reload()">Status check karein</button>`;
+
+  const f=$('utrForm');
+  if(f)f.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const utr=$('utr').value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();
+    if(!/^[0-9]{12}$/.test(utr)&&!/^[A-Z0-9]{12,22}$/.test(utr)){setUtrMsg('UTR galat lag raha hai. 12 digit UTR / Reference No. daalein.',false);return}
+    $('utrBtn').disabled=true;$('utrBtn').textContent='Bhej rahe hain...';
+    const {data:r,error:er}=await client.rpc('upload_submit_utr',{p_mobile:mobile,p_purpose:purpose,p_year:year,p_utr:utr});
+    $('utrBtn').disabled=false;$('utrBtn').textContent='UTR Submit karein';
+    if(er||r?.error){setUtrMsg(er?.message||r.error||'UTR save nahi hua',false);return}
+    setUtrMsg(`✓ UTR ••••${utr.slice(-4)} save ho gaya. Ab payment ka screenshot WhatsApp karein. Admin verify karke ID active karega.`,true);
+    $('utr').value='';
+    $('waBox').innerHTML=wa(d,waText(d,utr));
+  });
+}
+function setUtrMsg(t,ok){const m=$('utrMsg');m.textContent=t;m.className=ok?'okmsg':'errmsg'}
+function waText(d,utr){
+  const title=d.title||`${d.product_label}: ${d.fin_year}`;
+  return `Payment kar diya hai.\nLogin Mobile: ${d.mobile}\nProduct: ${title}\nAmount: ₹${d.amount}\nUTR: ${utr}\n(Screenshot attach hai)`;
 }
 function wa(d,text){
   const n=String(d.whatsapp||'').replace(/\D/g,'');
