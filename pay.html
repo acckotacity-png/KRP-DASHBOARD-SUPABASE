@@ -10,7 +10,7 @@
     .card{width:min(100%,430px);padding:24px;background:#fffdf8;border:1px solid #fff;border-radius:22px;box-shadow:16px 18px 40px #5448342b;text-align:center}
     .logo{width:58px;height:58px;border-radius:16px}h1{margin:10px 0 4px;font-size:21px}
     .sub{margin:0 0 14px;color:#687788;font-size:13px}
-    .info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:12px 0}
+    .info{display:grid;grid-template-columns:1fr 1.4fr;gap:6px;margin:12px 0}
     .info div{background:#f1efe8;border-radius:10px;padding:8px 4px}.info small{display:block;color:#7b8794;font-size:10px}.info b{font-size:13px}
     .qr img{width:250px;height:250px;border:1px solid #e1e7ef;border-radius:12px;padding:6px;background:#fff}
     .amt{font-size:28px;font-weight:800;margin:8px 0 2px;color:#0b6b40}
@@ -37,23 +37,24 @@ import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY} from './supabase-config.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const q=new URLSearchParams(location.search);
-const mobile=(q.get('m')||'').replace(/\D/g,'').slice(-10),purpose=(q.get('p')||'').toUpperCase(),year=q.get('y')||'';
+const mobile=(q.get('m')||'').replace(/\D/g,'').slice(-10),purpose=(q.get('p')||'').toUpperCase().replace(/[^A-Z0-9_]/g,''),year=q.get('y')||'';
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 
 function fail(t){$('sub').textContent='';$('body').innerHTML=`<div class="err">${esc(t)}</div>`}
 
 async function load(){
-  if(!/^[6-9]\d{9}$/.test(mobile)||!['IS','PRI','ROLLOVER'].includes(purpose)||!/^\d{4}-\d{4}$/.test(year)){
+  if(!/^[6-9]\d{9}$/.test(mobile)||!purpose||!/^\d{4}-\d{4}$/.test(year)){
     fail('Link adhoora hai. Excel se dobara "Payment" kholein.');return;
   }
   const {data:d,error}=await client.rpc('upload_check_license',{p_mobile:mobile,p_purpose:purpose,p_year:year});
   if(error){fail('Server se jaankari nahi mili. Thodi der baad try karein.');return}
 
-  const info=`<div class="info"><div><small>Mobile</small><b>${esc(d.mobile)}</b></div><div><small>Purpose</small><b>${esc(d.purpose)}</b></div><div><small>Year</small><b>${esc(d.fin_year)}</b></div></div>`;
+  const title=d.title||`${d.product_label}: ${d.fin_year}`;
+  const info=`<div class="info"><div><small>Mobile</small><b>${esc(d.mobile)}</b></div><div><small>Product · Year</small><b>${esc(title)}</b></div></div>`;
 
   if(d.status==='active'){
     $('sub').textContent='Aapki ID active hai';
-    $('body').innerHTML=info+`<div class="ok">✓ ${esc(d.purpose)} ${esc(d.fin_year)} ke liye ID ACTIVE hai.<br>Excel mein upload dobara start karein.</div>`;
+    $('body').innerHTML=info+`<div class="ok">✓ ${esc(title)} ke liye ID ACTIVE hai.<br>Excel mein upload dobara start karein.</div>`;
     return;
   }
   if(d.status==='inactive'){
@@ -63,15 +64,16 @@ async function load(){
   }
 
   $('sub').textContent=d.allowed?`Abhi ${d.free_limit-d.used} free entries baaki hain`:`${d.free_limit} free entries poori ho gayi hain`;
-  let qr='<div class="err">Payment details abhi set nahi hain. Admin se sampark karein.</div>';
+  let qr=`<div class="err">QR abhi nahi ban saka: ${esc(d.pay_issue||'payment details set nahi hain')}.<br>Admin se sampark karein.</div>`;
   if(d.upi_link){
     const img=await QRCode.toDataURL(d.upi_link,{width:500,margin:1});
     qr=`<div class="qr"><img src="${img}" alt="UPI QR"></div><div class="amt">₹${Number(d.amount).toLocaleString('en-IN')}</div><div class="muted">${esc(d.payee_name)}</div>
         <a class="btn upi" href="${esc(d.upi_link)}">UPI App se Pay karein</a>`;
   }
+  const payStep=d.upi_link?`QR scan karke <b>₹${Number(d.amount||0).toLocaleString('en-IN')}</b> pay karein.`:'Admin se payment details lekar pay karein.';
   $('body').innerHTML=info+qr+
-    `<ol class="steps"><li>QR scan karke <b>₹${Number(d.amount||0).toLocaleString('en-IN')}</b> pay karein.</li><li>Payment ka screenshot + apna login mobile no. WhatsApp karein.</li><li>Admin ID active karega, phir Excel mein upload dobara start karein.</li></ol>`+
-    wa(d,`Payment kar diya hai.\nLogin Mobile: ${d.mobile}\nPurpose: ${d.purpose}\nYear: ${d.fin_year}\nAmount: ₹${d.amount}\nUTR: `)+
+    `<ol class="steps"><li>${payStep}</li><li>Payment ka screenshot + apna login mobile no. WhatsApp karein.</li><li>Admin ID active karega, phir Excel mein upload dobara start karein.</li></ol>`+
+    wa(d,`Payment kar diya hai.\nLogin Mobile: ${d.mobile}\nProduct: ${title}\nAmount: ₹${d.amount}\nUTR: `)+
     `<button class="btn light" onclick="location.reload()">Status check karein</button>`;
 }
 function wa(d,text){
