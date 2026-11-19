@@ -45,6 +45,15 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    #invOverlay{position:fixed;inset:0;z-index:50;background:#0d1535e6;display:none;flex-direction:column}
+    #invOverlay.open{display:flex}
+    #invOverlay .invbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));background:#15245b;color:#fff}
+    #invOverlay .invbar b{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #invOverlay .invbar .btn{padding:9px 12px;font-size:13px}
+    #invOverlay .invclose{background:#fff;color:#15245b;font-size:14px}
+    #invOverlay iframe{flex:1 1 auto;width:100%;border:0;background:#eef1f6}
+    #invOverlay .invload{color:#fff;text-align:center;padding:40px;font-weight:700}
+    @media(max-width:560px){#invOverlay .invbar .btn .t{display:none}}
     .extra{color:#2f55d4;margin-left:2px}
     .freebox{border:1px dashed #9fb3d9;border-radius:9px;padding:9px;margin:2px 0 10px;background:#f6f8ff}
     .freebox .row2{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
@@ -143,6 +152,9 @@
     html.krp-dark-theme details summary{color:#9fb3c4}
     html.krp-dark-theme .qr .amt{color:#f1f5f9}
     html.krp-dark-theme #delInfo{color:#e5edf5}
+    html.krp-dark-theme #invOverlay .invbar{background:#122235!important}
+    html.krp-dark-theme #invOverlay .invclose{background:#f1f5f9!important;color:#122235!important;border:0!important}
+    html.krp-dark-theme #invOverlay .invbar b{color:#fff!important}
     html.krp-dark-theme .extra{color:#8fb0ff}
     html.krp-dark-theme .freebox{background:#0f2231;border-color:#35607a}
     html.krp-dark-theme .rpill.s{background:#0d3b28;color:#6ee7b7}html.krp-dark-theme .rpill.f{background:#4c1714;color:#fca5a5}
@@ -300,6 +312,16 @@
   <label class="chk"><input type="checkbox" id="delEntries"> Iski detail upload entries aur suspicious alerts bhi delete karein (success/failed ki ginti bani rahegi)</label>
   <div class="modal-actions"><button type="button" class="btn soft" data-close>Cancel</button><button class="btn red" type="submit" id="delBtn">Delete</button></div>
 </form></div>
+<div id="invOverlay" role="dialog" aria-modal="true" aria-label="Invoice">
+  <div class="invbar">
+    <b id="invTitle">Invoice</b>
+    <button type="button" class="btn green" id="invPrint">🖨<span class="t"> Print / PDF</span></button>
+    <button type="button" class="btn soft" id="invTab" title="Naye tab mein kholein">↗<span class="t"> Naya tab</span></button>
+    <button type="button" class="btn invclose" id="invClose">✕ Band karein</button>
+  </div>
+  <div class="invload" id="invLoad">Invoice ban raha hai...</div>
+  <iframe id="invFrame" title="Invoice preview" class="hidden"></iframe>
+</div>
 <datalist id="stateList"><option>Rajasthan</option><option>Madhya Pradesh</option><option>Uttar Pradesh</option><option>Gujarat</option><option>Maharashtra</option><option>Haryana</option><option>Punjab</option><option>Bihar</option><option>Chhattisgarh</option><option>Jharkhand</option><option>Odisha</option><option>Karnataka</option><option>Telangana</option><option>Andhra Pradesh</option><option>Tamil Nadu</option><option>Kerala</option><option>West Bengal</option><option>Assam</option><option>Himachal Pradesh</option><option>Uttarakhand</option><option>Delhi</option></datalist>
 <div id="entModal" class="modal"><div class="box detailbox">
   <h2 id="entTitle">Entries</h2>
@@ -687,11 +709,9 @@ $('delForm').addEventListener('submit',async e=>{
 const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const nice=v=>{const d=String(v||'').replace(/\D/g,'');return d.length===10?`+91 ${d.slice(0,5)} ${d.slice(5)}`:(v||'')};
 window.makeInvoice=async(m,p,y)=>{
-  const w=window.open('','_blank');
-  if(!w){msg('Popup block hai - browser mein is site ke popups allow karein');return}
-  w.document.write('<p style="font-family:Arial;padding:20px">Invoice ban raha hai...</p>');
+  openInvOverlay(`Invoice · ${m}`);
   const {data:lic,error}=await client.rpc('upload_assign_invoice',{p_mobile:m,p_product:p,p_year:y});
-  if(error){w.close();msg(error.message);return}
+  if(error){closeInv();msg(error.message);return}
   await load(true);
   const r=state.summary.find(x=>x.mobile===m&&x.product===p&&x.fin_year===y)||{};
   const st=state.settings,pr=prod(p),amount=Number(lic.amount??r.amount??pr.amount??0);
@@ -702,9 +722,9 @@ window.makeInvoice=async(m,p,y)=>{
   const qr=link?await QRCode.toDataURL(link,{width:420,margin:1}):'';
   const desc=`${String(pr.label||p).split('/').join(' / ')} ID, YEAR ${shortYear(y)}`;
   const terms=String(st.terms||'').split(/\r?\n/).map(t=>t.trim()).filter(Boolean);
-  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(lic.invoice_no)} · ${esc(m)}</title>
+  const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(lic.invoice_no)} · ${esc(m)}</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eef1f6;font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;color:#1d2b45}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0;background:#eef1f6;font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;color:#1d2b45}
 .page{width:210mm;min-height:297mm;margin:16px auto;background:#fff;padding:16mm 15mm;border:1px solid #d9e0ea}
 .row{display:flex;justify-content:space-between;gap:16px}.biz{font-size:26px;font-weight:800;color:#1d2b45}
 .title{text-align:right}.title h1{margin:0;font-size:28px;letter-spacing:1px;color:#15245b}.title div{font-size:13px;font-weight:700}
@@ -722,10 +742,19 @@ td{padding:11px 10px;border-bottom:1px solid #e6ebf2}th:last-child,td:last-child
 .tools button.l{background:#fff;color:#15245b;border:1px solid #c9d2e0}
 @media print{body{background:#fff}.page{margin:0;border:0;width:auto;min-height:0;padding:10mm}.tools{display:none}}
 @page{size:A4;margin:0}
+@media screen and (max-width:820px){
+  .page{width:auto;min-height:0;margin:10px;padding:18px 14px;border-radius:10px}
+  .biz{font-size:20px}.title h1{font-size:22px}.title div{font-size:11.5px}
+  .row{flex-wrap:wrap}.row.head{flex-wrap:nowrap}.party{font-size:12.5px}
+  .row:not(.head) .party.right{text-align:left;width:100%}
+  table{font-size:12.5px}th,td{padding:8px 6px}
+  .total{font-size:15px}
+  .pay{flex-direction:column;align-items:flex-start;gap:10px}.pay img{width:170px;height:170px}
+  .sign{font-size:12px}
+}
 </style></head><body>
-<div class="tools"><button onclick="print()">🖨 Print / Save PDF</button><button class="l" onclick="close()">Close</button></div>
 <div class="page">
-  <div class="row"><div class="biz">${esc(st.biz_name||st.payee_name||'')}</div>
+  <div class="row head"><div class="biz">${esc(st.biz_name||st.payee_name||'')}</div>
     <div class="title"><h1>INVOICE</h1><div>Invoice #: ${esc(lic.invoice_no)}</div><div>Date: ${esc(lic.invoice_date||'')}</div>
       <span class="badge ${paid?'paid':lic.status==='inactive'?'inactive':'pending'}">${paid?'PAID':lic.status==='inactive'?'INACTIVE':'PAYMENT PENDING'}</span></div></div>
   <hr>
@@ -744,7 +773,41 @@ td{padding:11px 10px;border-bottom:1px solid #e6ebf2}th:last-child,td:last-child
   <div class="sign"><b>Authorized Signatory</b>Digital invoice · signature not required.</div>
   ${terms.length?`<hr><div class="terms"><h4>TERMS &amp; CONDITIONS</h4><ol>${terms.map(t=>`<li>${esc(t)}</li>`).join('')}</ol></div>`:''}
 </div></body></html>`;
-  w.document.open();w.document.write(html);w.document.close();
+  showInvoice(html,`${lic.invoice_no} · ${m}`);
+};
+
+// ---------- invoice overlay (mobile par bhi band hota hai, Back button se bhi) ----------
+let invHtml='',invUrl='';
+function openInvOverlay(title){
+  $('invTitle').textContent=title;$('invLoad').classList.remove('hidden');$('invFrame').classList.add('hidden');
+  $('invOverlay').classList.add('open');document.body.style.overflow='hidden';
+  try{history.pushState({krpInv:1},'')}catch(_){}
+}
+function showInvoice(html,title){
+  invHtml=html;$('invTitle').textContent=title;
+  const f=$('invFrame');f.srcdoc=html;f.classList.remove('hidden');$('invLoad').classList.add('hidden');
+}
+function hideInv(){
+  $('invOverlay').classList.remove('open');document.body.style.overflow='';
+  $('invFrame').srcdoc='';invHtml='';if(invUrl){URL.revokeObjectURL(invUrl);invUrl=''}
+}
+function closeInv(){
+  if(!$('invOverlay').classList.contains('open'))return;
+  if(history.state&&history.state.krpInv){history.back()}else hideInv();
+}
+window.addEventListener('popstate',()=>{if($('invOverlay').classList.contains('open'))hideInv()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInv()});
+$('invClose').onclick=closeInv;
+$('invPrint').onclick=()=>{
+  try{const w=$('invFrame').contentWindow;w.focus();w.print()}
+  catch(_){$('invTab').click()}
+};
+$('invTab').onclick=()=>{
+  if(!invHtml)return;
+  if(invUrl)URL.revokeObjectURL(invUrl);
+  invUrl=URL.createObjectURL(new Blob([invHtml],{type:'text/html'}));
+  const w=window.open(invUrl,'_blank');
+  if(!w)msg('Popup block hai - Print / PDF button use karein');
 };
 
 let lastLink='';
