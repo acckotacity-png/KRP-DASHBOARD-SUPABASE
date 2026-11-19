@@ -23,7 +23,7 @@
     .filters{display:flex;gap:6px;flex-wrap:wrap}
     .filters input,.filters select{padding:9px;border:1px solid #d9e0e9;border-radius:8px;background:#fff;color:#25322d}
     .filters input{width:min(220px,60vw)}
-    .list{display:grid;gap:7px;padding:9px}
+    .list{display:grid;gap:7px;padding:9px;align-content:start;grid-auto-rows:max-content}
     .card{display:grid;grid-template-columns:1.1fr .7fr .9fr .8fr .9fr auto;align-items:center;gap:9px;border:1px solid #e1e7ef;border-radius:10px;padding:10px}
     .card strong,.card span{display:block}.muted{font-size:11px;color:#6f7b8f;margin-top:3px}
     .pill{display:inline-flex;width:max-content;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase}
@@ -45,6 +45,11 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .extra{color:#2f55d4;margin-left:2px}
+    .freebox{border:1px dashed #9fb3d9;border-radius:9px;padding:9px;margin:2px 0 10px;background:#f6f8ff}
+    .freebox .row2{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+    .freebox .quick{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+    .freebox .quick .btn{padding:5px 9px;font-size:11px}
     .board{position:relative;z-index:6}
     #listPanel.locked{display:flex;flex-direction:column}
     #listPanel.locked .toolbar{flex:0 0 auto}
@@ -138,6 +143,8 @@
     html.krp-dark-theme details summary{color:#9fb3c4}
     html.krp-dark-theme .qr .amt{color:#f1f5f9}
     html.krp-dark-theme #delInfo{color:#e5edf5}
+    html.krp-dark-theme .extra{color:#8fb0ff}
+    html.krp-dark-theme .freebox{background:#0f2231;border-color:#35607a}
     html.krp-dark-theme .rpill.s{background:#0d3b28;color:#6ee7b7}html.krp-dark-theme .rpill.f{background:#4c1714;color:#fca5a5}
     html.krp-dark-theme .etable th{background:#0d1e28!important;color:#9fb3c4}
     html.krp-dark-theme .etable td{border-color:#21384a;color:#d8e2e8}
@@ -246,7 +253,14 @@
     <div class="field"><label>Login Mobile No.</label><input id="mMobile" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" required></div>
     <div class="field"><label>Financial Year</label><input id="mYear" list="yearList" placeholder="2024-2025" pattern="[0-9]{4}-[0-9]{4}" required></div>
     <div class="field"><label>Product</label><select id="mProduct"></select></div>
-    <div class="field"><label>Status</label><select id="mStatus"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div>
+    <div class="field"><label>Status</label><select id="mStatus"><option value="active">Active (paid)</option><option value="pending">Pending (payment baaki)</option><option value="free">Free (payment abhi nahi)</option><option value="inactive">Inactive (band)</option></select></div>
+  </div>
+  <div class="freebox">
+    <div class="row2">
+      <div class="field" style="margin:0"><label>Extra free entries (is ID ko normal free ke upar)</label><input id="mExtra" type="number" min="0" max="100000" step="1" value="0"></div>
+      <div class="muted" id="mFreeInfo" style="padding-bottom:9px;text-align:right"></div>
+    </div>
+    <div class="quick"><button type="button" class="btn soft" data-add="5">+5</button><button type="button" class="btn soft" data-add="10">+10</button><button type="button" class="btn soft" data-add="25">+25</button><button type="button" class="btn soft" data-add="50">+50</button><button type="button" class="btn soft" data-add="0">Reset 0</button></div>
   </div>
   <div class="grid">
     <div class="field"><label>Amount ₹ (invoice / received)</label><input id="mAmount" type="number" min="0" step="1" required></div>
@@ -418,10 +432,10 @@ function card(r){
   return `<article class="card">
     <div><strong>${esc(r.mobile)}</strong><span class="muted">Last upload: ${fmt(r.last_upload)}</span></div>
     <div><span class="purpose">${esc(r.title||`${r.product_label}: ${shortYear(r.fin_year)}`)}</span><span class="muted">${esc(r.breakdown||'')}</span></div>
-    <div><strong>${used.toLocaleString('en-IN')} <small class="muted" style="display:inline">success</small></strong><span class="muted">${Number(r.failed_entries||0)} failed · free ${free}</span></div>
+    <div><strong>${used.toLocaleString('en-IN')} <small class="muted" style="display:inline">success</small></strong><span class="muted">${Number(r.failed_entries||0)} failed · free ${free}${Number(r.extra_free)>0?`<b class="extra">+${Number(r.extra_free)}</b>`:''}</span></div>
     <div><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span><span class="muted">${r.activated_at?'Active: '+fmt(r.activated_at):r.requested_at?'Request: '+fmt(r.requested_at):''}</span></div>
     <div class="muted">${money(r.amount??prod(r.product).amount)}${r.invoice_no?`<br><small>${esc(r.invoice_no)}</small>`:''}${r.customer_name?`<br>${esc(r.customer_name)}`:''}${r.user_utr&&r.license_status!=='active'?`<br><span class="utrtag">User UTR: ${esc(r.user_utr)}</span><br><small>${fmt(r.utr_submitted_at)}</small>`:''}${r.payment_ref?'<br>Paid UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
-    <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn inv sm" onclick="makeInvoice(${k})">Invoice</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button><button class="btn del sm" onclick="openDelete(${k})">Delete</button></div>
+    <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn inv sm" onclick="makeInvoice(${k})">Invoice</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status)}')">Edit</button><button class="btn del sm" onclick="openDelete(${k})">Delete</button></div>
   </article>`;
 }
 
@@ -565,7 +579,7 @@ function totals(){
 const xdt=v=>v?new Date(v).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'}):'';
 function licenseRows(rows){
   return rows.map(r=>({'Mobile / Login ID':r.mobile,'Product':r.product_label||prod(r.product).label||r.product,'Year':r.fin_year,
-    'Status':String(r.license_status||'').toUpperCase(),'Success Entries':Number(r.success_entries||0),'Failed Entries':Number(r.failed_entries||0),
+    'Status':String(r.license_status||'').toUpperCase(),'Success Entries':Number(r.success_entries||0),'Extra Free':Number(r.extra_free||0),'Failed Entries':Number(r.failed_entries||0),
     'Breakdown':r.breakdown||'','Amount (₹)':Number(r.amount??prod(r.product).amount??0),'User UTR':r.user_utr||'','UTR Submitted':xdt(r.utr_submitted_at),
     'Paid UTR / Ref':r.payment_ref||'','Invoice No.':r.invoice_no||'','Customer':r.customer_name||'','Customer Phone':r.customer_phone||'','State':r.customer_state||'','Activated At':xdt(r.activated_at),'Requested At':xdt(r.requested_at),'Last Upload':xdt(r.last_upload),'Note':r.admin_note||''}));
 }
@@ -613,11 +627,20 @@ async function exportExcel(){
 }
 $('exportBtn').onclick=exportExcel;
 
+let mRow={};
+function updFree(){
+  const base=Number(state.settings.free_limit??18),ex=Math.max(0,Number($('mExtra').value)||0),used=Number(mRow.success_entries||0),tot=base+ex;
+  $('mFreeInfo').innerHTML=`Kul free: <b>${base} + ${ex} = ${tot}</b><br>Use hui: <b>${used}</b> · Baaki: <b>${Math.max(0,tot-used)}</b>`;
+}
+$('mExtra').addEventListener('input',updFree);
+document.querySelectorAll('.freebox [data-add]').forEach(b=>b.onclick=()=>{const n=Number(b.dataset.add);$('mExtra').value=n?Math.max(0,Number($('mExtra').value)||0)+n:0;updFree()});
+
 window.openLicense=(mobile='',product='',year='',status='active')=>{
   const row=state.summary.find(r=>r.mobile===mobile&&r.product===product&&r.fin_year===year)||{};
   $('mMobile').value=mobile;$('mProduct').value=product||state.products[0]?.code||'';$('mYear').value=year||currentFY();$('mStatus').value=status;
   $('mRef').value=row.payment_ref||row.user_utr||'';$('mNote').value=row.admin_note||'';
   $('mAmount').value=Number(row.amount)>0?Number(row.amount):Number(prod($('mProduct').value).amount||0);
+  $('mExtra').value=Number(row.extra_free||0);mRow=row;updFree();
   $('mCustName').value=row.customer_name||'';$('mCustPhone').value=row.customer_phone||'';$('mCustState').value=row.customer_state||'';
   $('licTitle').textContent=mobile?`Manage · ${mobile}`:'Activate ID';updateRate();$('licModal').classList.add('open');
 };
@@ -626,15 +649,18 @@ $('mProduct').addEventListener('change',()=>{updateRate();$('mAmount').value=Num
 
 async function setLicense(mobile,product,year,status,ref=null,note=null,extra={}){
   const {error}=await client.rpc('upload_set_license',{p_mobile:mobile,p_product:product,p_year:year,p_status:status,p_payment_ref:ref,p_note:note,
-    p_amount:extra.amount??null,p_customer_name:extra.name??null,p_customer_phone:extra.phone??null,p_customer_state:extra.state??null});
+    p_amount:extra.amount??null,p_customer_name:extra.name??null,p_customer_phone:extra.phone??null,p_customer_state:extra.state??null,p_extra_free:extra.extraFree??null});
   if(error){msg(error.message);return false}
-  msg(status==='active'?`${mobile} · ${prod(product).label||product}: ${shortYear(year)} ACTIVE`:`Status: ${status}`);await load(true);return true;
+  msg(status==='active'?`${mobile} · ${prod(product).label||product}: ${shortYear(year)} ACTIVE`:`Save ho gaya · ${status.toUpperCase()}${extra.extraFree?` · +${extra.extraFree} extra free`:''}`);await load(true);return true;
 }
 window.quickSet=async(m,p,y,s)=>{if(s==='inactive'&&!confirm(`${m} · ${prod(p).label||p}: ${shortYear(y)} ko deactivate karein?`))return;await setLicense(m,p,y,s)};
 $('licForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!e.currentTarget.reportValidity())return;
-  if(await setLicense($('mMobile').value.trim(),$('mProduct').value,$('mYear').value.trim(),$('mStatus').value,$('mRef').value.trim(),$('mNote').value.trim(),
-     {amount:$('mAmount').value===''?null:Number($('mAmount').value),name:$('mCustName').value.trim(),phone:$('mCustPhone').value.trim(),state:$('mCustState').value.trim()}))$('licModal').classList.remove('open');
+  // Active nahi kar rahe to user ka bheja UTR "Paid UTR" na bane
+  let ref=$('mRef').value.trim();
+  if($('mStatus').value!=='active'&&!mRow.payment_ref&&ref&&ref===String(mRow.user_utr||''))ref='';
+  if(await setLicense($('mMobile').value.trim(),$('mProduct').value,$('mYear').value.trim(),$('mStatus').value,ref,$('mNote').value.trim(),
+     {amount:$('mAmount').value===''?null:Number($('mAmount').value),extraFree:Math.max(0,Math.floor(Number($('mExtra').value)||0)),name:$('mCustName').value.trim(),phone:$('mCustPhone').value.trim(),state:$('mCustState').value.trim()}))$('licModal').classList.remove('open');
 });
 
 // ---------- DELETE ----------
