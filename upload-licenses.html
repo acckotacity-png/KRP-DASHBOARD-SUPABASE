@@ -49,7 +49,7 @@
     .idrow:hover{border-color:#168447;box-shadow:0 2px 10px #16844722}.idrow strong,.idrow span{display:block}
     .chips{display:flex;gap:5px;flex-wrap:wrap}.chip{font-size:11px;padding:3px 8px;border-radius:12px;background:#eef1f5;color:#344256}
     .chip b.ok{color:#08753b}.chip b.bad{color:#b42720}
-    .sbig{font-size:16px;font-weight:800}.sbig .ok{color:#08753b}.sbig .bad{color:#b42720}
+    .sbig{font-size:16px;font-weight:800;white-space:nowrap}.sbig .ok{color:#08753b}.sbig .bad{color:#b42720}.sbig small{font-size:11px;font-weight:600;color:#6f7b8f}.sbig .sep{display:inline;color:#b6c0cc;margin:0 3px}
     .stor{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.stor div{background:#f5f7fb;border-radius:8px;padding:8px}.stor small{display:block;color:#68758b;font-size:11px}
     .meter{height:9px;border-radius:6px;background:#e7ebf1;overflow:hidden;margin:6px 0}.meter i{display:block;height:100%;background:#168447}
     @media(max-width:760px){.idrow{grid-template-columns:1fr 1fr}.idrow .chips{grid-column:1/-1}}
@@ -411,7 +411,7 @@ function idRow(g){
     <div><strong>${esc(g.mobile)}</strong><span class="muted">Last: ${fmt(g.last)}</span></div>
     <div><strong>${esc(shortYear(g.fin_year))}</strong><span class="muted">Year</span></div>
     <div class="chips">${Object.entries(g.by).sort().map(([p,v])=>`<span class="chip">${esc(p)}: <b class="ok">${v.s}</b> / <b class="bad">${v.f}</b></span>`).join('')}</div>
-    <div class="sbig"><span class="ok">${g.s.toLocaleString('en-IN')}</span> <small class="muted" style="display:inline">success</small><br><span class="bad">${g.f.toLocaleString('en-IN')}</span> <small class="muted" style="display:inline">failed</small></div>
+    <div class="sbig"><b class="ok">${g.s.toLocaleString('en-IN')}</b> <small>success</small> <span class="sep">·</span> <b class="bad">${g.f.toLocaleString('en-IN')}</b> <small>failed</small></div>
     <div><button class="btn soft sm" type="button">Entries ›</button></div>
   </article>`;
 }
