@@ -45,6 +45,10 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .btn.del{background:#fff;color:#b42720;border:1px solid #f1b9b5}.btn.inv{background:#15245b;color:#fff}
+    .delbox{width:min(440px,100%)}.delbox .warn{background:#fee8e7;color:#8a1f19;border-radius:9px;padding:10px;font-size:12.5px;line-height:1.5}
+    .delbox label.chk{display:flex;gap:8px;align-items:flex-start;margin:12px 0;font-size:13px;font-weight:700}
+    .field textarea{resize:vertical}
     .tab .badge{display:inline-block;min-width:18px;margin-left:5px;padding:1px 6px;border-radius:10px;background:#dc3a34;color:#fff;font-size:11px}
     .alert{display:grid;grid-template-columns:6px 1.6fr 1fr .9fr auto;gap:10px;align-items:center;border:1px solid #e1e7ef;border-radius:10px;padding:10px 10px 10px 0;overflow:hidden}
     .alert .bar{align-self:stretch;border-radius:0 4px 4px 0}.alert.high .bar{background:#dc3a34}.alert.medium .bar{background:#ef941b}.alert.low .bar{background:#8a96a8}
@@ -63,7 +67,7 @@
     html.krp-dark-theme .toolbar,html.krp-dark-theme td{border-color:#294652}html.krp-dark-theme th{background:#0d1e28;color:#91a5b2}
     html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
     html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
-    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
+    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .btn.del{background:#10232e;color:#ff9b94;border-color:#6b2a27}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
   </style>
 </head>
 <body>
@@ -118,6 +122,15 @@
         <div class="field"><label>QR पर दिखने वाला नाम</label><input id="payeeName" placeholder="KRP Services" required></div>
         <div class="field"><label>WhatsApp No. (user screenshot + mobile भेजेगा)</label><input id="whatsappNo" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}"></div>
         <div class="field"><label>Free entries (हर mobile + product + year)</label><input id="freeLimit" type="number" min="0" max="10000" required></div>
+        <h3 style="margin-top:14px">Invoice details</h3>
+        <div class="field"><label>Business Name (invoice ke upar)</label><input id="bizName" maxlength="80" placeholder="Web Automation"></div>
+        <div class="field"><label>Address</label><textarea id="bizAddress" rows="2" maxlength="300" placeholder="Kota, Rajasthan"></textarea></div>
+        <div class="field"><label>Phone(s)</label><input id="bizPhones" maxlength="80" placeholder="+91 95218 67142 / +91 90397 79483"></div>
+        <div class="grid">
+          <div class="field"><label>Invoice No. prefix</label><input id="invPrefix" maxlength="12" pattern="[A-Za-z0-9]{1,12}" placeholder="INV"></div>
+          <div class="field"><label>Agla Invoice No.</label><input id="invNext" type="number" min="1" step="1"></div>
+        </div>
+        <div class="field"><label>Terms &amp; Conditions (har line ek point)</label><textarea id="terms" rows="4" maxlength="2000"></textarea></div>
         <h3 style="margin-top:14px">Products &amp; Rates (₹ per mobile per year)</h3>
         <p class="muted" style="margin:-4px 0 8px">Ek product ke saare purposes ka ek hi payment aur ek hi license hota hai.</p>
         <div id="productRows"></div>
@@ -150,7 +163,15 @@
     <div class="field"><label>Product</label><select id="mProduct"></select></div>
     <div class="field"><label>Status</label><select id="mStatus"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div>
   </div>
-  <div class="field"><label>UTR / Payment Ref.</label><input id="mRef" maxlength="60"></div>
+  <div class="grid">
+    <div class="field"><label>Amount ₹ (invoice / received)</label><input id="mAmount" type="number" min="0" step="1" required></div>
+    <div class="field"><label>UTR / Payment Ref.</label><input id="mRef" maxlength="60"></div>
+  </div>
+  <div class="grid">
+    <div class="field"><label>Customer Name (invoice)</label><input id="mCustName" maxlength="80"></div>
+    <div class="field"><label>Customer Phone</label><input id="mCustPhone" inputmode="numeric" maxlength="13"></div>
+  </div>
+  <div class="field"><label>State</label><input id="mCustState" maxlength="40" list="stateList"></div>
   <div class="field"><label>Note</label><textarea id="mNote" rows="2" maxlength="300"></textarea></div>
   <p class="muted" id="mRate"></p>
   <div class="modal-actions"><button type="button" class="btn soft" data-close>Cancel</button><button class="btn green" type="submit">Save</button></div>
@@ -173,6 +194,14 @@
   <div id="detailBody"></div>
   <div class="modal-actions"><button type="button" class="btn green" data-close>Close</button></div>
 </div></div>
+<div id="delModal" class="modal"><form id="delForm" class="box delbox">
+  <h2>User / ID delete karein</h2>
+  <p id="delInfo" style="font-weight:700"></p>
+  <div class="warn">License (status, UTR, invoice no.) hat jayega. Agar ye user dobara Excel chalayega to wo phir se free user ki tarah shuru hoga.</div>
+  <label class="chk"><input type="checkbox" id="delEntries"> Iski saari upload entries aur suspicious alerts bhi delete karein (free entries ki ginti 0 ho jayegi - wapas nahi aayengi)</label>
+  <div class="modal-actions"><button type="button" class="btn soft" data-close>Cancel</button><button class="btn red" type="submit" id="delBtn">Delete</button></div>
+</form></div>
+<datalist id="stateList"><option>Rajasthan</option><option>Madhya Pradesh</option><option>Uttar Pradesh</option><option>Gujarat</option><option>Maharashtra</option><option>Haryana</option><option>Punjab</option><option>Bihar</option><option>Chhattisgarh</option><option>Jharkhand</option><option>Odisha</option><option>Karnataka</option><option>Telangana</option><option>Andhra Pradesh</option><option>Tamil Nadu</option><option>Kerala</option><option>West Bengal</option><option>Assam</option><option>Himachal Pradesh</option><option>Uttarakhand</option><option>Delhi</option></datalist>
 <datalist id="yearList"></datalist>
 
 <script type="module">
@@ -292,8 +321,8 @@ function card(r){
     <div><span class="purpose">${esc(r.title||`${r.product_label}: ${shortYear(r.fin_year)}`)}</span><span class="muted">${esc(r.breakdown||'')}</span></div>
     <div><strong>${used.toLocaleString('en-IN')} <small class="muted" style="display:inline">success</small></strong><span class="muted">${Number(r.failed_entries||0)} failed · free ${free}</span></div>
     <div><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span><span class="muted">${r.activated_at?'Active: '+fmt(r.activated_at):r.requested_at?'Request: '+fmt(r.requested_at):''}</span></div>
-    <div class="muted">${money(r.amount??prod(r.product).amount)}${r.user_utr&&r.license_status!=='active'?`<br><span class="utrtag">User UTR: ${esc(r.user_utr)}</span><br><small>${fmt(r.utr_submitted_at)}</small>`:''}${r.payment_ref?'<br>Paid UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
-    <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button></div>
+    <div class="muted">${money(r.amount??prod(r.product).amount)}${r.invoice_no?`<br><small>${esc(r.invoice_no)}</small>`:''}${r.customer_name?`<br>${esc(r.customer_name)}`:''}${r.user_utr&&r.license_status!=='active'?`<br><span class="utrtag">User UTR: ${esc(r.user_utr)}</span><br><small>${fmt(r.utr_submitted_at)}</small>`:''}${r.payment_ref?'<br>Paid UTR: '+esc(r.payment_ref):''}${r.admin_note?'<br>'+esc(r.admin_note):''}</div>
+    <div class="actions">${act}<button class="btn soft sm" onclick="showQr(${k})">QR</button><button class="btn inv sm" onclick="makeInvoice(${k})">Invoice</button><button class="btn soft sm" onclick="openLicense(${k},'${esc(r.license_status==='free'?'active':r.license_status)}')">Edit</button><button class="btn del sm" onclick="openDelete(${k})">Delete</button></div>
   </article>`;
 }
 
@@ -352,7 +381,7 @@ function licenseRows(rows){
   return rows.map(r=>({'Mobile / Login ID':r.mobile,'Product':r.product_label||prod(r.product).label||r.product,'Year':r.fin_year,
     'Status':String(r.license_status||'').toUpperCase(),'Success Entries':Number(r.success_entries||0),'Failed Entries':Number(r.failed_entries||0),
     'Breakdown':r.breakdown||'','Amount (₹)':Number(r.amount??prod(r.product).amount??0),'User UTR':r.user_utr||'','UTR Submitted':xdt(r.utr_submitted_at),
-    'Paid UTR / Ref':r.payment_ref||'','Activated At':xdt(r.activated_at),'Requested At':xdt(r.requested_at),'Last Upload':xdt(r.last_upload),'Note':r.admin_note||''}));
+    'Paid UTR / Ref':r.payment_ref||'','Invoice No.':r.invoice_no||'','Customer':r.customer_name||'','Customer Phone':r.customer_phone||'','State':r.customer_state||'','Activated At':xdt(r.activated_at),'Requested At':xdt(r.requested_at),'Last Upload':xdt(r.last_upload),'Note':r.admin_note||''}));
 }
 function entryRows(rows){
   return rows.map(r=>({'Time':xdt(r.created_at),'Mobile / Login ID':r.mobile,'Purpose':r.purpose,'Year':r.fin_year,'Application No.':r.app_no||'',
@@ -401,21 +430,109 @@ window.openLicense=(mobile='',product='',year='',status='active')=>{
   const row=state.summary.find(r=>r.mobile===mobile&&r.product===product&&r.fin_year===year)||{};
   $('mMobile').value=mobile;$('mProduct').value=product||state.products[0]?.code||'';$('mYear').value=year||currentFY();$('mStatus').value=status;
   $('mRef').value=row.payment_ref||row.user_utr||'';$('mNote').value=row.admin_note||'';
+  $('mAmount').value=Number(row.amount)>0?Number(row.amount):Number(prod($('mProduct').value).amount||0);
+  $('mCustName').value=row.customer_name||'';$('mCustPhone').value=row.customer_phone||'';$('mCustState').value=row.customer_state||'';
   $('licTitle').textContent=mobile?`Manage · ${mobile}`:'Activate ID';updateRate();$('licModal').classList.add('open');
 };
 function updateRate(){const p=prod($('mProduct').value);$('mRate').textContent=`${p.label||''} (${(p.purposes||[]).join(', ')}) rate: ${money(p.amount)} · एक mobile + product + year की एक ही ID बनेगी।`}
-$('mProduct').addEventListener('change',updateRate);
+$('mProduct').addEventListener('change',()=>{updateRate();$('mAmount').value=Number(prod($('mProduct').value).amount||0)});
 
-async function setLicense(mobile,product,year,status,ref=null,note=null){
-  const {error}=await client.rpc('upload_set_license',{p_mobile:mobile,p_product:product,p_year:year,p_status:status,p_payment_ref:ref,p_note:note});
+async function setLicense(mobile,product,year,status,ref=null,note=null,extra={}){
+  const {error}=await client.rpc('upload_set_license',{p_mobile:mobile,p_product:product,p_year:year,p_status:status,p_payment_ref:ref,p_note:note,
+    p_amount:extra.amount??null,p_customer_name:extra.name??null,p_customer_phone:extra.phone??null,p_customer_state:extra.state??null});
   if(error){msg(error.message);return false}
   msg(status==='active'?`${mobile} · ${prod(product).label||product}: ${shortYear(year)} ACTIVE`:`Status: ${status}`);await load(true);return true;
 }
 window.quickSet=async(m,p,y,s)=>{if(s==='inactive'&&!confirm(`${m} · ${prod(p).label||p}: ${shortYear(y)} ko deactivate karein?`))return;await setLicense(m,p,y,s)};
 $('licForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!e.currentTarget.reportValidity())return;
-  if(await setLicense($('mMobile').value.trim(),$('mProduct').value,$('mYear').value.trim(),$('mStatus').value,$('mRef').value.trim(),$('mNote').value.trim()))$('licModal').classList.remove('open');
+  if(await setLicense($('mMobile').value.trim(),$('mProduct').value,$('mYear').value.trim(),$('mStatus').value,$('mRef').value.trim(),$('mNote').value.trim(),
+     {amount:$('mAmount').value===''?null:Number($('mAmount').value),name:$('mCustName').value.trim(),phone:$('mCustPhone').value.trim(),state:$('mCustState').value.trim()}))$('licModal').classList.remove('open');
 });
+
+// ---------- DELETE ----------
+let delKey=null;
+window.openDelete=(m,p,y)=>{
+  delKey={m,p,y};$('delEntries').checked=false;
+  const r=state.summary.find(x=>x.mobile===m&&x.product===p&&x.fin_year===y)||{};
+  $('delInfo').textContent=`${m} · ${prod(p).label||p}: ${shortYear(y)} · ${String(r.license_status||'free').toUpperCase()} · ${Number(r.success_entries||0)} entries`;
+  $('delModal').classList.add('open');
+};
+$('delForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!delKey)return;
+  const all=$('delEntries').checked;
+  if(all&&!confirm(`${delKey.m} ki saari entries bhi hamesha ke liye delete hongi. Pakka?`))return;
+  $('delBtn').disabled=true;
+  const {data,error}=await client.rpc('upload_delete_license',{p_mobile:delKey.m,p_product:delKey.p,p_year:delKey.y,p_delete_entries:all});
+  $('delBtn').disabled=false;
+  if(error){msg(error.message);return}
+  $('delModal').classList.remove('open');
+  msg(`Delete ho gaya · license ${data?.licenses??0}, entries ${data?.entries??0}`);delKey=null;await load(true);
+});
+
+// ---------- INVOICE ----------
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nice=v=>{const d=String(v||'').replace(/\D/g,'');return d.length===10?`+91 ${d.slice(0,5)} ${d.slice(5)}`:(v||'')};
+window.makeInvoice=async(m,p,y)=>{
+  const w=window.open('','_blank');
+  if(!w){msg('Popup block hai - browser mein is site ke popups allow karein');return}
+  w.document.write('<p style="font-family:Arial;padding:20px">Invoice ban raha hai...</p>');
+  const {data:lic,error}=await client.rpc('upload_assign_invoice',{p_mobile:m,p_product:p,p_year:y});
+  if(error){w.close();msg(error.message);return}
+  await load(true);
+  const r=state.summary.find(x=>x.mobile===m&&x.product===p&&x.fin_year===y)||{};
+  const st=state.settings,pr=prod(p),amount=Number(lic.amount??r.amount??pr.amount??0);
+  const paid=lic.status==='active';
+  const link=(()=>{if(!st.upi_id||!(amount>0))return '';const enc=encodeURIComponent;
+    const note=[String(pr.label||'').replace(/\//g,'-'),shortYear(y),m,lic.invoice_no].filter(Boolean).join(' ');
+    return `upi://pay?pa=${st.upi_id.trim()}&pn=${enc(st.payee_name||'')}&am=${amount.toFixed(2)}&cu=INR&tn=${enc(note)}`})();
+  const qr=link?await QRCode.toDataURL(link,{width:420,margin:1}):'';
+  const desc=`${String(pr.label||p).split('/').join(' / ')} ID, YEAR ${shortYear(y)}`;
+  const terms=String(st.terms||'').split(/\r?\n/).map(t=>t.trim()).filter(Boolean);
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(lic.invoice_no)} · ${esc(m)}</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef1f6;font-family:"Segoe UI",Arial,"Noto Sans",sans-serif;color:#1d2b45}
+.page{width:210mm;min-height:297mm;margin:16px auto;background:#fff;padding:16mm 15mm;border:1px solid #d9e0ea}
+.row{display:flex;justify-content:space-between;gap:16px}.biz{font-size:26px;font-weight:800;color:#1d2b45}
+.title{text-align:right}.title h1{margin:0;font-size:28px;letter-spacing:1px;color:#15245b}.title div{font-size:13px;font-weight:700}
+.badge{display:inline-block;margin-top:8px;padding:5px 14px;border-radius:14px;font-size:12px;font-weight:800;letter-spacing:.5px}
+.badge.paid{background:#dcf8e7;color:#08753b}.badge.pending{background:#fff2cd;color:#9a6800}.badge.inactive{background:#eceff3;color:#53617a}
+hr{border:0;border-top:1px solid #d9e0ea;margin:18px 0}.party{font-size:13.5px;line-height:1.5}.party b{font-size:14px}.right{text-align:right}
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:14px}th{background:#f2f5fa;text-align:left;padding:10px;border-bottom:1px solid #d9e0ea}
+td{padding:11px 10px;border-bottom:1px solid #e6ebf2}th:last-child,td:last-child{text-align:right}
+.total{text-align:right;font-size:19px;font-weight:800;margin:14px 0 4px}
+.pay{display:flex;gap:18px;align-items:center;border:1.5px dashed #b9c4d6;border-radius:12px;padding:12px 14px;margin-top:18px}
+.pay img{width:150px;height:150px}.pay h3{margin:0 0 6px;font-size:16px}.pay p{margin:3px 0;font-size:13px}
+.sign{text-align:right;margin-top:30px;font-size:13px}.sign b{display:block;font-size:14px}
+.terms h4{margin:0 0 6px;font-size:13px;letter-spacing:.5px}.terms ol{margin:0;padding-left:18px;font-size:12.5px;line-height:1.6}
+.tools{position:fixed;top:12px;right:12px;display:flex;gap:8px}.tools button{border:0;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer;background:#15245b;color:#fff}
+.tools button.l{background:#fff;color:#15245b;border:1px solid #c9d2e0}
+@media print{body{background:#fff}.page{margin:0;border:0;width:auto;min-height:0;padding:10mm}.tools{display:none}}
+@page{size:A4;margin:0}
+</style></head><body>
+<div class="tools"><button onclick="print()">🖨 Print / Save PDF</button><button class="l" onclick="close()">Close</button></div>
+<div class="page">
+  <div class="row"><div class="biz">${esc(st.biz_name||st.payee_name||'')}</div>
+    <div class="title"><h1>INVOICE</h1><div>Invoice #: ${esc(lic.invoice_no)}</div><div>Date: ${esc(lic.invoice_date||'')}</div>
+      <span class="badge ${paid?'paid':lic.status==='inactive'?'inactive':'pending'}">${paid?'PAID':lic.status==='inactive'?'INACTIVE':'PAYMENT PENDING'}</span></div></div>
+  <hr>
+  <div class="row">
+    <div class="party"><b>From:</b><br>${esc(st.biz_name||st.payee_name||'')}<br>${esc(st.biz_address||'').replace(/\n/g,'<br>')}${st.biz_phones?`<br>Phone: ${esc(st.biz_phones)}`:''}</div>
+    <div class="party right"><b>To (Customer):</b><br>${lic.customer_name?esc(lic.customer_name)+'<br>':''}${lic.customer_phone?esc(nice(lic.customer_phone))+'<br>':''}${lic.customer_state?'State: '+esc(lic.customer_state)+'<br>':''}Login ID: ${esc(m)}</div>
+  </div>
+  <hr>
+  <table><thead><tr><th>Description / Purpose</th><th>Amount</th></tr></thead><tbody>
+    <tr><td>${esc(desc)}</td><td>${inr(amount)}</td></tr>
+    ${paid&&lic.payment_ref?`<tr><td style="color:#53617a">Payment received · UTR ${esc(lic.payment_ref)}${lic.activated_at?' · '+esc(new Date(lic.activated_at).toLocaleDateString('en-IN')):''}</td><td style="color:#08753b">${inr(amount)}</td></tr>`:''}
+  </tbody></table>
+  <div class="total">Total Invoice Amount: Rs. ${Number(amount).toLocaleString('en-IN',{minimumFractionDigits:2})}</div>
+  ${paid?`<div class="right" style="font-size:13px;color:#08753b;font-weight:700">Balance Due: Rs. 0.00</div>`:`<div class="right" style="font-size:13px;color:#9a6800;font-weight:700">Balance Due: Rs. ${Number(amount).toLocaleString('en-IN',{minimumFractionDigits:2})}</div>`}
+  ${qr?`<div class="pay"><img src="${qr}" alt="UPI QR"><div><h3>${paid?'UPI QR':'Scan &amp; Pay'} · ${inr(amount)}</h3><p>UPI ID: <b>${esc(st.upi_id)}</b></p><p>${esc(st.payee_name||'')}</p><p style="color:#53617a">Note mein Login ID ${esc(m)} aur invoice no. apne aap aata hai.</p></div></div>`:''}
+  <div class="sign"><b>Authorized Signatory</b>Digital invoice · signature not required.</div>
+  ${terms.length?`<hr><div class="terms"><h4>TERMS &amp; CONDITIONS</h4><ol>${terms.map(t=>`<li>${esc(t)}</li>`).join('')}</ol></div>`:''}
+</div></body></html>`;
+  w.document.open();w.document.write(html);w.document.close();
+};
 
 let lastLink='';
 window.showQr=async(m,p,y)=>{
@@ -428,6 +545,8 @@ $('copyLink').onclick=async()=>{if(!lastLink)return;try{await navigator.clipboar
 
 function fillSettings(){
   const s=state.settings;$('upiId').value=s.upi_id||'';$('payeeName').value=s.payee_name||'';$('whatsappNo').value=s.whatsapp_no||'';$('freeLimit').value=s.free_limit??18;
+  $('bizName').value=s.biz_name||'';$('bizAddress').value=s.biz_address||'';$('bizPhones').value=s.biz_phones||'';
+  $('invPrefix').value=s.invoice_prefix||'INV';$('invNext').value=s.invoice_next??1001;$('terms').value=s.terms||'';
   $('productRows').innerHTML=state.products.map(p=>`<div class="prod-row" data-code="${esc(p.code)}">
     <div class="field"><label>${esc(p.code)} · Purposes: ${esc((p.purposes||[]).join(', '))}</label><input data-k="label" value="${esc(p.label)}" required></div>
     <div class="field"><label>Rate ₹</label><input data-k="amount" type="number" min="0" step="1" value="${Number(p.amount||0)}" required></div>
@@ -439,7 +558,10 @@ $('previewProduct').addEventListener('change',renderPreview);
 $('settingsForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!e.currentTarget.reportValidity())return;
   const now=new Date().toISOString();
-  const {error:se}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),updated_at:now}).eq('id',1);
+  const {error:se}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),
+    biz_name:$('bizName').value.trim(),biz_address:$('bizAddress').value.trim(),biz_phones:$('bizPhones').value.trim(),
+    invoice_prefix:($('invPrefix').value.trim()||'INV').toUpperCase(),invoice_next:Math.max(1,Number($('invNext').value)||1001),
+    terms:$('terms').value.trim(),updated_at:now}).eq('id',1);
   if(se){msg(se.message);return}
   for(const row of document.querySelectorAll('#productRows .prod-row')){
     const get=k=>row.querySelector(`[data-k="${k}"]`);
