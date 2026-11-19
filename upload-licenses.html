@@ -45,6 +45,31 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .board{position:relative;z-index:6}
+    #listPanel.locked{display:flex;flex-direction:column}
+    #listPanel.locked .toolbar{flex:0 0 auto}
+    #listPanel.locked #list{flex:1 1 auto;overflow:auto;min-height:0;overscroll-behavior:contain}
+    #settingsPanel.locked{overflow:auto;overscroll-behavior:contain}
+    .board .tabs{margin:10px 0}
+    .nw{white-space:nowrap}
+    .rpill{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:800;white-space:nowrap}
+    .rpill.s{background:#dcf8e7;color:#08753b}.rpill.f{background:#fee8e7;color:#b42720}
+    .etable{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+    .etable th{position:sticky;top:0;z-index:1;background:#eef2f8;white-space:nowrap}
+    .etable td{vertical-align:top;padding:7px 8px}
+    .etable td.app{font-family:Consolas,"Courier New",monospace;font-size:12px;white-space:nowrap}
+    .etable td.rem{min-width:220px;color:#53617a;line-height:1.4}
+    .etable tr.f td{background:#fff8f7}
+    .etable tbody tr:hover td{background:#f2f6ff}
+    #entBody{border:1px solid #e1e7ef;border-radius:9px}
+    @media(max-width:760px){
+      .board .top{padding:10px 12px}.board .top h1{font-size:15px}.board .top p{font-size:10px}
+      .board .top-actions .btn{padding:7px 9px;font-size:12px}
+      .board .tabs{gap:5px;margin:8px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.board .tabs::-webkit-scrollbar{display:none}
+      .board .tab{white-space:nowrap;padding:7px 10px;font-size:12px}
+      .board .stats{grid-template-columns:repeat(3,1fr)!important;gap:5px;margin-bottom:6px}
+      .board .stat{padding:6px 8px}.board .stat small{font-size:10px}.board .stat strong{font-size:15px;margin-top:1px}
+    }
     .idrow{display:grid;grid-template-columns:1.1fr .6fr 1.6fr .9fr auto;gap:10px;align-items:center;border:1px solid #e1e7ef;border-radius:10px;padding:10px;cursor:pointer}
     .idrow:hover{border-color:#168447;box-shadow:0 2px 10px #16844722}.idrow strong,.idrow span{display:block}
     .chips{display:flex;gap:5px;flex-wrap:wrap}.chip{font-size:11px;padding:3px 8px;border-radius:12px;background:#eef1f5;color:#344256}
@@ -113,10 +138,18 @@
     html.krp-dark-theme details summary{color:#9fb3c4}
     html.krp-dark-theme .qr .amt{color:#f1f5f9}
     html.krp-dark-theme #delInfo{color:#e5edf5}
+    html.krp-dark-theme .rpill.s{background:#0d3b28;color:#6ee7b7}html.krp-dark-theme .rpill.f{background:#4c1714;color:#fca5a5}
+    html.krp-dark-theme .etable th{background:#0d1e28!important;color:#9fb3c4}
+    html.krp-dark-theme .etable td{border-color:#21384a;color:#d8e2e8}
+    html.krp-dark-theme .etable td.rem{color:#9fb3c4}
+    html.krp-dark-theme .etable tr.f td{background:#1d1418}
+    html.krp-dark-theme .etable tbody tr:hover td{background:#132a3a}
+    html.krp-dark-theme #entBody{border-color:#284257}
 </style>
 </head>
 <body>
 <main class="wrap" id="ulApp">
+  <div class="board" id="board">
   <header class="top">
     <div><h1>Admin · Upload Licenses</h1><p id="adminIdentity">Admin verification...</p></div>
     <div class="top-actions">
@@ -144,6 +177,7 @@
     <div class="stat money"><small>Payment Received</small><strong id="sReceived">₹0</strong></div>
     <div class="stat due"><small>Pending Amount</small><strong id="sDue">₹0</strong></div>
   </section>
+  </div>
 
   <section class="panel" id="listPanel">
     <div class="toolbar">
@@ -277,6 +311,8 @@ const state={tab:'pending',summary:[],entries:[],settings:{},products:[],alerts:
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=v=>v?new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)):'—';
+const fmtS=v=>v?new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'2-digit',hour:'numeric',minute:'2-digit'}).format(new Date(v)):'—';
+const resPill=ok=>`<span class="rpill ${ok?'s':'f'}">${ok?'Success':'Failed'}</span>`;
 const money=v=>v==null?'—':'₹'+Number(v).toLocaleString('en-IN');
 const shortYear=y=>{const m=String(y||'').match(/^(\d{4})-(\d{4})$/);return m?`${m[1].slice(2)}-${m[2].slice(2)}`:y||''};
 const prod=code=>state.products.find(p=>p.code===code)||{};
@@ -343,6 +379,7 @@ function filtered(rows,isEntry=false){
 }
 
 function render(){
+  fitSoon();
   const s=state.summary;
   $('sPending').textContent=s.filter(r=>r.license_status==='pending').length;
   $('sActive').textContent=s.filter(r=>r.license_status==='active').length;
@@ -423,7 +460,7 @@ window.showDetail=async(mobile,product,year)=>{
     <h3>License</h3>${lic.length?`<table><thead><tr><th>Product · Year</th><th>Status</th><th>Success</th><th>Failed</th><th>User UTR</th><th>Paid UTR</th><th>Last upload</th></tr></thead><tbody>${lic.map(r=>`<tr><td>${esc(r.title)}</td><td><span class="pill ${esc(r.license_status)}">${esc(r.license_status)}</span></td><td>${r.success_entries}</td><td>${r.failed_entries}</td><td>${esc(r.user_utr||'')}</td><td>${esc(r.payment_ref||'')}</td><td>${fmt(r.last_upload)}</td></tr>`).join('')}</tbody></table>`:'<p class="muted">Koi license nahi</p>'}
     <h3>Din-wise successful entries</h3><p class="muted">${Object.entries(perDay).slice(0,20).map(([d,n])=>`${d}: <b>${n}</b>`).join(' · ')||'—'}</p>
     <h3>Suspicious events</h3>${(evs.data||[]).length?`<table><thead><tr><th>Time</th><th>Type</th><th>Detail</th></tr></thead><tbody>${evs.data.map(e=>`<tr><td>${fmt(e.created_at)}</td><td>${esc(e.kind)}</td><td>${esc(e.detail||'')}</td></tr>`).join('')}</tbody></table>`:'<p class="muted">Koi event nahi</p>'}
-    <h3>Recent entries (${entries.length})</h3><div style="max-height:320px;overflow:auto"><table><thead><tr><th>Time</th><th>Purpose</th><th>Year</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${entries.map(r=>`<tr><td>${fmt(r.created_at)}</td><td>${esc(r.purpose)}</td><td>${esc(shortYear(r.fin_year))}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table></div>`;
+    <h3>Recent entries (${entries.length})</h3><div style="max-height:320px;overflow:auto"><table class="etable"><thead><tr><th>Time</th><th>Purpose</th><th>Year</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${entries.map(r=>`<tr class="${r.success?'s':'f'}"><td class="nw">${fmtS(r.created_at)}</td><td class="purpose nw">${esc(r.purpose)}</td><td class="nw">${esc(shortYear(r.fin_year))}</td><td class="app">${esc(r.app_no)}</td><td>${resPill(r.success)}</td><td class="app">${esc(r.claim_id||'—')}</td><td class="rem">${esc(r.remark)}</td></tr>`).join('')}</tbody></table></div>`;
 };
 function alertRows(rows){
   return rows.map(a=>({'Severity':String(a.severity).toUpperCase(),'Alert':a.title,'Mobile / Login ID':a.mobile,'Product':a.product?(prod(a.product).label||a.product):'','Year':a.fin_year||'',
@@ -473,7 +510,7 @@ async function loadEntries(){
   if(error){$('entBody').innerHTML=`<div class="empty">${esc(error.message)}</div>`;return}
   ent.rows.push(...(data||[]));ent.done=(data||[]).length<ent.page;
   const months=Number(state.settings.retention_months||0);
-  $('entBody').innerHTML=ent.rows.length?`<table><thead><tr><th>Time</th><th>Purpose</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${ent.rows.map(r=>`<tr><td>${fmt(r.created_at)}</td><td class="purpose">${esc(r.purpose)}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table>${ent.done&&months?`<p class="muted" style="text-align:center">${months} mahine se purani detail entries apne aap hat jaati hain (ginti upar bani rehti hai).</p>`:''}`:`<div class="empty">Detail entries nahi hain${months?` (${months} mahine se purani hat chuki hongi)`:''}. Ginti upar dikh rahi hai.</div>`;
+  $('entBody').innerHTML=ent.rows.length?`<table class="etable"><thead><tr><th>Time</th><th>Purpose</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${ent.rows.map(r=>`<tr class="${r.success?'s':'f'}"><td class="nw">${fmtS(r.created_at)}</td><td class="purpose nw">${esc(r.purpose)}</td><td class="app">${esc(r.app_no)}</td><td>${resPill(r.success)}</td><td class="app">${esc(r.claim_id||'—')}</td><td class="rem">${esc(r.remark)}</td></tr>`).join('')}</tbody></table>${ent.done&&months?`<p class="muted" style="text-align:center">${months} mahine se purani detail entries apne aap hat jaati hain (ginti upar bani rehti hai).</p>`:''}`:`<div class="empty">Detail entries nahi hain${months?` (${months} mahine se purani hat chuki hongi)`:''}. Ginti upar dikh rahi hai.</div>`;
   $('entMore').classList.toggle('hidden',ent.done);
 }
 $('entMore').onclick=loadEntries;
@@ -740,6 +777,21 @@ function selectTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.t
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
 $('showAcked').addEventListener('change',render);
 {const t=new URLSearchParams(location.search).get('tab');if(t&&document.querySelector(`.tab[data-tab="${t}"]`)){state.tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t))}}
+// Upar ka board (header + tabs + stats) lock; sirf neeche ka panel scroll hoga
+function fitPanes(){
+  const panes=[$('listPanel'),$('settingsPanel')];
+  window.scrollTo(0,0);
+  for(const p of panes){
+    if(p.classList.contains('hidden'))continue;
+    const top=p.getBoundingClientRect().top;
+    const h=Math.floor(window.innerHeight-top-12);
+    if(h>=260){p.classList.add('locked');p.style.height=h+'px'}
+    else{p.classList.remove('locked');p.style.height=''}
+  }
+}
+let fitT;const fitSoon=()=>{clearTimeout(fitT);fitT=setTimeout(fitPanes,60)};
+window.addEventListener('resize',fitSoon);
+new MutationObserver(fitSoon).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 boot();
 </script>
 </body></html>
