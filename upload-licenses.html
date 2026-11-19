@@ -45,6 +45,14 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .idrow{display:grid;grid-template-columns:1.1fr .6fr 1.6fr .9fr auto;gap:10px;align-items:center;border:1px solid #e1e7ef;border-radius:10px;padding:10px;cursor:pointer}
+    .idrow:hover{border-color:#168447;box-shadow:0 2px 10px #16844722}.idrow strong,.idrow span{display:block}
+    .chips{display:flex;gap:5px;flex-wrap:wrap}.chip{font-size:11px;padding:3px 8px;border-radius:12px;background:#eef1f5;color:#344256}
+    .chip b.ok{color:#08753b}.chip b.bad{color:#b42720}
+    .sbig{font-size:16px;font-weight:800}.sbig .ok{color:#08753b}.sbig .bad{color:#b42720}
+    .stor{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.stor div{background:#f5f7fb;border-radius:8px;padding:8px}.stor small{display:block;color:#68758b;font-size:11px}
+    .meter{height:9px;border-radius:6px;background:#e7ebf1;overflow:hidden;margin:6px 0}.meter i{display:block;height:100%;background:#168447}
+    @media(max-width:760px){.idrow{grid-template-columns:1fr 1fr}.idrow .chips{grid-column:1/-1}}
     .btn.del{background:#fff;color:#b42720;border:1px solid #f1b9b5}.btn.inv{background:#15245b;color:#fff}
     .delbox{width:min(440px,100%)}.delbox .warn{background:#fee8e7;color:#8a1f19;border-radius:9px;padding:10px;font-size:12.5px;line-height:1.5}
     .delbox label.chk{display:flex;gap:8px;align-items:flex-start;margin:12px 0;font-size:13px;font-weight:700}
@@ -67,7 +75,7 @@
     html.krp-dark-theme .toolbar,html.krp-dark-theme td{border-color:#294652}html.krp-dark-theme th{background:#0d1e28;color:#91a5b2}
     html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
     html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
-    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .btn.del{background:#10232e;color:#ff9b94;border-color:#6b2a27}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
+    html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .btn.del{background:#10232e;color:#ff9b94;border-color:#6b2a27}html.krp-dark-theme .idrow{border-color:#294652;background:#10232e}html.krp-dark-theme .chip,html.krp-dark-theme .stor div{background:#162d39;color:#cfdde4}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
   </style>
 </head>
 <body>
@@ -86,7 +94,7 @@
   <div class="tabs">
     <button class="btn tab active" data-tab="pending">Payment Pending</button>
     <button class="btn tab" data-tab="all">All Users</button>
-    <button class="btn tab" data-tab="entries">Recent Entries</button>
+    <button class="btn tab" data-tab="entries">Entries (ID-wise)</button>
     <button class="btn tab" data-tab="alerts">⚠ Alerts<span class="badge hidden" id="alertBadge">0</span></button>
     <button class="btn tab" data-tab="settings">Rates · UPI · QR</button>
   </div>
@@ -150,6 +158,12 @@
         <div class="field"><label>Product</label><select id="previewProduct"></select></div>
         <div class="qr" id="previewQr"><div class="empty">UPI ID aur rate save karein</div></div>
         <p class="muted">User ke QR mein note ke saath product, year aur mobile bhi jata hai, taaki aap payment pehchaan sakein.</p>
+        <h3 style="margin-top:18px">Storage &amp; Auto-delete</h3>
+        <div id="storageBox" class="muted">Loading...</div>
+        <div class="field" style="margin-top:8px"><label>Detail entries kitne mahine baad apne aap hatein (0 = kabhi nahi)</label>
+          <input id="retention" type="number" min="0" max="120" step="1" form="settingsForm"></div>
+        <p class="muted" style="margin-top:-2px">Sirf andar ki detail rows (application no., remark) hatti hain. Har ID ka success/failed total aur free entries ki ginti <b>hamesha</b> rehti hai.</p>
+        <div class="modal-actions" style="justify-content:flex-start"><button class="btn soft" type="button" id="purgeBtn">Purani entries abhi saaf karein</button><button class="btn soft" type="button" id="storRefresh">↻</button></div>
       </div>
     </div>
   </section>
@@ -197,11 +211,22 @@
 <div id="delModal" class="modal"><form id="delForm" class="box delbox">
   <h2>User / ID delete karein</h2>
   <p id="delInfo" style="font-weight:700"></p>
-  <div class="warn">License (status, UTR, invoice no.) hat jayega. Agar ye user dobara Excel chalayega to wo phir se free user ki tarah shuru hoga.</div>
-  <label class="chk"><input type="checkbox" id="delEntries"> Iski saari upload entries aur suspicious alerts bhi delete karein (free entries ki ginti 0 ho jayegi - wapas nahi aayengi)</label>
+  <div class="warn">License (status, UTR, invoice no.) hat jayega. Free entries ki ginti <b>nahi</b> hategi - ye ID is product + year mein dobara free entries nahi le sakti; Excel chalane par payment maangega.</div>
+  <label class="chk"><input type="checkbox" id="delEntries"> Iski detail upload entries aur suspicious alerts bhi delete karein (success/failed ki ginti bani rahegi)</label>
   <div class="modal-actions"><button type="button" class="btn soft" data-close>Cancel</button><button class="btn red" type="submit" id="delBtn">Delete</button></div>
 </form></div>
 <datalist id="stateList"><option>Rajasthan</option><option>Madhya Pradesh</option><option>Uttar Pradesh</option><option>Gujarat</option><option>Maharashtra</option><option>Haryana</option><option>Punjab</option><option>Bihar</option><option>Chhattisgarh</option><option>Jharkhand</option><option>Odisha</option><option>Karnataka</option><option>Telangana</option><option>Andhra Pradesh</option><option>Tamil Nadu</option><option>Kerala</option><option>West Bengal</option><option>Assam</option><option>Himachal Pradesh</option><option>Uttarakhand</option><option>Delhi</option></datalist>
+<div id="entModal" class="modal"><div class="box detailbox">
+  <h2 id="entTitle">Entries</h2>
+  <div class="chips" id="entTotals" style="margin-bottom:8px"></div>
+  <div class="filters" style="margin-bottom:8px">
+    <select id="entPurpose"><option value="">All Purpose</option></select>
+    <select id="entResult"><option value="">Success + Failed</option><option value="1">Sirf Success</option><option value="0">Sirf Failed</option></select>
+    <button class="btn green" type="button" id="entExport">⬇ Excel</button>
+  </div>
+  <div id="entBody" style="max-height:60vh;overflow:auto"></div>
+  <div class="modal-actions"><button type="button" class="btn soft" id="entMore">Aur dikhayein</button><button type="button" class="btn green" data-close>Close</button></div>
+</div></div>
 <datalist id="yearList"></datalist>
 
 <script type="module">
@@ -254,7 +279,7 @@ async function boot(){
 async function load(silent=false){
   const [sum,ent,set,pro,alr]=await Promise.all([
     client.from('upload_summary').select('*').order('last_upload',{ascending:false,nullsFirst:false}),
-    client.from('upload_entries').select('*').order('created_at',{ascending:false}).limit(300),
+    client.from('upload_entry_totals').select('*').order('last_at',{ascending:false}),
     client.from('upload_settings').select('*').eq('id',1).maybeSingle(),
     client.from('upload_products').select('*').order('sort_order').order('code'),
     client.rpc('upload_get_alerts')
@@ -262,7 +287,7 @@ async function load(silent=false){
   state.alerts=alr.error?[]:(alr.data||[]);
   const err=sum.error||ent.error||set.error||pro.error;
   if(err){msg(/does not exist|schema cache|column/i.test(err.message)?'Supabase mein naya supabase-upload-licenses.sql run karein.':err.message);return}
-  state.summary=sum.data||[];state.entries=ent.data||[];state.settings=set.data||{};state.products=pro.data||[];
+  state.summary=sum.data||[];state.totals=ent.data||[];state.settings=set.data||{};state.products=pro.data||[];
   const opts=state.products.map(p=>`<option value="${esc(p.code)}">${esc(p.label)}${p.active?'':' (off)'}</option>`).join('');
   const keep=(id,first)=>{const v=$(id).value;$(id).innerHTML=first+opts;if([...$(id).options].some(o=>o.value===v))$(id).value=v};
   keep('fProduct','<option value="">All Products</option>');keep('mProduct','');keep('previewProduct','');
@@ -290,7 +315,7 @@ function render(){
   $('exportBtn').classList.toggle('hidden',state.tab==='settings');
   const settings=state.tab==='settings';
   $('listPanel').classList.toggle('hidden',settings);$('settingsPanel').classList.toggle('hidden',!settings);
-  if(settings){renderPreview();return}
+  if(settings){renderPreview();loadStorage();return}
   $('ackToggle').classList.toggle('hidden',state.tab!=='alerts');
   if(state.tab==='alerts'){
     $('listTitle').textContent='Suspicious Activity (last 30 days)';
@@ -299,9 +324,9 @@ function render(){
     return;
   }
   if(state.tab==='entries'){
-    $('listTitle').textContent='Recent Entries (last 300)';
-    const rows=filtered(state.entries,true);
-    $('list').innerHTML=rows.length?`<div style="overflow:auto"><table><thead><tr><th>Time</th><th>Mobile</th><th>Purpose</th><th>Year</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${fmt(r.created_at)}</td><td>${esc(r.mobile)}</td><td class="purpose">${esc(r.purpose)}</td><td>${esc(shortYear(r.fin_year))}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">कोई entry नहीं मिली</div>';
+    $('listTitle').textContent='Entries · ID-wise (click karke andar dekhein)';
+    const groups=idGroups(filtered(state.totals||[],true));
+    $('list').innerHTML=groups.length?groups.map(idRow).join(''):'<div class="empty">कोई entry नहीं मिली</div>';
     return;
   }
   $('listTitle').textContent=state.tab==='pending'?'Payment Pending':'All Users';
@@ -368,6 +393,93 @@ function alertRows(rows){
     'Kitni baar':Number(a.cnt),'Pehli baar':xdt(a.first_seen),'Aakhri baar':xdt(a.last_seen),'Detail':a.detail||'','Matlab':a.message,'Dekha':a.acked?'Haan':'Nahi'}));
 }
 
+// ---------- ID-wise entries ----------
+function idGroups(rows){
+  const m=new Map();
+  for(const t of rows){
+    const k=`${t.mobile}|${t.fin_year}`;
+    const g=m.get(k)||{mobile:t.mobile,fin_year:t.fin_year,s:0,f:0,last:null,first:null,by:{}};
+    g.s+=Number(t.success_count||0);g.f+=Number(t.failed_count||0);
+    g.by[t.purpose]={s:Number(t.success_count||0),f:Number(t.failed_count||0)};
+    if(!g.last||t.last_at>g.last)g.last=t.last_at;if(!g.first||t.first_at<g.first)g.first=t.first_at;
+    m.set(k,g);
+  }
+  return [...m.values()].sort((a,b)=>String(b.last).localeCompare(String(a.last)));
+}
+function idRow(g){
+  return `<article class="idrow" onclick="openEntries('${esc(g.mobile)}','${esc(g.fin_year)}')">
+    <div><strong>${esc(g.mobile)}</strong><span class="muted">Last: ${fmt(g.last)}</span></div>
+    <div><strong>${esc(shortYear(g.fin_year))}</strong><span class="muted">Year</span></div>
+    <div class="chips">${Object.entries(g.by).sort().map(([p,v])=>`<span class="chip">${esc(p)}: <b class="ok">${v.s}</b> / <b class="bad">${v.f}</b></span>`).join('')}</div>
+    <div class="sbig"><span class="ok">${g.s.toLocaleString('en-IN')}</span> <small class="muted" style="display:inline">success</small><br><span class="bad">${g.f.toLocaleString('en-IN')}</span> <small class="muted" style="display:inline">failed</small></div>
+    <div><button class="btn soft sm" type="button">Entries ›</button></div>
+  </article>`;
+}
+const ent={mobile:'',year:'',rows:[],done:false,page:100};
+window.openEntries=async(mobile,year)=>{
+  Object.assign(ent,{mobile,year,rows:[],done:false});
+  const g=idGroups((state.totals||[]).filter(t=>t.mobile===mobile&&t.fin_year===year))[0]||{by:{},s:0,f:0};
+  $('entTitle').textContent=`Entries · ${mobile} · ${shortYear(year)}`;
+  $('entTotals').innerHTML=`<span class="chip">Total: <b class="ok">${g.s}</b> success / <b class="bad">${g.f}</b> failed</span>`+Object.entries(g.by).sort().map(([p,v])=>`<span class="chip">${esc(p)}: <b class="ok">${v.s}</b> / <b class="bad">${v.f}</b></span>`).join('');
+  $('entPurpose').innerHTML='<option value="">All Purpose</option>'+Object.keys(g.by).sort().map(p=>`<option>${esc(p)}</option>`).join('');
+  $('entResult').value='';$('entBody').innerHTML='<div class="empty">Loading...</div>';$('entModal').classList.add('open');
+  await loadEntries();
+};
+function entQuery(from,to){
+  let q=client.from('upload_entries').select('*').eq('mobile',ent.mobile).eq('fin_year',ent.year).order('created_at',{ascending:false});
+  if($('entPurpose').value)q=q.eq('purpose',$('entPurpose').value);
+  if($('entResult').value!=='')q=q.eq('success',$('entResult').value==='1');
+  return q.range(from,to);
+}
+async function loadEntries(){
+  const {data,error}=await entQuery(ent.rows.length,ent.rows.length+ent.page-1);
+  if(error){$('entBody').innerHTML=`<div class="empty">${esc(error.message)}</div>`;return}
+  ent.rows.push(...(data||[]));ent.done=(data||[]).length<ent.page;
+  const months=Number(state.settings.retention_months||0);
+  $('entBody').innerHTML=ent.rows.length?`<table><thead><tr><th>Time</th><th>Purpose</th><th>Application No.</th><th>Result</th><th>Claim ID</th><th>Remark</th></tr></thead><tbody>${ent.rows.map(r=>`<tr><td>${fmt(r.created_at)}</td><td class="purpose">${esc(r.purpose)}</td><td>${esc(r.app_no)}</td><td class="${r.success?'ok':'bad'}">${r.success?'Success':'Failed'}</td><td>${esc(r.claim_id)}</td><td class="muted">${esc(r.remark)}</td></tr>`).join('')}</tbody></table>${ent.done&&months?`<p class="muted" style="text-align:center">${months} mahine se purani detail entries apne aap hat jaati hain (ginti upar bani rehti hai).</p>`:''}`:`<div class="empty">Detail entries nahi hain${months?` (${months} mahine se purani hat chuki hongi)`:''}. Ginti upar dikh rahi hai.</div>`;
+  $('entMore').classList.toggle('hidden',ent.done);
+}
+$('entMore').onclick=loadEntries;
+['entPurpose','entResult'].forEach(id=>$(id).addEventListener('change',()=>{ent.rows=[];ent.done=false;$('entBody').innerHTML='<div class="empty">Loading...</div>';loadEntries()}));
+$('entExport').onclick=async()=>{
+  const all=[];for(let f=0;f<100000;f+=1000){const {data,error}=await entQuery(f,f+999);if(error){msg(error.message);return}all.push(...(data||[]));if(!data||data.length<1000)break}
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,sheet(entryRows(all)),'Entries');
+  XLSX.writeFile(wb,`KRP_Entries_${ent.mobile}_${shortYear(ent.year)}.xlsx`);
+};
+function totalsRows(groups){
+  const purposes=[...new Set(groups.flatMap(g=>Object.keys(g.by)))].sort();
+  return groups.map(g=>{const o={'Mobile / Login ID':g.mobile,'Year':g.fin_year,'Total Success':g.s,'Total Failed':g.f};
+    purposes.forEach(p=>{o[`${p} Success`]=g.by[p]?.s||0;o[`${p} Failed`]=g.by[p]?.f||0});o['Pehli entry']=xdt(g.first);o['Aakhri entry']=xdt(g.last);return o});
+}
+
+// ---------- Storage ----------
+const bytes=n=>{n=Number(n||0);return n>1048576?(n/1048576).toFixed(1)+' MB':(n/1024).toFixed(0)+' KB'};
+async function loadStorage(){
+  const {data:d,error}=await client.rpc('upload_storage_stats');
+  if(error){$('storageBox').textContent=error.message;return}
+  const lim=500*1048576,db=Number(d.database_bytes||0),pct=Math.min(100,db/lim*100);
+  const per=d.entries_rows?Math.round(d.entries_bytes/d.entries_rows):220;
+  $('storageBox').innerHTML=`<div class="meter"><i style="width:${pct.toFixed(1)}%;${pct>80?'background:#dc3a34':''}"></i></div>
+    <div>Poora database: <b>${bytes(db)}</b> / 500 MB (Free plan) · ${pct.toFixed(1)}%</div>
+    <div class="stor">
+      <div><small>Detail entries</small><b>${Number(d.entries_rows).toLocaleString('en-IN')}</b> · ${bytes(d.entries_bytes)}</div>
+      <div><small>ID-wise totals (hamesha)</small><b>${Number(d.totals_rows).toLocaleString('en-IN')}</b> · ${bytes(d.totals_bytes)}</div>
+      <div><small>Licenses</small><b>${Number(d.licenses_rows).toLocaleString('en-IN')}</b> · ${bytes(d.licenses_bytes)}</div>
+      <div><small>Alert events</small><b>${Number(d.events_rows).toLocaleString('en-IN')}</b> · ${bytes(d.events_bytes)}</div>
+    </div>
+    <div>Sabse purani entry: <b>${d.oldest_entry?fmt(d.oldest_entry):'—'}</b> · Aakhri safai: ${d.last_purge_at?fmt(d.last_purge_at):'abhi nahi'}</div>
+    <div>Lagbhag <b>${per} bytes</b> per entry → 1 lakh entries ≈ <b>${bytes(per*100000)}</b></div>`;
+}
+$('storRefresh').onclick=loadStorage;
+$('purgeBtn').onclick=async()=>{
+  const m=Number(state.settings.retention_months||0);
+  if(!m){msg('Auto-delete band hai (0). Pehle mahine set karke Save karein.');return}
+  if(!confirm(`${m} mahine se purani detail entries abhi delete hongi (ginti bani rahegi). Aage badhein?`))return;
+  const {data,error}=await client.rpc('upload_purge_now');
+  if(error){msg(error.message);return}
+  msg(`${data.entries} purani entries saaf hui`);loadStorage();
+};
+
 function totals(){
   const s=state.summary,amt=r=>Number(r.amount??prod(r.product).amount??0)||0;
   return {received:s.filter(r=>r.license_status==='active').reduce((a,r)=>a+amt(r),0),
@@ -407,8 +519,9 @@ async function exportExcel(){
       const rows=filtered(state.alerts.filter(a=>$('showAcked').checked||!a.acked));
       XLSX.utils.book_append_sheet(wb,sheet(alertRows(rows)),'Alerts');name=`KRP_Suspicious_${stamp}.xlsx`;
     }else if(state.tab==='entries'){
+      XLSX.utils.book_append_sheet(wb,sheet(totalsRows(idGroups(filtered(state.totals||[],true)))),'ID-wise Totals');
       const rows=filtered(await fetchAllEntries(),true);
-      XLSX.utils.book_append_sheet(wb,sheet(entryRows(rows)),'Entries');name=`KRP_Entries_${stamp}.xlsx`;
+      XLSX.utils.book_append_sheet(wb,sheet(entryRows(rows)),'Detail Entries');name=`KRP_Entries_${stamp}.xlsx`;
     }else{
       const base=state.tab==='pending'?state.summary.filter(r=>r.license_status==='pending'):state.summary;
       const rows=filtered(base);
@@ -461,7 +574,7 @@ window.openDelete=(m,p,y)=>{
 $('delForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!delKey)return;
   const all=$('delEntries').checked;
-  if(all&&!confirm(`${delKey.m} ki saari entries bhi hamesha ke liye delete hongi. Pakka?`))return;
+  if(all&&!confirm(`${delKey.m} ki detail entries hamesha ke liye delete hongi (ginti bani rahegi). Pakka?`))return;
   $('delBtn').disabled=true;
   const {data,error}=await client.rpc('upload_delete_license',{p_mobile:delKey.m,p_product:delKey.p,p_year:delKey.y,p_delete_entries:all});
   $('delBtn').disabled=false;
@@ -546,6 +659,7 @@ $('copyLink').onclick=async()=>{if(!lastLink)return;try{await navigator.clipboar
 function fillSettings(){
   const s=state.settings;$('upiId').value=s.upi_id||'';$('payeeName').value=s.payee_name||'';$('whatsappNo').value=s.whatsapp_no||'';$('freeLimit').value=s.free_limit??18;
   $('bizName').value=s.biz_name||'';$('bizAddress').value=s.biz_address||'';$('bizPhones').value=s.biz_phones||'';
+  $('retention').value=s.retention_months??6;
   $('invPrefix').value=s.invoice_prefix||'INV';$('invNext').value=s.invoice_next??1001;$('terms').value=s.terms||'';
   $('productRows').innerHTML=state.products.map(p=>`<div class="prod-row" data-code="${esc(p.code)}">
     <div class="field"><label>${esc(p.code)} · Purposes: ${esc((p.purposes||[]).join(', '))}</label><input data-k="label" value="${esc(p.label)}" required></div>
@@ -561,7 +675,7 @@ $('settingsForm').addEventListener('submit',async e=>{
   const {error:se}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),
     biz_name:$('bizName').value.trim(),biz_address:$('bizAddress').value.trim(),biz_phones:$('bizPhones').value.trim(),
     invoice_prefix:($('invPrefix').value.trim()||'INV').toUpperCase(),invoice_next:Math.max(1,Number($('invNext').value)||1001),
-    terms:$('terms').value.trim(),updated_at:now}).eq('id',1);
+    terms:$('terms').value.trim(),retention_months:Math.min(120,Math.max(0,Number($('retention').value)||0)),updated_at:now}).eq('id',1);
   if(se){msg(se.message);return}
   for(const row of document.querySelectorAll('#productRows .prod-row')){
     const get=k=>row.querySelector(`[data-k="${k}"]`);
