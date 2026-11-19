@@ -76,14 +76,51 @@
     html.krp-dark-theme .muted,html.krp-dark-theme .stat small{color:#91a5b2}html.krp-dark-theme .purpose{color:#a9c7ff}
     html.krp-dark-theme .filters input,html.krp-dark-theme .filters select,html.krp-dark-theme .field input,html.krp-dark-theme .field select,html.krp-dark-theme .field textarea{background:#091925;color:#d8e2e8;border-color:#294652;color-scheme:dark}
     html.krp-dark-theme .utrtag{background:#4a3a10;color:#ffd98a}html.krp-dark-theme .alert{border-color:#294652;background:#10232e}html.krp-dark-theme .alert p{color:#91a5b2}html.krp-dark-theme .btn.del{background:#10232e;color:#ff9b94;border-color:#6b2a27}html.krp-dark-theme .idrow{border-color:#294652;background:#10232e}html.krp-dark-theme .chip,html.krp-dark-theme .stor div{background:#162d39;color:#cfdde4}html.krp-dark-theme .tab{background:#162d39;color:#b9c9d2;border-color:#294652}html.krp-dark-theme .tab.active{background:#137a51;color:#fff}
-  </style>
+      /* ===== DARK THEME (is page ke liye, theme.css ke overrides ke upar) ===== */
+    html.krp-dark-theme #ulApp.wrap{width:min(1180px,calc(100% - 20px))!important;margin:14px auto!important}
+    html.krp-dark-theme #ulApp .top{background:linear-gradient(145deg,#122235,#0d1a29)!important}
+    html.krp-dark-theme #ulApp .top-actions .btn.light{background:#1c2f45!important;color:#e2ecff!important;border:1px solid #33506e!important}
+    html.krp-dark-theme #ulApp .top-actions .btn.green{background:#13915a!important;color:#fff!important}
+    html.krp-dark-theme #ulApp .tab{background:#14283a!important;color:#b9cbe0!important;border:1px solid #2c4560!important}
+    html.krp-dark-theme #ulApp .tab.active{background:#13915a!important;color:#fff!important;border-color:#13915a!important}
+    html.krp-dark-theme #ulApp .tab .badge{background:#ef4444!important;color:#fff!important}
+    html.krp-dark-theme .btn.soft{background:#1d3a50!important;color:#d6ecff!important;border:1px solid #35607a!important}
+    html.krp-dark-theme .btn.soft:hover{background:#25506b!important}
+    html.krp-dark-theme .btn.inv{background:#2f55d4!important;color:#fff!important}
+    html.krp-dark-theme .btn.green{background:#13915a!important;color:#fff!important}
+    html.krp-dark-theme .btn.red{background:#dc3a34!important;color:#fff!important}
+    html.krp-dark-theme .btn.del{background:transparent!important;color:#ff9b94!important;border:1px solid #7a2f2b!important}
+    html.krp-dark-theme .btn:disabled{opacity:.55}
+    html.krp-dark-theme #ulApp .stat strong{color:#f1f5f9}
+    html.krp-dark-theme #ulApp .stat.money strong{color:#34d399}html.krp-dark-theme #ulApp .stat.due strong{color:#fbbf24}
+    html.krp-dark-theme #ulApp .card,html.krp-dark-theme #ulApp .idrow,html.krp-dark-theme #ulApp .alert{background:#0f2231!important;border:1px solid #284257!important;box-shadow:none!important;border-radius:10px!important}
+    html.krp-dark-theme #ulApp .idrow:hover{border-color:#13915a!important}
+    html.krp-dark-theme #ulApp .card strong,html.krp-dark-theme #ulApp .idrow strong{color:#f1f5f9}
+    html.krp-dark-theme .ok,html.krp-dark-theme .sbig .ok,html.krp-dark-theme .chip b.ok{color:#34d399!important}
+    html.krp-dark-theme .bad,html.krp-dark-theme .sbig .bad,html.krp-dark-theme .chip b.bad{color:#f87171!important}
+    html.krp-dark-theme .sbig small{color:#9fb3c4}
+    html.krp-dark-theme .pill.free{background:#22324f;color:#a9c3ff}html.krp-dark-theme .pill.pending{background:#4a3a10;color:#fcd34d}
+    html.krp-dark-theme .pill.active{background:#0d3b28;color:#6ee7b7}html.krp-dark-theme .pill.inactive{background:#334155;color:#e2e8f0}
+    html.krp-dark-theme .sev.high{background:#4c1714;color:#fca5a5}html.krp-dark-theme .sev.medium{background:#4a3a10;color:#fcd34d}html.krp-dark-theme .sev.low{background:#26394a;color:#cbd5e1}
+    html.krp-dark-theme .prod-row{border-color:#294652}
+    html.krp-dark-theme .meter{background:#26394a}
+    html.krp-dark-theme .empty{color:#91a5b2}
+    html.krp-dark-theme .ackrow{color:#b9cbe0}
+    html.krp-dark-theme .delbox .warn{background:#3d1513;color:#fecaca}
+    html.krp-dark-theme .box h2,html.krp-dark-theme .box2 h3,html.krp-dark-theme .detailbox h3{color:#f1f5f9}
+    html.krp-dark-theme .field label{color:#c8d6e2}
+    html.krp-dark-theme .alertbox li,html.krp-dark-theme .alert h4{color:#e5edf5}
+    html.krp-dark-theme details summary{color:#9fb3c4}
+    html.krp-dark-theme .qr .amt{color:#f1f5f9}
+    html.krp-dark-theme #delInfo{color:#e5edf5}
+</style>
 </head>
 <body>
-<main class="wrap">
+<main class="wrap" id="ulApp">
   <header class="top">
     <div><h1>Admin · Upload Licenses</h1><p id="adminIdentity">Admin verification...</p></div>
     <div class="top-actions">
-      <button class="btn light" type="button" onclick="toggleKrpTheme()" aria-label="Toggle theme">◐</button>
+      <button class="btn light" type="button" onclick="toggleKrpTheme()" aria-label="Toggle theme" title="Light / Dark" style="min-width:38px;display:inline-flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
       <button class="btn green" type="button" id="newLicenseBtn">+ Activate ID</button>
       <button class="btn light" type="button" id="refreshBtn">↻</button>
       <button class="btn light" type="button" onclick="location.href='admin.html'">Access Control</button>
