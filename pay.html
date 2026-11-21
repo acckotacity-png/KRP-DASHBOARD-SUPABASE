@@ -44,20 +44,20 @@ import {SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY} from './supabase-config.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const q=new URLSearchParams(location.search);
-const mobile=(q.get('m')||'').replace(/\D/g,'').slice(-10),purpose=(q.get('p')||'').toUpperCase().replace(/[^A-Z0-9_]/g,''),year=q.get('y')||'';
+const rawId=(q.get('m')||'').trim(),mobile=/^[+0-9 ()-]+$/.test(rawId)?rawId.replace(/\D/g,'').slice(-10):rawId.toLowerCase(),purpose=(q.get('p')||'').toUpperCase().replace(/[^A-Z0-9_]/g,''),year=q.get('y')||'';
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 
 function fail(t){$('sub').textContent='';$('body').innerHTML=`<div class="err">${esc(t)}</div>`}
 
 async function load(){
-  if(!/^[6-9]\d{9}$/.test(mobile)||!purpose||!/^\d{4}-\d{4}$/.test(year)){
+  if(!(/^[6-9]\d{9}$/.test(mobile)||/^[a-z0-9_.@-]{3,60}$/.test(mobile))||!purpose||!/^\d{4}-\d{4}$/.test(year)){
     fail('Link adhoora hai. Excel se dobara "Payment" kholein.');return;
   }
   const {data:d,error}=await client.rpc('upload_check_license',{p_mobile:mobile,p_purpose:purpose,p_year:year});
   if(error){fail('Server se jaankari nahi mili. Thodi der baad try karein.');return}
 
   const title=d.title||`${d.product_label}: ${d.fin_year}`;
-  const info=`<div class="info"><div><small>Mobile</small><b>${esc(d.mobile)}</b></div><div><small>Product · Year</small><b>${esc(title)}</b></div></div>`;
+  const info=`<div class="info"><div><small>Login ID</small><b>${esc(d.mobile)}</b></div><div><small>Product · Year</small><b>${esc(title)}</b></div></div>`;
 
   if(d.status==='active'){
     $('sub').textContent='Aapki ID active hai';
@@ -106,7 +106,7 @@ async function load(){
 function setUtrMsg(t,ok){const m=$('utrMsg');m.textContent=t;m.className=ok?'okmsg':'errmsg'}
 function waText(d,utr){
   const title=d.title||`${d.product_label}: ${d.fin_year}`;
-  return `Payment kar diya hai.\nLogin Mobile: ${d.mobile}\nProduct: ${title}\nAmount: ₹${d.amount}\nUTR: ${utr}\n(Screenshot attach hai)`;
+  return `Payment kar diya hai.\nLogin ID: ${d.mobile}\nProduct: ${title}\nAmount: ₹${d.amount}\nUTR: ${utr}\n(Screenshot attach hai)`;
 }
 function wa(d,text){
   const n=String(d.whatsapp||'').replace(/\D/g,'');

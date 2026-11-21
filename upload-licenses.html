@@ -45,6 +45,9 @@
     .qr .amt{font-size:24px;font-weight:800;margin:8px 0 2px}
     .message{position:fixed;right:15px;bottom:15px;padding:10px 13px;border-radius:8px;background:#14213d;color:#fff;font-size:12px;z-index:20}
     .hidden{display:none!important}
+    .upd{font-size:10px;color:#cbd6ff;white-space:nowrap}
+    #refreshBtn.spin{opacity:.7;pointer-events:none}
+
     #invOverlay{position:fixed;inset:0;z-index:50;background:#0d1535e6;display:none;flex-direction:column}
     #invOverlay.open{display:flex}
     #invOverlay .invbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));background:#15245b;color:#fff}
@@ -174,7 +177,7 @@
     <div class="top-actions">
       <button class="btn light" type="button" onclick="toggleKrpTheme()" aria-label="Toggle theme" title="Light / Dark" style="min-width:38px;display:inline-flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
       <button class="btn green" type="button" id="newLicenseBtn">+ Activate ID</button>
-      <button class="btn light" type="button" id="refreshBtn">↻</button>
+      <button class="btn light" type="button" id="refreshBtn" title="Naya data laayein">↻ Refresh</button><span class="upd" id="lastUpd"></span>
       <button class="btn light" type="button" onclick="location.href='admin.html'">Access Control</button>
       <button class="btn light" type="button" onclick="location.href='index.html'">← Dashboard</button>
     </div>
@@ -191,7 +194,7 @@
   <section class="stats">
     <div class="stat"><small>Pending IDs</small><strong id="sPending">0</strong></div>
     <div class="stat"><small>Active IDs</small><strong id="sActive">0</strong></div>
-    <div class="stat"><small>Users (mobile)</small><strong id="sUsers">0</strong></div>
+    <div class="stat"><small>Users (Login ID)</small><strong id="sUsers">0</strong></div>
     <div class="stat"><small>Successful Entries</small><strong id="sEntries">0</strong></div>
     <div class="stat money"><small>Payment Received</small><strong id="sReceived">₹0</strong></div>
     <div class="stat due"><small>Pending Amount</small><strong id="sDue">₹0</strong></div>
@@ -202,7 +205,7 @@
     <div class="toolbar">
       <strong id="listTitle">Payment Pending</strong>
       <div class="filters">
-        <input id="search" placeholder="Mobile No. खोजें" inputmode="numeric">
+        <input id="search" placeholder="Mobile / Login ID खोजें">
         <select id="fProduct"><option value="">All Products</option></select>
         <select id="fYear"><option value="">All Years</option></select>
         <label class="ackrow hidden" id="ackToggle"><input type="checkbox" id="showAcked"> Purane (dekhe hue) bhi</label>
@@ -262,7 +265,7 @@
 <div id="licModal" class="modal"><form id="licForm" class="box">
   <h2 id="licTitle">Activate ID</h2>
   <div class="grid">
-    <div class="field"><label>Login Mobile No.</label><input id="mMobile" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" required></div>
+    <div class="field"><label>Login ID (mobile ya user id)</label><input id="mMobile" maxlength="60" pattern="[6-9][0-9]{9}|[A-Za-z0-9_.@\-]{3,60}" autocapitalize="none" required></div>
     <div class="field"><label>Financial Year</label><input id="mYear" list="yearList" placeholder="2024-2025" pattern="[0-9]{4}-[0-9]{4}" required></div>
     <div class="field"><label>Product</label><select id="mProduct"></select></div>
     <div class="field"><label>Status</label><select id="mStatus"><option value="active">Active (paid)</option><option value="pending">Pending (payment baaki)</option><option value="free">Free (payment abhi nahi)</option><option value="inactive">Inactive (band)</option></select></div>
@@ -386,6 +389,13 @@ async function boot(){
 }
 
 async function load(silent=false){
+  $('refreshBtn').classList.add('spin');$('refreshBtn').textContent='↻ Refreshing...';
+  try{await loadInner(silent)}finally{
+    $('refreshBtn').classList.remove('spin');$('refreshBtn').textContent='↻ Refresh';
+    $('lastUpd').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+  }
+}
+async function loadInner(silent=false){
   const [sum,ent,set,pro,alr]=await Promise.all([
     client.from('upload_summary').select('*').order('last_upload',{ascending:false,nullsFirst:false}),
     client.from('upload_entry_totals').select('*').order('last_at',{ascending:false}),
@@ -410,7 +420,7 @@ async function load(silent=false){
 }
 
 function filtered(rows,isEntry=false){
-  const q=$('search').value.replace(/\D/g,''),p=$('fProduct').value,y=$('fYear').value;
+  const q=$('search').value.trim().toLowerCase(),p=$('fProduct').value,y=$('fYear').value;
   return rows.filter(r=>(!q||String(r.mobile).includes(q))&&(!p||(isEntry?productOfPurpose(r.purpose).code===p:r.product===p))&&(!y||r.fin_year===y));
 }
 
@@ -858,7 +868,7 @@ $('addProductBtn').onclick=async()=>{
 };
 
 $('newLicenseBtn').onclick=()=>openLicense();
-$('refreshBtn').onclick=()=>load();
+$('refreshBtn').onclick=async()=>{await load(true);msg('Data refresh ho gaya')};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 ['search','fProduct','fYear'].forEach(id=>$(id).addEventListener('input',render));
