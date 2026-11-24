@@ -70,7 +70,11 @@
     #listPanel.locked{display:flex;flex-direction:column}
     #listPanel.locked .toolbar{flex:0 0 auto}
     #listPanel.locked #list{flex:1 1 auto;overflow:auto;min-height:0;overscroll-behavior:contain}
-    #settingsPanel.locked{overflow:auto;overscroll-behavior:contain}
+    .page.locked{overflow:auto;overscroll-behavior:contain}
+    .pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 14px 0}.pagehead h2{margin:0 0 3px;font-size:18px}.pagehead p{margin:0}
+    .tab.cfg{border-style:dashed}.tab.cfg.active{border-style:solid}
+    .addbox{align-self:start;background:#f6fbf8;border-color:#cfe8da}.page input::placeholder,.page textarea::placeholder{color:#9aa7b5;font-weight:400;opacity:1}
+    html.krp-dark-theme .addbox{background:#10291d;border-color:#245c3d}
     .board .tabs{margin:10px 0}
     .nw{white-space:nowrap}
     .rpill{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:800;white-space:nowrap}
@@ -192,7 +196,9 @@
     <button class="btn tab" data-tab="all">All Users</button>
     <button class="btn tab" data-tab="entries">Entries (ID-wise)</button>
     <button class="btn tab" data-tab="alerts">⚠ Alerts<span class="badge hidden" id="alertBadge">0</span></button>
-    <button class="btn tab" data-tab="settings">Rates · UPI · QR</button>
+    <button class="btn tab cfg" data-tab="products">🏷 Products</button>
+    <button class="btn tab cfg" data-tab="payment">💳 Payment Settings</button>
+    <button class="btn tab cfg" data-tab="storage">🗄 Storage</button>
   </div>
 
   <section class="stats">
@@ -219,15 +225,39 @@
     <div id="list" class="list"><div class="empty">Loading...</div></div>
   </section>
 
-  <section class="panel hidden" id="settingsPanel">
+  <!-- ===== PAGE: PRODUCTS & RATES ===== -->
+  <section class="panel page hidden" id="productsPanel">
+    <div class="pagehead"><div><h2>🏷 Products &amp; Rates</h2><p class="muted">Ek product ke saare purposes ka ek hi payment aur ek hi license hota hai. Rate ₹ per Login ID per year.</p></div></div>
+    <div class="settings">
+      <form class="box2" id="productsForm">
+        <h3>Products <span class="muted" id="prodCount" style="font-weight:600"></span></h3>
+        <div id="productRows"></div>
+        <div class="modal-actions"><button class="btn green" type="submit">Products save karein</button></div>
+      </form>
+      <div class="box2 addbox">
+        <h3>+ Naya product jodein</h3>
+        <p class="muted" style="margin:-4px 0 10px">Jaise Loan Application, PMFBY Rabi, PMFBY Kharif.</p>
+        <div class="field"><label>Code (A-Z, 0-9, _)</label><input id="npCode" placeholder="PMFBY_RABI" autocapitalize="characters"></div>
+        <div class="field"><label>Naam / Label (user ko dikhega)</label><input id="npLabel" placeholder="PMFBY RABI-2026"></div>
+        <div class="field"><label>Purposes (comma se)</label><input id="npPurposes" placeholder="PMFBY"></div>
+        <div class="field"><label>Rate ₹</label><input id="npAmount" type="number" min="0" step="1" value="0"></div>
+        <p class="muted">Purpose wahi likhein jo Excel ke Login popup mein chuna jata hai. Ek purpose sirf ek product mein ho sakta hai.</p>
+        <div class="modal-actions" style="justify-content:flex-start"><button class="btn green" type="button" id="addProductBtn">Product jodein</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: PAYMENT SETTINGS ===== -->
+  <section class="panel page hidden" id="paymentPanel">
+    <div class="pagehead"><div><h2>💳 Payment Settings</h2><p class="muted">UPI, QR, free entries aur invoice ki details.</p></div></div>
     <div class="settings">
       <form class="box2" id="settingsForm">
-        <h3>Payment Settings</h3>
+        <h3>UPI &amp; Free entries</h3>
         <div class="field"><label>UPI ID (जिस पर payment आएगा)</label><input id="upiId" placeholder="name@bank" required></div>
         <div class="field"><label>QR पर दिखने वाला नाम</label><input id="payeeName" placeholder="KRP Services" required></div>
         <div class="field"><label>WhatsApp No. (user screenshot + mobile भेजेगा)</label><input id="whatsappNo" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}"></div>
-        <div class="field"><label>Free entries (हर mobile + product + year)</label><input id="freeLimit" type="number" min="0" max="10000" required></div>
-        <h3 style="margin-top:14px">Invoice details</h3>
+        <div class="field"><label>Free entries (हर Login ID + product + year)</label><input id="freeLimit" type="number" min="0" max="10000" required></div>
+        <h3 style="margin-top:16px">Invoice details</h3>
         <div class="field"><label>Business Name (invoice ke upar)</label><input id="bizName" maxlength="80" placeholder="Web Automation"></div>
         <div class="field"><label>Address</label><textarea id="bizAddress" rows="2" maxlength="300" placeholder="Kota, Rajasthan"></textarea></div>
         <div class="field"><label>Phone(s)</label><input id="bizPhones" maxlength="80" placeholder="+91 95218 67142 / +91 90397 79483"></div>
@@ -236,32 +266,32 @@
           <div class="field"><label>Agla Invoice No.</label><input id="invNext" type="number" min="1" step="1"></div>
         </div>
         <div class="field"><label>Terms &amp; Conditions (har line ek point)</label><textarea id="terms" rows="4" maxlength="2000"></textarea></div>
-        <h3 style="margin-top:14px">Products &amp; Rates (₹ per mobile per year)</h3>
-        <p class="muted" style="margin:-4px 0 8px">Ek product ke saare purposes ka ek hi payment aur ek hi license hota hai.</p>
-        <div id="productRows"></div>
-        <details style="margin-top:6px"><summary class="muted" style="cursor:pointer;font-weight:700">+ Naya product jodein (jaise Loan Application, PMFBY)</summary>
-          <div class="grid" style="margin-top:8px">
-            <div class="field"><label>Code (A-Z, _)</label><input id="npCode" placeholder="PMFBY"></div>
-            <div class="field"><label>Naam / Label</label><input id="npLabel" placeholder="PMFBY"></div>
-            <div class="field"><label>Purposes (comma se)</label><input id="npPurposes" placeholder="PMFBY"></div>
-            <div class="field"><label>Rate ₹</label><input id="npAmount" type="number" min="0" step="1" value="0"></div>
-          </div>
-          <div class="modal-actions" style="margin-top:0"><button class="btn soft" type="button" id="addProductBtn">Product jodein</button></div>
-        </details>
-        <div class="modal-actions"><button class="btn green" type="submit">Save Settings</button></div>
+        <div class="modal-actions"><button class="btn green" type="submit">Payment Settings save karein</button></div>
       </form>
       <div class="box2">
         <h3>QR Preview</h3>
         <div class="field"><label>Product</label><select id="previewProduct"></select></div>
         <div class="qr" id="previewQr"><div class="empty">UPI ID aur rate save karein</div></div>
-        <p class="muted">User ke QR mein note ke saath product, year aur mobile bhi jata hai, taaki aap payment pehchaan sakein.</p>
-        <h3 style="margin-top:18px">Storage &amp; Auto-delete</h3>
-        <div id="storageBox" class="muted">Loading...</div>
-        <div class="field" style="margin-top:8px"><label>Detail entries kitne mahine baad apne aap hatein (0 = kabhi nahi)</label>
-          <input id="retention" type="number" min="0" max="120" step="1" form="settingsForm"></div>
-        <p class="muted" style="margin-top:-2px">Sirf andar ki detail rows (application no., remark) hatti hain. Har ID ka success/failed total aur free entries ki ginti <b>hamesha</b> rehti hai.</p>
-        <div class="modal-actions" style="justify-content:flex-start"><button class="btn soft" type="button" id="purgeBtn">Purani entries abhi saaf karein</button><button class="btn soft" type="button" id="storRefresh">↻</button></div>
+        <p class="muted">User ke QR mein note ke saath product, year aur Login ID bhi jata hai, taaki aap payment pehchaan sakein.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: STORAGE ===== -->
+  <section class="panel page hidden" id="storagePanel">
+    <div class="pagehead"><div><h2>🗄 Storage &amp; Auto-delete</h2><p class="muted">Supabase ka kitna space use ho raha hai aur purani entries kab hatein.</p></div><button class="btn soft" type="button" id="storRefresh">↻ Refresh</button></div>
+    <div class="settings">
+      <div class="box2">
+        <h3>Database usage</h3>
+        <div id="storageBox" class="muted">Loading...</div>
+      </div>
+      <form class="box2" id="storageForm">
+        <h3>Auto-delete</h3>
+        <div class="field"><label>Detail entries kitne mahine baad apne aap hatein (0 = kabhi nahi)</label>
+          <input id="retention" type="number" min="0" max="120" step="1" required></div>
+        <p class="muted">Sirf andar ki detail rows (application no., remark) hatti hain. Har ID ka success/failed total aur free entries ki ginti <b>hamesha</b> rehti hai.</p>
+        <div class="modal-actions" style="justify-content:flex-start"><button class="btn green" type="submit">Save</button><button class="btn soft" type="button" id="purgeBtn">Purani entries abhi saaf karein</button></div>
+      </form>
     </div>
   </section>
 </main>
@@ -390,7 +420,7 @@ async function boot(){
   const years=[];const y0=new Date().getFullYear()+1;for(let y=y0;y>=y0-6;y--)years.push(`${y-1}-${y}`);
   $('yearList').innerHTML=years.map(y=>`<option value="${y}">`).join('');
   await load();
-  setInterval(()=>{if(document.visibilityState==='visible'&&state.tab!=='settings')load(true)},30000);
+  setInterval(()=>{if(document.visibilityState==='visible'&&!PAGES[state.tab])load(true)},30000);
 }
 
 async function load(silent=false){
@@ -431,6 +461,7 @@ function filtered(rows,isEntry=false){
   return rows.filter(r=>(!q||String(r.mobile).includes(q))&&(!p||(isEntry?productOfPurpose(r.purpose).code===p:r.product===p))&&(!y||r.fin_year===y));
 }
 
+const PAGES={products:'productsPanel',payment:'paymentPanel',storage:'storagePanel'};
 function render(){
   fitSoon();
   const s=state.summary;
@@ -439,10 +470,11 @@ function render(){
   $('sUsers').textContent=new Set(s.map(r=>r.mobile)).size;
   $('sEntries').textContent=s.reduce((a,r)=>a+Number(r.success_entries||0),0).toLocaleString('en-IN');
   $('sReceived').textContent=money(totals().received);$('sDue').textContent=money(totals().due);
-  $('exportBtn').classList.toggle('hidden',state.tab==='settings');
-  const settings=state.tab==='settings';
-  $('listPanel').classList.toggle('hidden',settings);$('settingsPanel').classList.toggle('hidden',!settings);
-  if(settings){renderPreview();loadStorage();return}
+  const page=PAGES[state.tab];
+  $('exportBtn').classList.toggle('hidden',!!page);
+  $('listPanel').classList.toggle('hidden',!!page);
+  Object.entries(PAGES).forEach(([t,id])=>$(id).classList.toggle('hidden',state.tab!==t));
+  if(page){if(state.tab==='payment')renderPreview();if(state.tab==='storage')loadStorage();return}
   $('ackToggle').classList.toggle('hidden',state.tab!=='alerts');
   if(state.tab==='alerts'){
     $('listTitle').textContent='Suspicious Activity (last 30 days)';
@@ -856,6 +888,7 @@ function fillSettings(){
   $('bizName').value=s.biz_name||'';$('bizAddress').value=s.biz_address||'';$('bizPhones').value=s.biz_phones||'';
   $('retention').value=s.retention_months??6;
   $('invPrefix').value=s.invoice_prefix||'INV';$('invNext').value=s.invoice_next??1001;$('terms').value=s.terms||'';
+  $('prodCount').textContent=`(${state.products.length})`;
   $('productRows').innerHTML=state.products.map(p=>`<div class="prod-row" data-code="${esc(p.code)}">
     <div class="field"><label>${esc(p.code)} · Purposes: ${esc((p.purposes||[]).join(', '))}</label><input data-k="label" value="${esc(p.label)}" required></div>
     <div class="field"><label>Rate ₹</label><input data-k="amount" type="number" min="0" step="1" value="${Number(p.amount||0)}" required></div>
@@ -866,18 +899,27 @@ async function renderPreview(){const c=$('previewProduct').value;$('previewQr').
 $('previewProduct').addEventListener('change',renderPreview);
 $('settingsForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!e.currentTarget.reportValidity())return;
-  const now=new Date().toISOString();
-  const {error:se}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),
+  const {error}=await client.from('upload_settings').update({upi_id:$('upiId').value.trim(),payee_name:$('payeeName').value.trim(),whatsapp_no:$('whatsappNo').value.trim(),free_limit:Number($('freeLimit').value),
     biz_name:$('bizName').value.trim(),biz_address:$('bizAddress').value.trim(),biz_phones:$('bizPhones').value.trim(),
     invoice_prefix:($('invPrefix').value.trim()||'INV').toUpperCase(),invoice_next:Math.max(1,Number($('invNext').value)||1001),
-    terms:$('terms').value.trim(),retention_months:Math.min(120,Math.max(0,Number($('retention').value)||0)),updated_at:now}).eq('id',1);
-  if(se){msg(se.message);return}
+    terms:$('terms').value.trim(),updated_at:new Date().toISOString()}).eq('id',1);
+  if(error){msg(error.message);return}
+  msg('Payment Settings save ho gayi');await load();
+});
+$('productsForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!e.currentTarget.reportValidity())return;
   for(const row of document.querySelectorAll('#productRows .prod-row')){
     const get=k=>row.querySelector(`[data-k="${k}"]`);
     const {error}=await client.from('upload_products').update({label:get('label').value.trim(),amount:Number(get('amount').value)||0,active:get('active').checked}).eq('code',row.dataset.code);
     if(error){msg(error.message);return}
   }
-  msg('Settings save ho gayi');await load();
+  msg('Products save ho gaye');await load();
+});
+$('storageForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!e.currentTarget.reportValidity())return;
+  const {error}=await client.from('upload_settings').update({retention_months:Math.min(120,Math.max(0,Number($('retention').value)||0)),updated_at:new Date().toISOString()}).eq('id',1);
+  if(error){msg(error.message);return}
+  msg('Auto-delete setting save ho gayi');await load(true);loadStorage();
 });
 $('addProductBtn').onclick=async()=>{
   const code=$('npCode').value.trim().toUpperCase(),label=$('npLabel').value.trim()||code;
@@ -897,10 +939,10 @@ document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if
 function selectTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));state.tab=t;render()}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
 $('showAcked').addEventListener('change',render);
-{const t=new URLSearchParams(location.search).get('tab');if(t&&document.querySelector(`.tab[data-tab="${t}"]`)){state.tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t))}}
+{let t=new URLSearchParams(location.search).get('tab');if(t==='settings')t='payment';if(t&&document.querySelector(`.tab[data-tab="${t}"]`)){state.tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t))}}
 // Upar ka board (header + tabs + stats) lock; sirf neeche ka panel scroll hoga
 function fitPanes(){
-  const panes=[$('listPanel'),$('settingsPanel')];
+  const panes=[$('listPanel'),...Object.values(PAGES).map($)];
   window.scrollTo(0,0);
   for(const p of panes){
     if(p.classList.contains('hidden'))continue;
