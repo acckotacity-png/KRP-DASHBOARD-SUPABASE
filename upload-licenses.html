@@ -78,7 +78,12 @@
     .yrchip.def{border-color:#168447;background:#e7f6ee;color:#0b6b3a}
     .yrchip button{border:0;background:transparent;cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:6px;color:#7a8699}
     .yrchip button.x:hover{background:#fde4e2;color:#c0322b}.yrchip.def .star{color:#e0a100}
-    .yradd{display:flex;gap:8px;flex-wrap:wrap}.yradd input{width:140px;padding:9px 10px;border:1px solid #cfd9e6;border-radius:9px;font:inherit;font-weight:700}
+    .yradd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.yradd select{padding:9px 10px;border:1px solid #cfd9e6;border-radius:9px;font:inherit;font-weight:700;background:#fff}
+    .yrgroup{margin:0 0 12px}.yrgroup h4{margin:0 0 7px;font-size:13px;color:#475569;display:flex;gap:8px;align-items:center}
+    .yrchip.off{opacity:.55;background:#f1f3f6;text-decoration:none}.yrchip.off .yrtxt{text-decoration:line-through}
+    .yrchip .sw{font-size:11px;font-weight:900;padding:3px 7px;border-radius:6px;background:#dff5e8;color:#0b6b3a}.yrchip.off .sw{background:#e5e7eb;color:#6b7280}
+    .prodoff{font-size:11px;font-weight:800;color:#b42318;background:#fde4e2;border-radius:6px;padding:2px 6px}
+    html.krp-dark-theme .yradd select{background:#0b1a22;border-color:#294652;color:#e6f0eb}html.krp-dark-theme .yrgroup h4{color:#a9bdb4}html.krp-dark-theme .yrchip.off{background:#1b2730}.yradd input{width:140px;padding:9px 10px;border:1px solid #cfd9e6;border-radius:9px;font:inherit;font-weight:700}
     html.krp-dark-theme .yrchip{background:#162d39;border-color:#294652;color:#dce8e2}html.krp-dark-theme .yrchip.def{background:#174a2f;border-color:#2c8a57;color:#b6f3cf}
     html.krp-dark-theme .yradd input{background:#0b1a22;border-color:#294652;color:#e6f0eb}
     .addbox{align-self:start;background:#f6fbf8;border-color:#cfe8da}.page input::placeholder,.page textarea::placeholder{color:#9aa7b5;font-weight:400;opacity:1}
@@ -254,11 +259,10 @@
       </div>
     </div>
       <div class="settings" style="padding-top:0"><div class="box2 yrbox" style="grid-column:1/-1">
-      <h3>📅 Financial Years (sabhi users ke Excel Login popup mein)</h3>
-      <p class="muted" style="margin:-4px 0 10px">Jo year yahan hai wahi har user ke popup ki list mein aayega. Year hatane par jis user ki sheet mein wo year hai, uska popup khulte hi <b>Default</b> year lag jayega. ⭐ par click = Default.</p>
-      <div id="yrChips" class="yrchips"></div>
-      <div class="yradd"><input id="yrNew" placeholder="2026-2027" maxlength="9"><button class="btn soft" type="button" id="yrAddBtn">+ Year jodein</button><button class="btn green" type="button" id="yrSaveBtn">Years save karein</button></div>
-      <p class="muted" id="yrInfo" style="margin:8px 0 0"></p>
+      <h3>📅 Product + Financial Year <span class="muted" style="font-weight:600">(sabhi users ke Excel Login popup mein yahi dikhega)</span></h3>
+      <p class="muted" style="margin:-4px 0 10px"><b>ON</b> = Excel ki Year list mein aayega · <b>OFF</b> = sabhi Excel se hat jayega (jis sheet mein wo year hai wahan popup khulte hi ⭐ Default year lagega) · ✕ = hamesha ke liye hatao. Har click turant save hota hai.</p>
+      <div class="yradd"><select id="yrProd"></select><input id="yrNew" placeholder="2026-2027" maxlength="9"><button class="btn green" type="button" id="yrAddBtn">+ Year jodein</button></div>
+      <div id="yrChips"></div>
     </div></div>
   </section>
 
@@ -446,14 +450,16 @@ async function load(silent=false){
   }
 }
 async function loadInner(silent=false){
-  const [sum,ent,set,pro,alr,asg]=await Promise.all([
+  const [sum,ent,set,pro,alr,asg,pyr]=await Promise.all([
     client.from('upload_summary').select('*').order('last_upload',{ascending:false,nullsFirst:false}),
     client.from('upload_entry_totals').select('*').order('last_at',{ascending:false}),
     client.from('upload_settings').select('*').eq('id',1).maybeSingle(),
     client.from('upload_products').select('*').order('sort_order').order('code'),
     client.rpc('upload_get_alerts'),
-    client.from('upload_login_assign').select('*')
+    client.from('upload_login_assign').select('*'),
+    client.from('upload_product_years').select('*')
   ]);
+  state.pyears=(pyr&&!pyr.error&&pyr.data)||[];state.pyearsMissing=!!(pyr&&pyr.error);
   state.assign=Object.fromEntries(((asg&&!asg.error&&asg.data)||[]).map(a=>[a.login_id,a]));
   state.alerts=alr.error?[]:(alr.data||[]);
   const err=sum.error||ent.error||set.error||pro.error;
@@ -905,7 +911,7 @@ function fillSettings(){
   $('retention').value=s.retention_months??6;
   $('invPrefix').value=s.invoice_prefix||'INV';$('invNext').value=s.invoice_next??1001;$('terms').value=s.terms||'';
   $('prodCount').textContent=`(${state.products.length})`;
-  yrs={list:[...(s.excel_years||[])].sort(),def:s.default_year||''};renderYears();
+  renderYears();
   $('productRows').innerHTML=state.products.map(p=>`<div class="prod-row" data-code="${esc(p.code)}">
     <div class="field"><label>${esc(p.code)} · Purposes: ${esc((p.purposes||[]).join(', '))}</label><input data-k="label" value="${esc(p.label)}" required></div>
     <div class="field"><label>Rate ₹</label><input data-k="amount" type="number" min="0" step="1" value="${Number(p.amount||0)}" required></div>
@@ -924,24 +930,33 @@ $('settingsForm').addEventListener('submit',async e=>{
   msg('Payment Settings save ho gayi');await load();
 });
 // ---------- Financial Years (Excel) ----------
-let yrs={list:[],def:''};
 const normYear=v=>{v=String(v||'').replace(/\s/g,'');if(/^\d{4}$/.test(v))return `${v}-${+v+1}`;if(/^\d{4}-\d{2}$/.test(v))return `${v.slice(0,4)}-${v.slice(0,2)}${v.slice(5)}`;return /^\d{4}-\d{4}$/.test(v)&&+v.slice(5)===+v.slice(0,4)+1?v:''};
 function renderYears(){
-  if(yrs.list.length&&!yrs.list.includes(yrs.def))yrs.def=yrs.list[yrs.list.length-1];
-  $('yrChips').innerHTML=yrs.list.length?yrs.list.map(y=>`<span class="yrchip ${y===yrs.def?'def':''}"><button type="button" class="star" title="Default banayein" onclick="yrDef('${y}')">${y===yrs.def?'⭐':'☆'}</button>${esc(y)}<button type="button" class="x" title="Hatayein" onclick="yrDel('${y}')">✕</button></span>`).join('')
-    :'<span class="muted">Koi year nahi - Excel apne aap pichhle 3 + agla year dikhayega.</span>';
-  $('yrInfo').textContent=yrs.list.length?`Default: ${yrs.def} · Kul ${yrs.list.length} year`:'';
+  const prods=state.products||[];
+  $('yrProd').innerHTML=`<option value="*">Sabhi products</option>`+prods.map(p=>`<option value="${esc(p.code)}">${esc(p.label)}</option>`).join('');
+  if(state.pyearsMissing){$('yrChips').innerHTML='<p class="muted">Supabase mein naya supabase-upload-licenses.sql run karein.</p>';return}
+  $('yrChips').innerHTML=prods.map(p=>{
+    const ys=state.pyears.filter(y=>y.product===p.code).sort((a,b)=>a.fin_year.localeCompare(b.fin_year));
+    const def=(ys.filter(y=>y.active).sort((a,b)=>(b.is_default-a.is_default)||b.fin_year.localeCompare(a.fin_year))[0]||{}).fin_year;
+    return `<div class="yrgroup"><h4>${esc(p.label)} ${p.active?'':'<span class="prodoff">Product band - Excel mein nahi aayega</span>'}</h4><div class="yrchips">${ys.length?ys.map(y=>`<span class="yrchip ${y.fin_year===def?'def':''} ${y.active?'':'off'}">
+      <button type="button" class="star" title="Default banayein" onclick="yrDef('${esc(p.code)}','${y.fin_year}')">${y.fin_year===def?'⭐':'☆'}</button>
+      <span class="yrtxt">${esc(p.label)} - ${y.fin_year}</span>
+      <button type="button" class="sw" title="On / Off" onclick="yrToggle('${esc(p.code)}','${y.fin_year}',${!y.active})">${y.active?'ON':'OFF'}</button>
+      <button type="button" class="x" title="Hatayein" onclick="yrDel('${esc(p.code)}','${y.fin_year}')">✕</button></span>`).join('')
+      :'<span class="muted">Koi year nahi - Excel apne aap pichhle 3 + agla year dikhayega.</span>'}</div></div>`}).join('');
 }
-window.yrDef=y=>{yrs.def=y;renderYears()};
-window.yrDel=y=>{yrs.list=yrs.list.filter(x=>x!==y);renderYears()};
+async function yrRun(q,ok){const {error}=await q;if(error){msg(error.message);return}if(ok)msg(ok);await load(true);renderYears()}
+window.yrToggle=(c,y,on)=>yrRun(client.from('upload_product_years').update({active:on,updated_at:new Date().toISOString()}).eq('product',c).eq('fin_year',y),on?`${y} ON - Excel mein dikhega`:`${y} OFF - sabhi Excel se hat jayega`);
+window.yrDel=(c,y)=>{if(!confirm(`${prod(c).label||c} - ${y} hamesha ke liye hatayein?`))return;yrRun(client.from('upload_product_years').delete().eq('product',c).eq('fin_year',y),'Year hata diya')};
+window.yrDef=async(c,y)=>{
+  const a=await client.from('upload_product_years').update({is_default:false}).eq('product',c);
+  if(a.error){msg(a.error.message);return}
+  yrRun(client.from('upload_product_years').update({is_default:true,active:true}).eq('product',c).eq('fin_year',y),`${y} Default bana`)};
 $('yrAddBtn').onclick=()=>{const y=normYear($('yrNew').value);if(!y){msg('Year aise likhein: 2026-2027');return}
-  if(!yrs.list.includes(y))yrs.list=[...yrs.list,y].sort();$('yrNew').value='';renderYears()};
+  const codes=$('yrProd').value==='*'?(state.products||[]).map(p=>p.code):[$('yrProd').value];
+  $('yrNew').value='';
+  yrRun(client.from('upload_product_years').upsert(codes.map(c=>({product:c,fin_year:y,active:true})),{onConflict:'product,fin_year'}),`${y} jod diya (${codes.length} product)`)};
 $('yrNew').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('yrAddBtn').click()}});
-$('yrSaveBtn').onclick=async()=>{
-  const {error}=await client.from('upload_settings').update({excel_years:yrs.list,default_year:yrs.list.length?yrs.def:null,updated_at:new Date().toISOString()}).eq('id',1);
-  if(error){msg(/column/i.test(error.message)?'Supabase mein naya supabase-upload-licenses.sql run karein.':error.message);return}
-  msg('Years save ho gaye - sabhi users ke Excel mein agli baar popup kholte hi dikhenge');await load(true);
-};
 $('productsForm').addEventListener('submit',async e=>{
   e.preventDefault();if(!e.currentTarget.reportValidity())return;
   for(const row of document.querySelectorAll('#productRows .prod-row')){
