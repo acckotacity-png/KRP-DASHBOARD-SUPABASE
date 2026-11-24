@@ -974,7 +974,10 @@ $('storageForm').addEventListener('submit',async e=>{
 });
 $('addProductBtn').onclick=async()=>{
   const code=$('npCode').value.trim().toUpperCase(),label=$('npLabel').value.trim()||code;
-  const purposes=$('npPurposes').value.split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+  const purposes=$('npPurposes').value.split(/[,\/]/).map(x=>x.trim().toUpperCase().replace(/\s+/g,'_')).filter(Boolean);
+  if(purposes.some(x=>!/^[A-Z0-9_]{1,30}$/.test(x))){msg('Purpose mein sirf A-Z, 0-9, _ (jaise IS, PRI, ROLLOVER - comma se alag)');return}
+  const taken=purposes.find(x=>(state.products||[]).some(p=>(p.purposes||[]).includes(x)));
+  if(taken){msg(`Purpose ${taken} pehle se ek product mein hai - naya product mat banaiye, usi product mein year jodein`);return}
   if(!/^[A-Z][A-Z0-9_]{1,30}$/.test(code)||!purposes.length){msg('Code aur kam se kam ek purpose bharein');return}
   const {error}=await client.from('upload_products').insert({code,label,purposes,amount:Number($('npAmount').value)||0,sort_order:100});
   if(error){msg(error.message);return}
