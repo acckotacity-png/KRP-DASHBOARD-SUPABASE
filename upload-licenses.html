@@ -209,7 +209,7 @@
     <button class="btn tab cfg" data-tab="storage">🗄 Storage</button>
   </div>
 
-  <section class="stats">
+  <section class="stats" id="statsBar">
     <div class="stat"><small>Pending IDs</small><strong id="sPending">0</strong></div>
     <div class="stat"><small>Active IDs</small><strong id="sActive">0</strong></div>
     <div class="stat"><small>Users (Login ID)</small><strong id="sUsers">0</strong></div>
@@ -489,6 +489,7 @@ function render(){
   $('exportBtn').classList.toggle('hidden',!!page);
   $('listPanel').classList.toggle('hidden',!!page);
   Object.entries(PAGES).forEach(([t,id])=>$(id).classList.toggle('hidden',state.tab!==t));
+  $('statsBar').classList.toggle('hidden',!!page);
   if(page){if(state.tab==='payment')renderPreview();if(state.tab==='storage')loadStorage();return}
   $('ackToggle').classList.toggle('hidden',state.tab!=='alerts');
   if(state.tab==='alerts'){
